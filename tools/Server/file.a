@@ -1,0 +1,7 @@
+<article class="s-12 m-12 l-6 margin-m-bottom">
+ <img class="margin-bottom" src="xxImagexx" alt="">
+ <h3 class="text-strong"><a class="text-dark text-primary-hover" href="xxURLxx" target="_blank">xxTitlexx</a></h3>
+ <p class="margin-bottom text-dark text-size-16 text-uppercase">xxDatexx @ xxLocationxx</p>
+ <p>xxContentxx</p>
+ <a class="text-more-info text-primary-hover" href="xxURLxx" target="_blank">xxReadMexx</a>
+</article>
