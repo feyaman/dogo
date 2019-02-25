@@ -1,0 +1,57 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript">
+	window.onload = function(){
+		document.getElementById("video_link").src=document.getElementById("selectbox").value;
+	}       
+	function getOptionValue() {
+		document.getElementById("video_link").src=document.getElementById("selectbox").value;
+	}
+	var youtube_url_list = []
+</script>
+</head>
+<body>
+	<select id="selectbox" onChange="getOptionValue()" style="position: absolute; top:5; right:0;">
+	<!--{{{ 35 options here-->
+		<option value="http://www.youtube.com/embed/CXgbekl66jc" selected>ML Lecture 0-1: Introduction of Machine Learning</option>
+		<option value="https://youtube.com/embed/On1N8u1z2Ng">ML Lecture 0-2: Why we need to learn machine learning?</option>
+		<option value="https://youtube.com/embed/fegAeph9UaA">ML Lecture 1: Regression - Case Study</option>//
+		<option value="https://youtube.com/embed/1UqCjFQiiy0">ML Lecture 1: Regression - Demo</option>
+		<option value="https://youtube.com/embed/D_S6y0Jm6dQ">ML Lecture 2: Where does the error come from?</option>
+		<option value="https://youtube.com/embed/yKKNr-QKz2Q">ML Lecture 3-1: Gradient Descent</option>
+		<option value="https://youtube.com/embed/1_HBTJyWgNA">ML Lecture 3-2: Gradient Descent (Demo by AOE)</option>
+		<option value="https://youtube.com/embed/wzPAInDF_gI">ML Lecture 3-3: Gradient Descent (Demo by Minecraft)</option>
+		<option value="https://youtube.com/embed/fZAZUYEeIMg">ML Lecture 4: Classification</option>
+		<option value="https://youtube.com/embed/hSXFuypLukA">ML Lecture 5: Logistic Regression</option>
+		<option value="https://youtube.com/embed/Dr-WRlEFefw">ML Lecture 6: Brief Introduction of Deep Learning</option>
+		<option value="https://youtube.com/embed/ibJpTrp5mcE">ML Lecture 7: Backpropagation</option>
+		<option value="https://youtube.com/embed/Lx3l4lOrquw">ML Lecture 8-1: “Hello world” of deep learning</option>
+		<option value="https://youtube.com/embed/5BJDJd-dzzg">ML Lecture 8-2: Keras 2.0</option>
+		<option value="https://youtube.com/embed/L8unuZNpWw8">ML Lecture 8-3: Keras Demo</option>
+		<option value="https://youtube.com/embed/xki61j7z-30">ML Lecture 9-1: Tips for Training DNN</option>
+		<option value="https://youtube.com/embed/Ky1ku1miDow">ML Lecture 9-2: Keras Demo 2</option>
+		<option value="https://youtube.com/embed/F1vek6ULo9w">ML Lecture 9-3: Fizz Buzz in Tensorflow (sequel)</option>
+		<option value="https://youtube.com/embed/FrKWiRv254g">ML Lecture 10: Convolutional Neural Network</option>
+		<option value="https://youtube.com/embed/XsC9byQkUH8">ML Lecture 11: Why Deep?</option>
+		<option value="https://youtube.com/embed/fX_guE7JNnY">ML Lecture 12: Semi-supervised</option>
+		<option value="https://youtube.com/embed/iwh5o_M4BNU">ML Lecture 13: Unsupervised Learning - Linear Methods</option>
+		<option value="https://youtube.com/embed/X7PH3NuYW0Q">ML Lecture 14: Unsupervised Learning - Word Embedding</option>
+		<option value="https://youtube.com/embed/GBUEjkpoxXc">ML Lecture 15: Unsupervised Learning - Neighbor Embedding</option>
+		<option value="https://youtube.com/embed/Tk5B4seA-AU">ML Lecture 16: Unsupervised Learning - Auto-encoder</option>
+		<option value="https://youtube.com/embed/YNUek8ioAJk">ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I)</option>
+		<option value="https://youtube.com/embed/8zomhgKrsmQ">ML Lecture 18: Unsupervised Learning - Deep Generative Model (Part II)</option>
+		<option value="https://youtube.com/embed/qD6iD4TFsdQ">ML Lecture 19: Transfer Learning</option>
+		<option value="https://youtube.com/embed/QSEPStBgwRQ">ML Lecture 20: Support Vector Machine (SVM)</option>
+		<option value="https://youtube.com/embed/xCGidAeyS4M">ML Lecture 21-1: Recurrent Neural Network (Part I)</option>
+		<option value="https://youtube.com/embed/rTqmWlnwz_0">ML Lecture 21-2: Recurrent Neural Network (Part II)</option>
+		<option value="https://youtube.com/embed/tH9FH1DH5n0">ML Lecture 22: Ensemble</option>
+		<option value="https://youtube.com/embed/W8XF3ME8G2I">ML Lecture 23-1: Deep Reinforcement Learning</option>
+		<option value="https://youtube.com/embed/y8UPGr36ccI">ML Lecture 23-2: Policy Gradient (Supplementary Explanation)</option>
+		<option value="https://youtube.com/embed/2-JNBzCq77c">ML Lecture 23-3: Reinforcement Learning (including Q-learning)</option>
+	<!--}}}-->
+	</select>
+	<iframe id="video_link" src="" width=50% height=100% frameborder="0" allowfullscreen></iframe>
+	<iframe id="sbv_files" src="caption/1.html" style="position: absolute; top:30; right:0; border: 5px solid; width:49% ;height:90%"></iframe>
+</body>
+</html>
