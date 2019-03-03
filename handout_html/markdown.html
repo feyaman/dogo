@@ -1,29 +1,83 @@
 <head>
 <script src="./stackedit.min.js"></script>
 <style>
-textarea.source {
-    visibility: hidden;
-    height: 0px;
-}
+  textarea#md {
+    display: none;
+  }
 </style>
 </head>
 <div >
-  <textarea class="source"></textarea>
+  <textarea id="md"></textarea>
+  <table>
+	<tr id="row_save">
+		<td>Filename to Save As:</td>
+		<td><input id="inputFileNameToSaveAs"></input></td>
+		<td><button onclick="save()">Save Text to File</button></td>
+	</tr>
+	<tr id="row_load">
+		<td>Select a File to Load:</td>
+		<td><input type="file" id="fileToLoad">
+		<td><button onclick="load()">Load Selected File</button><td>
+	</tr>
+  </table>
 </div>
 <script>
-  const el = document.querySelector('textarea');
+  const el = document.getElementById('md');
   const stackedit = new Stackedit();
-
-  // Open the iframe
-  stackedit.openFile({
-    name: 'Filename', // with an optional filename
-    content: {
-      text: el.value // and the Markdown content.
-    }
-  });
 
   // Listen to StackEdit events and apply the changes to the textarea.
   stackedit.on('fileChange', (file) => {
     el.value = file.content.text;
   });
+
+  function save() {
+    var textToWrite = document.getElementById('md');
+    var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+    var fileNameToSaveAs = document.getElementById("inputFileNameToSaveAs").value;
+
+    var downloadLink = document.createElement("a");
+    downloadLink.download = fileNameToSaveAs;
+    downloadLink.innerHTML = "Download File";
+    if (window.webkitURL != null)
+    {
+      // Chrome allows the link to be clicked
+      // without actually adding it to the DOM.
+      downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+    }
+    else
+    {
+      // Firefox requires the link to be added to the DOM
+      // before it can be clicked.
+      downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+      downloadLink.onclick = destroyClickedElement;
+      downloadLink.style.display = "none";
+      document.body.appendChild(downloadLink);
+    }
+
+    downloadLink.click();
+  }
+
+  function destroyClickedElement(event) {
+    document.body.removeChild(event.target);
+  }
+
+  function load() {
+    var fileToLoad = document.getElementById("fileToLoad").files[0];
+
+    var fileReader = new FileReader();
+    fileReader.onload = function(fileLoadedEvent) {
+      var textFromFileLoaded = fileLoadedEvent.target.result;
+      el.value = textFromFileLoaded;
+    };
+    fileReader.readAsText(fileToLoad, "UTF-8");
+    // Open the iframe
+    stackedit.openFile({
+      name: 'Filename', // with an optional filename
+      content: {
+        text: el.value // and the Markdown content.
+      }
+    });
+    var tmp = document.getElementById("row_load");
+    tmp.style.display = 'none';
+  }
 </script>
