@@ -23,13 +23,18 @@ function setPdfOnScreen(index) {
 	document.getElementById('display').innerHTML = '';
 	var target = Slide_list[index]
 	for (var i = 0; i < Slide_list[index].pageNumber; i++) {
-		document.getElementById('display').innerHTML += '<p style="font-size:10px;"> ![0](./JPG/'+
-			target.pdf_name+'/'+target.pdf_name+'_'+i+'.jpg) </p><img src="./JPG/'+
-			target.pdf_name+'/'+target.pdf_name+'_'+i+'.jpg" alt="Oops GG" width="100%" height="100%"><br>'
+		document.getElementById('display').innerHTML += '<p style="font-size:10px;">'+
+			'![0](./JPG/' + target.pdf_name+'/'+target.pdf_name+'_'+ i +'.jpg) </p>'+
+			'<img src="./JPG/' + target.pdf_name + '/'+target.pdf_name+'_'+ i +'.jpg" '+
+				'alt="Oops GG" width="100%" height="100%" onclick="copyText(this.src)"><br>'
 	}
 }
 
 function changeSlide(index) {
 	// alert("Test!") 
 	setPdfOnScreen(index)
+}
+
+function copyText(src) {
+	alert("Test!")
 }
