@@ -1,6 +1,6 @@
 var Slide_list = [
     { pdf_name: 'W1_Regression', pageNumber: 39},
-    { pdf_name: 'W1_Bias and Variance', pageNumber: 22},
+    { pdf_name: 'W1_Bias_and_Variance', pageNumber: 22},
     { pdf_name: 'W2_Classification', pageNumber: 35},
     { pdf_name: 'W2_Gradient Descent', pageNumber: 39},
     { pdf_name: 'W2_Logistic Regression', pageNumber: 38}
