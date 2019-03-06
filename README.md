@@ -1,17 +1,16 @@
+# DOGO
 
 https://www.youtube.com/watch?v=76KM9CA7N7A
 https://www.youtube.com/watch?v=hKlO3z3dcww
 
-1.
-批踢踢推文產生器
+## 1. 批踢踢推文產生器
 https://github.com/zake7749/PTT-Chat-Generator
 
-2.
-競賽
+## 2. 競賽
 
-3.
-O - e - N
+## 3. O - e - N
 
+```C
 /***  1-9-2019  ***/ 
 tool_a setting.config
 function: get homeDir's  all dir & all file, process, save2targetDir
@@ -19,10 +18,12 @@ function: get homeDir's  all dir & all file, process, save2targetDir
 homeDir=/Server/Data/
 targetDir=/Client/Data/
 
-
 tool_b file.a file.b
+```
 
--- file.a --
+# -- file.a --
+
+```html
 <article class="s-12 m-12 l-6 margin-m-bottom">
  <img class="margin-bottom" src="xxImagexx" alt="">
  <h3 class="text-strong"><a class="text-dark text-primary-hover" href="xxURLxx" target="_blank">xxTitlexx</a></h3>
@@ -30,9 +31,12 @@ tool_b file.a file.b
  <p>xxContentxx</p>
  <a class="text-more-info text-primary-hover" href="xxURLxx" target="_blank">xxReadMexx</a>
 </article>
+```
+
 
 -- file.b --
 ========
+```html
 <theImage>
 events_img/AImeetup1812.jpg
 <end>
@@ -59,8 +63,9 @@ https://www.accupass.com/event/1811070213411553674230
 
 <theReadMe>
 Read More
-<end>
-========
+
+# <end>
+
 <theImage>
 events_img/AI_Carnival.jpg
 <end>
@@ -88,3 +93,7 @@ http://case.ntu.edu.tw/sciactivity/20181216/?fbclid=IwAR0PFxr0S_fSoBwxJwvH-V88rP
 <theReadMe>
 Read More
 <end>
+```
+
+
+
