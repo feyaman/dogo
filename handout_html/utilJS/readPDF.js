@@ -25,7 +25,7 @@ function setPdfOnScreen(index) {
 	for (var i = 0; i < Slide_list[index].pageNumber; i++) {
 		document.getElementById('display').innerHTML += '<p style="font-size:10px;">'+
 			'![0](./JPG/' + target.pdf_name+'/'+target.pdf_name+'_'+ i +'.jpg) </p>'+
-			'<img src="./JPG/' + target.pdf_name + '/'+target.pdf_name+'_'+ i +'.jpg" '+
+			'<img src="../JPG/' + target.pdf_name + '/'+target.pdf_name+'_'+ i +'.jpg" '+
 				'alt="Oops GG" class="pdfImage" width="100%" height="100%" onclick="copyText(this.src)"><br>'
 	}
 }
