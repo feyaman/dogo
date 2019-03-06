@@ -1,8 +1,5 @@
 # DOGO
 
-https://www.youtube.com/watch?v=76KM9CA7N7A
-https://www.youtube.com/watch?v=hKlO3z3dcww
-
 ## 1. 批踢踢推文產生器
 https://github.com/zake7749/PTT-Chat-Generator
 
@@ -97,3 +94,8 @@ Read More
 
 
 
+https://www.youtube.com/watch?v=76KM9CA7N7A
+
+
+
+https://www.youtube.com/watch?v=hKlO3z3dcww
