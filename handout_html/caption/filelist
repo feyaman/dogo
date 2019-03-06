@@ -1,0 +1,35 @@
+1.html
+ML Lecture 0-1. Introduction of Machine Learning.sbv
+ML Lecture 1. Regression - Case Study.sbv
+ML Lecture 1. Regression - Demo.sbv
+ML Lecture 2. Where does the error come from.sbv
+ML Lecture 3-1. Gradient Descent.sbv
+ML Lecture 3-2. Gradient Descent (Demo by AOE).sbv
+ML Lecture 3-3. Gradient Descent (Demo by Minecraft).sbv
+ML Lecture 4. Classification.sbv
+ML Lecture 5. Logistic Regression.sbv
+ML Lecture 6. Brief Introduction of Deep Learning.sbv
+ML Lecture 7. Backpropagation.sbv
+ML Lecture 8-1. “Hello world” of deep learning.sbv
+ML Lecture 8-2. Keras 2.0.sbv
+ML Lecture 8-3. Keras Demo.sbv
+ML Lecture 9-1. Tips for Training DNN.sbv
+ML Lecture 9-2. Keras Demo 2.sbv
+ML Lecture 9-3. Fizz Buzz in Tensorflow (sequel).sbv
+ML Lecture 10. Convolutional Neural Network.sbv
+ML Lecture 11. Why Deep.sbv
+ML Lecture 12. Semi-supervised.sbv
+ML Lecture 13. Unsupervised Learning - Linear Methods.sbv
+ML Lecture 14. Unsupervised Learning - Word Embedding.sbv
+ML Lecture 15. Unsupervised Learning - Neighbor Embedding.sbv
+ML Lecture 16. Unsupervised Learning - Auto-encoder.sbv
+ML Lecture 17. Unsupervised Learning - Deep Generative Model (Part I).sbv
+ML Lecture 18. Unsupervised Learning - Deep Generative Model (Part II).sbv
+ML Lecture 19. Transfer Learning.sbv
+ML Lecture 20. Support Vector Machine (SVM).sbv
+ML Lecture 21-1 RNN (Part I).sbv
+ML Lecture 21-2. Recurrent Neural Network (Part II).sbv
+ML Lecture 22. Ensemble.sbv
+ML Lecture 23-1. Deep Reinforcement Learning.sbv
+ML Lecture 23-2. Policy Gradient (Supplementary Explanation).sbv
+ML Lecture 23-3. Reinforcement Learning (including Q-learning).sbv
