@@ -26,7 +26,7 @@ function setPdfOnScreen(index) {
 		document.getElementById('display').innerHTML += '<p style="font-size:10px;">'+
 			'![0](./JPG/' + target.pdf_name+'/'+target.pdf_name+'_'+ i +'.jpg) </p>'+
 			'<img src="./JPG/' + target.pdf_name + '/'+target.pdf_name+'_'+ i +'.jpg" '+
-				'alt="Oops GG" width="100%" height="100%" onclick="copyText(this.src)"><br>'
+				'alt="Oops GG" class="pdfImage" width="100%" height="100%" onclick="copyText(this.src)"><br>'
 	}
 }
 
