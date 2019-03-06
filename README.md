@@ -10,7 +10,7 @@ https://github.com/zake7749/PTT-Chat-Generator
 
 ## 3. O - e - N
 
-```C
+```bash
 /***  1-9-2019  ***/ 
 tool_a setting.config
 function: get homeDir's  all dir & all file, process, save2targetDir
