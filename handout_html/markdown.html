@@ -1,4 +1,5 @@
 <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script src="./stackedit.min.js"></script>
 <style>
   textarea#md {
@@ -68,15 +69,19 @@
     fileReader.onload = function(fileLoadedEvent) {
       var textFromFileLoaded = fileLoadedEvent.target.result;
       el.value = textFromFileLoaded;
+      console.log("textarea after read:", el.value);
     };
     fileReader.readAsText(fileToLoad, "UTF-8");
     // Open the iframe
-    stackedit.openFile({
-      name: 'Filename', // with an optional filename
-      content: {
-        text: el.value // and the Markdown content.
-      }
-    });
+    setTimeout(function() {
+      stackedit.openFile({
+        name: 'Filename', // with an optional filename
+        content: {
+          text: el.value // and the Markdown content.
+        }
+      });
+      }, 300
+    );
     var tmp = document.getElementById("row_load");
     tmp.style.display = 'none';
   }
