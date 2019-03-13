@@ -10,7 +10,7 @@
 <div >
   <textarea id="md"></textarea>
   <table>
-	<tr id="row_save">
+  <tr id="row_save">
 		<td>Filename to Save As:</td>
 		<td><input id="inputFileNameToSaveAs"></input></td>
 		<td><button onclick="save()">Save Text to File</button></td>
@@ -32,7 +32,7 @@
   });
 
   function save() {
-    var textToWrite = document.getElementById('md');
+    var textToWrite = document.getElementById('md').value;
     var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
     var fileNameToSaveAs = document.getElementById("inputFileNameToSaveAs").value;
 
