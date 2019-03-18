@@ -1,10 +1,33 @@
 var Slide_list = [
-    { pdf_name: 'W1_Regression', pageNumber: 39},
-    { pdf_name: 'W1_Bias_and_Variance', pageNumber: 22},
-    { pdf_name: 'W2_Classification', pageNumber: 35},
-    { pdf_name: 'W2_Gradient_Descent', pageNumber: 39},
-    { pdf_name: 'W2_Logistic_Regression', pageNumber: 38}
-    // { pdf_name: '', pageNumber: }
+    // { pdf_name: 'W1_Regression', pageNumber: 39},
+    // { pdf_name: 'W1_Bias_and_Variance', pageNumber: 22},
+    // { pdf_name: 'W2_Classification', pageNumber: 35},
+    // { pdf_name: 'W2_Gradient_Descent', pageNumber: 39},
+    // { pdf_name: 'W2_Logistic_Regression', pageNumber: 38}
+    { pdf_name: 'Introduction_of_this_course', pageNumber: 63},
+    { pdf_name: 'Regression', pageNumber: 39},
+    { pdf_name: 'Where_does_the_error_come_from?', pageNumber: 22},
+    { pdf_name: 'Gradient_Descent', pageNumber: 38},
+    { pdf_name: 'Classification-Probabilistic_Generative_Model', pageNumber: 35},
+    { pdf_name: 'Classification-Logistic_Regression', pageNumber: 38},
+    { pdf_name: 'Introduction_of_Deep_Learning', pageNumber: 29},
+    { pdf_name: 'Backpropagation', pageNumber: 18},
+    { pdf_name: 'Hello_world_of_Deep_Learning', pageNumber: 17},
+    { pdf_name: 'Tips_for_Deep_Learning', pageNumber: 52},
+    { pdf_name: 'Convolutional_Neural_Network', pageNumber: 49},
+    { pdf_name: 'Why_Deep?', pageNumber: 34},
+    { pdf_name: 'Semi-supervised_Learning', pageNumber: 32},
+    { pdf_name: 'Unsupervised_Learning-Principle_Component_Analysis', pageNumber: 34},
+    { pdf_name: 'Unsupervised_Learning-Neighbor_Embedding', pageNumber: 15},
+    { pdf_name: 'Unsupervised_Learning-Deep_Auto-encoder', pageNumber: 29},
+    { pdf_name: 'Unsupervised_Learning-Word_Embedding', pageNumber: 24},
+    { pdf_name: 'Unsupervised_Learning-Deep_Generative_Model', pageNumber: 70},
+    { pdf_name: 'Transfer_Learning', pageNumber: 40},
+    { pdf_name: 'Recurrent_Neural_Network', pageNumber: 89},
+    { pdf_name: 'Matrix_Factorization', pageNumber: 8},
+    { pdf_name: 'Ensemble', pageNumber: 43},
+    { pdf_name: 'Introduction_of_Structured_Learning', pageNumber: 66},
+    { pdf_name: 'Introduction_of_Reinforcement_Learning', pageNumber: 57},
 ];
 
 // Initial 
