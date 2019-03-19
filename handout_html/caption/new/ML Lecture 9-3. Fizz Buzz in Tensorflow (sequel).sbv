@@ -1,0 +1,249 @@
+臺灣大學人工智慧中心
+科技部人工智慧技術暨全幅健康照護聯合研究中心
+http://aintu.tw
+
+所謂的硬 train 的意思就是說
+
+看起來好像不能 train 的東西
+
+但是，我們還是用 train 的方法來做
+
+這個就叫做硬 train，或是叫做硬 train 一發這樣子
+
+如果你看一下這個
+
+這個是一個部落格，這個部落格裡面
+
+有一個 Fizz Buzz in TensorFlow 的故事
+
+有一天，有一個人他去
+
+這個人好像還滿知名的
+
+知名的資料科學家
+
+他去面試
+
+然後人家說，那我們來考一下程式能力吧
+
+在白板上面寫程式
+
+人家就問說
+
+你會不會來寫一下這個
+
+Fizz Buzz 的程式
+
+Fizz Buzz是甚麼意思呢？Fizz Buzz 的意思是說
+
+現在讓你 print 一串數字
+
+比如說，1~100
+
+但是，如果這串數字裡面
+
+這個數字可以被 3 整除，我們就 output Fizz
+
+被 5 整除，你就 output Buzz
+
+同時可以被 3 和 5 整除，你就 output Fizz Buzz
+
+所以，你的程式 output 應該是 1, 2
+
+然後，3 可以被 3 整除 ，你就 output Fizz
+
+然後 4，然後 5 可以被 5 整除，你就 output Buzz
+
+然後，output Fizz
+
+然後，7, 8, Fizz, Buzz, 11, Fizz
+
+然後，13, 14, Fizz Buzz 這樣
+
+你應該 output 這樣一個 sequence
+
+我們今天知道，對大家來說
+
+這個是一個非常簡單的問題
+
+那個人就說，怎麼做呢
+
+怎麼做？我要用 Python 做
+
+那我要先 import 一些 library，這很正常
+
+直接 import TensorFlow
+
+然後，接下來，我要準備一些 training data
+
+你叫我 output 1~100
+
+我當然不能用這個當作 training data
+
+所以，我先要 label 101~1000 的 Fizz Buzz
+
+怎麼做你就去 Amazon 上找
+
+你去 amt 上找人 label 就好
+
+label 好以後，我們就弄一個 network 給它 train 下去
+
+看看結果會怎麼樣
+
+然後，它後來 train 下去以後
+
+哇，正確率才 80 幾這樣子
+
+然後他就沒有得到那一份工作
+
+我決定來自己試一下這個 Fizz Buzz 的東西
+
+到底能不能夠做得起來
+
+自己來實作一下
+
+首先，我們先來看我們的 training data 長甚麼樣子
+
+開一下我的 ipython，run 一下
+
+那我現在就對數字 101~1000 
+
+做了 labeling，你就不要管那個 label 是怎麼來的了
+
+我們先來看一下我們的 training data
+
+那 training data 的 input 每一筆呢
+
+每一筆就代表了一個數字
+
+我們先看一下它的 shape
+
+總共有 900 筆 data，就是從 101 一直數到 1000
+
+總共 900 筆 data
+
+我們把第一筆 data dump 出來看看
+
+那每一個數字，我們都是用二進位來表示它
+
+每一個數字，我們都是用
+
+二進位的數值來表示它
+
+第一個數字是 101
+
+101 用二進位來表示就是 1010011000
+
+第一個數字，代表的是這個
+
+2 的 0 次方、2 的 1 次方、2 的 2 次方
+
+然後，2 的 5 次方、2 的 6 次方
+
+你直接把它加起來，你會發現說，它確實就是
+
+101 這樣，那如果 102 的話
+
+就是這個樣子，那 103 的話，就是這個樣子
+
+然後，我們看一下 label 的 data
+
+label 的 data 長甚麼樣子呢？
+
+比如說，101 它可以被 3 整除嗎？不行
+
+它可以被 5 整除嗎？不行，所以
+
+它是 output 原來自己的數字
+
+那我們現在總共有 4 個 class
+
+這 4 個 class 分別代表了
+
+output 原來的數字
+
+output Fizz、output Buzz、output Fizz Buzz
+
+那如果 output 原來的數字
+
+就是第一維是 1，其他維是 0
+
+所以，101 的話，第一維是 1，其他都是 0
+
+接下來呢，我把前面的燈稍微關一下
+
+接下來我們考慮說 output 102
+
+output 102
+
+那如果 102 的話，它可以被 3 整除嗎？它可以被 3 整除
+
+但不能被 5 整除，所以應該 output Fizz
+
+所以，它的第二維是 1，其他都是 0
+
+就這樣子，硬做一下
+
+我這邊用的 network 架構
+
+跟那個人面試時用的 network 架構是一樣的
+
+input 10 維
+
+然後，1 個 hidden layer 就是 100 個 neuron
+
+然後，apply ReLU 的 activation function
+
+output 4 維，Softmax，然後用 Adam 這樣
+
+這個拿掉
+
+那等一下就直接 print 正確率，跑一下
+
+跑一下
+
+很快阿
+
+沒多少才 900 筆 training data，秒 train、秒 train
+
+哇，這個正確率是 76% 阿
+
+做出來也不是 100
+
+但是，我不會就這樣放棄，因為你想想看
+
+如果
+
+你想想看你看看你的 training data
+
+你的 training data 正確率才 80% 而已
+
+代表說，你還沒有讓你的 network
+
+真的在 training data 上面學起來
+
+它還沒有真的去 fit 那個 training data
+
+我們知道說，做 deep learning 的起手式是
+
+先想辦法 fit 你的 training data
+
+怎麼 fit 你的 training data 呢？
+
+開一個比較大的 network，舉例來說
+
+我們把 hidden layer 的 size 改成 1000
+
+那再 train 一下，也是很快，秒 train
+
+你看現在上升起來了
+
+上升起來，可以跑到 100 嗎？跑到 100 了
+
+那你看正確率就是 100%
+
+這樣我就拿到那個 job 了
+
+臺灣大學人工智慧中心
+科技部人工智慧技術暨全幅健康照護聯合研究中心
+http://aintu.tw

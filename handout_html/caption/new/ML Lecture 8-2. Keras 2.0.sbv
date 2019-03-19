@@ -1,0 +1,435 @@
+臺灣大學人工智慧中心
+科技部人工智慧技術暨全幅健康照護聯合研究中心
+http://aintu.tw
+
+那我們來講一下，如果在改版以後的 Keras 長甚麼樣子
+
+那現在是這個樣子的
+
+現在是說
+
+這個大概你在作業三的時候
+
+我們作業三是一個有關 CNN 影像辨識的作業
+
+所以，這個時候會先想要做 CNN
+
+之後也會講說怎麼實作 CNN，而且
+
+在助教的教學裡面
+
+手把手的教學裡面，會教你怎麼把 Keras 安裝起來
+
+那我們在講 CNN 之前，我們先講一下你要
+
+implement 一個最 basic 的
+ Fully Connected Feedforward Network
+
+如果你用 Keras 的話，你要怎麼做
+
+那現在假設我們要做的事情是手寫數字的辨識
+
+那我們要兜一個 network
+
+建了一個 network 的 structure
+
+它 input 是 28*28 的 dimension
+
+28*28 的 dimension 意思就是說
+
+這其實是一張 image
+
+image 的解析度是 28*28
+
+我們把它拉直，變成長度是一個 28*28 維的向量
+
+output 呢，現在做的是手寫數字的辨識
+
+手寫數字辨識就是 input 一張 image
+
+要決定它是 0~9 的哪一個數字
+
+所以，我們的 output 就是每一維
+
+對應那一個數字，所以 output 就是 10 維
+
+中間呢，假如你要有兩個 hidden layer
+
+每一個 hidden layer 是 500 個 neuron 的話
+
+那你會怎麼做呢？
+
+如果是用 Keras 的話
+
+你要宣告一個 network，你的做法就是
+
+首先，你先宣告說 model = Sequential( )
+
+再來，你要把第一個 hidden layer 加進去的話，怎麼做呢
+
+這很簡單，你只要下 add 就好
+
+add 你就 add 一個 layer
+
+然後，add 的這個指令後面呢
+
+你加了一個 Dense 的意思就是說
+
+你加的是一個 fully connected 的 layer
+
+如果你把這個 Dense 改成別的，比如說改成
+
+convolution 2D，那你就加一個  convolution 的 layer
+
+所以，這個其實都非常地簡單
+
+那 input dimension 就是告訴我們說
+
+input 的 dimension 要是多少
+
+那原來在 Keras 1.0版裡面
+
+output 的 dimension 或是 neuron 的數目
+
+它是用 output dimension 來表示啦
+
+不過，現在在新版裡面，它改成 unit
+
+我想這更直觀了，每一個 neuron 它就是一個 unit
+
+那 unit = 500，就是說
+
+我們有 500 個 unit，我們有 500 個 neuron
+
+然後，接下來就是下 activation function
+
+那這邊就看你想要選哪一個 activation function 都可以啦
+
+有很多的 activation function 是你可以選擇的
+
+每一個 activation function 都只是一個
+
+一個英文的詞彙，你把那個詞彙打上去就好了
+
+你要自己加新的 activation function，其實還滿容易的
+
+你在 Keras 的 code 裡面找到
+
+它定義 activation 那個 function 的地方
+
+就可以自己直接插新的 activation function
+
+這都還蠻容易的
+
+那再加第二個 layer
+
+如果加第二個 layer 的話
+
+你就不需要再宣告 input 的 dimension 了
+
+因為，第二個 layer 的 input dimension
+
+就是前一個 layer 的 unit
+
+前一個 layer 已經說是 500 個 unit，所以
+
+第二個 layer 的 input 就是 500，不需要再定義一次
+
+那這邊你只需要告訴它說
+
+接下來第二個 layer 會有多少個 unit
+
+unit = 500，然後 activation function
+
+等於__，就隨便選一個你想要用的 activation function
+
+每一層要選不一樣的，也都是可以的
+
+那最後一個 layer
+
+因為 output 要是 10 個數字
+
+所以，最後一個 layer 的 output 一定要是 10 維
+
+你說 11 或 9 都是不行的
+
+就是 10 個數字，所以就是 10 維
+
+所以，unit 就設 10
+
+activation function 這邊你其實選別的
+
+compile 也會過，不過我們通常會選
+
+softmax，如果選 softmax 的話
+
+意味著 output 的每一個 dimension
+
+值會介於 0~1 之間
+
+然後它的總和是 1
+
+你就可以把它當做是一個很像機率的東西來看待
+
+那 softmax 在前面的課程裡面也是講過的
+
+再來，第二個步驟
+
+你要做一下 Configuration
+
+這邊包括了你要定義 loss function
+
+你就下 model.compile()
+
+然後，loss 等於甚麼東西
+
+然後，選一個你自己喜歡的 loss function
+
+那有非常多不同的、可能的選擇
+
+那你要選一個 optimizer
+
+那其實所有的 optimizer
+
+都是 Gradient Descent base 的
+
+那你下不同的英文單字
+
+只是有不同的方法來幫你決定
+
+你的 learning rate，像我們之前已經知道了一個
+
+Adagrad 的做法
+
+那其實還有很多其他的做法
+
+再來，下完 Configure 以後
+
+你就可以開始 train 你的 network
+
+那 train 你的 network 非常簡單，就是一行
+
+雖然說，Backpropagation 是一個非常複雜的東西
+
+但是，其實當你在用這些
+
+現代的 deep learning framework 的時候
+
+就是一行
+
+所以，你就 call model.fit
+
+它就開始用 Gradient Descent 呢
+
+幫你去 train 你的 network
+
+那你要給它你的 training data
+
+你要給它你的 training data 的 input
+
+還有你的 training data 的 label
+
+那這邊這個 x_train 呢
+
+代表了 image
+
+y_train 代表這是一個 image 的 label
+
+我們現在做的是手寫數字的辨識
+
+那 input 就是那些手寫數字的 image
+
+而 label 就是每一張 image 它實際對應的數字
+
+是哪一個
+
+那 batch_size 跟 epoch 我們今天就不解釋
+
+其實在 video 裡面，我們已經解釋過了
+
+那有關 x_train 跟 y_train 的格式
+
+我想這個大家來說，應該也不是太難的問題
+
+你這個 x_train 跟 y_train，你都必須要存成 numpy array
+
+不要問我說怎麼把 image 存成 numpy array
+
+這個是你的責任這樣
+
+那這個 numpy array 長甚麼樣子呢？
+
+現在，在我們等一下要示範的 task 裡面
+
+第幾個軸，代表有幾個 training example
+
+第一個軸如果是一萬維
+
+代表說有一萬個 training example
+
+第二個軸呢，第二個軸
+
+代表說，現在每一個 training example
+
+每一個 image 我們用多長的 vector 來表示
+
+我們用多少的數字表示一個 image
+
+那這邊是用 28*28，也就是 784 維 vector
+
+來表示這個 image，所以這個 x_train
+
+它就是一個 matrix
+
+這個 matrix 的其中一維
+
+它代表了這個
+
+這個 training 的 example 數目，另外一維呢
+
+代表每一個 example
+
+它用多少的數值來表示
+
+那在 y_train 的部分
+
+在 label 的部分，怎麼表示你的 label 呢？
+
+這邊的作法是
+
+label 也存成一個二維的 matrix
+
+第一個維度一樣代表了 training example 數目
+
+第二個維度
+
+代表了現在總共有多少個不同的 class
+
+現在因為總共有 10 個 class，就 0~9
+
+所以，第二個維度的長度就是 10
+
+那對每一個 example 來說，它的這個 vector 阿
+
+都是只有一維是 1，其他都是 0
+
+只有一維是 1，其他都是 0
+
+1 的部分這邊就用黑色來表示
+
+那每一維就對應到一個數字
+
+這邊是從 0 開始算，0, 1, 2, 3, 4, 5
+
+今天如果說
+
+第一張 image 對應的是數字 5
+
+那就是對應到數字 5 的那一個 dimension
+
+它的值是 1，其他 dimension 值是 0
+
+那你就實際算算看
+
+從 0 開始算，0, 1, 2, 3, 4, 5
+
+它確實是對應到 5 的那個維度是 1
+
+其他是 0
+
+就代表說第一張 image 它是數字 5
+
+第二張 image 是數字 0
+
+所以就對應到 0 那個維度是 1，其它是 0
+
+所以，你看第四張 image 是數字 1
+
+那就對應到數字 1 的那個維度
+
+它的值放 1，其他維度值就放 0
+
+接下來 train 完以後
+
+你就得到一個 model
+
+你可以把 model 存起來
+
+然後之後再把它讀出來
+
+那這個部分，大家就自己參考一下 Keras 的說明
+
+它這個 documentation 的說明
+
+那接下來，你要真的拿這個 network 來使用
+
+使用有兩個不同的情境
+
+這兩個不同的情境，一個是
+
+叫做 evaluation
+
+所以，evaluation 的意思就是說
+
+你實際上有 testing data 的 label
+
+你想要知道說，你的 model 表現的
+
+在 testing data 上到底表現得怎麼樣
+
+這個時候，你就 call evaluation 這個 function
+
+然後，你就把 training data 的 image
+
+跟 training data 的 label 丟給 evaluation 這個 function
+
+它就自動幫你算出你的 model 的正確率
+
+那它會 output 一個二維的向量
+
+這邊就寫作 score
+
+那這二維向量的第一個維度
+
+代表了在 testing set 上的 loss
+
+第二個維度代表在 testing set 上的 accuracy
+
+那這個 score 跟 accuracy 之間的值是不一樣的
+
+大家可以理解嗎？因為算 loss 的時候，你可能用
+
+cross entropy，可能用 mean square error
+
+那你算出來是 cross entropy，或 mean square error
+
+accuracy 是對與不對
+
+那你會量出一個正確率
+
+所以，這兩個的值是不一樣的
+
+那第二個 case 是做 predict
+
+所謂做 predict 的意思是說
+
+你現在的系統真正上線了
+
+你沒有正確答案
+
+你真的要拿你這個系統來做手寫數字辨識
+
+使用者真的輸給你一個手寫數字的圖片
+
+你要真的去預測它的結果是多少
+
+得到 network 的 output
+
+那這個時候，你沒有正確答案
+
+所以你 x_test 只有把 image 丟進去
+這個時候你要 call predict 這個 function
+
+臺灣大學人工智慧中心
+科技部人工智慧技術暨全幅健康照護聯合研究中心
+http://aintu.tw
