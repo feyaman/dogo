@@ -1,27 +1,74 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script src="./stackedit.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/core.js"></script>
 <style>
   textarea#md {
     display: none;
   }
 </style>
 </head>
+<body>
+<iframe id="frmFile" src="caption/new/0.sbv" style="display: none;"></iframe>
 <div >
   <textarea id="md"></textarea>
   <table>
-  <tr id="row_save">
-		<td>Filename to Save As:</td>
-		<td><input id="inputFileNameToSaveAs"></input></td>
-		<td><button onclick="save()">Save Text to File</button></td>
-	</tr>
 	<tr id="row_load">
 		<td>Select a File to Load:</td>
 		<td><input type="file" id="fileToLoad">
 		<td><button onclick="load()">Load Selected File</button><td>
 	</tr>
+  <tr id="load_caption">
+    <td>Load caption: </td>
+    <td>
+      <select id="selectbox" onChange="loadurl()">
+	<!--{{{ 35 opt ions here-->
+		<option value=0 selected>ML Lecture 0-1: Introduction of Machine Learning</option>
+		<option value=1>ML Lecture 0-2: Why we need to learn machine learning?</option>
+		<option value=2>ML Lecture 1: Regression - Case Study</option>//
+		<option value=3>ML Lecture 1: Regression - Demo</option>
+		<option value=4>ML Lecture 2: Where does the error come from?</option>
+		<option value=5>ML Lecture 3-1: Gradient Descent</option>
+		<option value=6>ML Lecture 3-2: Gradient Descent (Demo by AOE)</option>
+		<option value=7>ML Lecture 3-3: Gradient Descent (Demo by Minecraft)</option>
+		<option value=8>ML Lecture 4: Classification</option>
+		<option value=9>ML Lecture 5: Logistic Regression</option>
+		<option value=10>ML Lecture 6: Brief Introduction of Deep Learning</option>
+		<option value=11>ML Lecture 7: Backpropagation</option>
+		<option value=12>ML Lecture 8-1: “Hello world” of deep learning</option>
+		<option value=13>ML Lecture 8-2: Keras 2.0</option>
+		<option value=14>ML Lecture 8-3: Keras Demo</option>
+		<option value=15>ML Lecture 9-1: Tips for Training DNN</option>
+		<option value=16>ML Lecture 9-2: Keras Demo 2</option>
+		<option value=17>ML Lecture 9-3: Fizz Buzz in Tensorflow (sequel)</option>
+		<option value=18>ML Lecture 10: Convolutional Neural Network</option>
+		<option value=19>ML Lecture 11: Why Deep?</option>
+		<option value=20>ML Lecture 12: Semi-supervised</option>
+		<option value=21>ML Lecture 13: Unsupervised Learning - Linear Methods</option>
+		<option value=22>ML Lecture 14: Unsupervised Learning - Word Embedding</option>
+		<option value=23>ML Lecture 15: Unsupervised Learning - Neighbor Embedding</option>
+		<option value=24>ML Lecture 16: Unsupervised Learning - Auto-encoder</option>
+		<option value=25>ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I)</option>
+		<option value=26>ML Lecture 18: Unsupervised Learning - Deep Generative Model (Part II)</option>
+		<option value=27>ML Lecture 19: Transfer Learning</option>
+		<option value=28>ML Lecture 20: Support Vector Machine (SVM)</option>
+		<option value=29>ML Lecture 21-1: Recurrent Neural Network (Part I)</option>
+		<option value=30>ML Lecture 21-2: Recurrent Neural Network (Part II)</option>
+		<option value=31>ML Lecture 22: Ensemble</option>
+		<option value=32>ML Lecture 23-1: Deep Reinforcement Learning</option>
+		<option value=33>ML Lecture 23-2: Policy Gradient (Supplementary Explanation)</option>
+		<option value=34>ML Lecture 23-3: Reinforcement Learning (including Q-learning)</option>
+	<!--}}}-->
+	</select></td>
+  </tr>
+  <tr id="row_save">
+		<td>Filename to Save As:</td>
+		<td><input id="inputFileNameToSaveAs"></input></td>
+		<td><button onclick="save()">Save Text to File</button></td>
+	</tr>
   </table>
 </div>
+</body>
 <script>
   const el = document.getElementById('md');
   const stackedit = new Stackedit();
@@ -85,4 +132,15 @@
     var tmp = document.getElementById("row_load");
     tmp.style.display = 'none';
   }
+function loadurl() {
+  var theFrame = document.getElementById("frmFile");
+  theFrame.src = "caption/new/" + document.getElementById("selectbox").value + ".sbv";
+  var cont = theFrame.contentWindow.document.body.childNodes[0].innerHTML;
+  stackedit.openFile({
+      name: 'Filename', // with an optional filename
+    content: {
+      text: cont // and the Markdown content.
+    }
+  });
+}
 </script>
