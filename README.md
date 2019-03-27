@@ -1,3 +1,24 @@
+
+ai.ntu.edu.tw/resource
+
+
+11, 12  : 
+ML Lecture 11: Why Deep?, 
+ML Lecture 12: Semi-supervised, 
+
+13, 14 : 
+ML Lecture 13: Unsupervised Learning - Linear Methods, 
+ML Lecture 14: Unsupervised Learning - Word Embedding
+
+15, 16, 17  
+ML Lecture 15: Unsupervised Learning - Neighbor Embedding, 
+ML Lecture 16: Unsupervised Learning - Auto-encoder
+ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I), 
+
+
+
+
+
 # DOGO
 
 ## 1. 批踢踢推文產生器
