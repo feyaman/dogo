@@ -1,5 +1,6 @@
-
+## 
 ai.ntu.edu.tw/resource
+http://ai.ntu.edu.tw/aho/
 
 ##### 李衡
 11, 12  : 
