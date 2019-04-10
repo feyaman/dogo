@@ -1,3 +1,5 @@
+# DOGO
+
 ## Link
 
 ai.ntu.edu.tw/resource
@@ -20,11 +22,6 @@ ML Lecture 15: Unsupervised Learning - Neighbor Embedding,
 ML Lecture 16: Unsupervised Learning - Auto-encoder
 ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I), 
 
-
-
-
-
-# DOGO
 
 ## 1. 批踢踢推文產生器
 https://github.com/zake7749/PTT-Chat-Generator
