@@ -26,8 +26,8 @@
 <body>
 	<select id="selectbox" onChange="getOptionValue()" style="position: absolute; top:5; right:0;">
 	<!--{{{ 35 opt ions here-->
-		<option value=1 selected>ML Lecture 0-1: Introduction of Machine Learning</option>
-		<option value=0>ML Lecture 0-2: Why we need to learn machine learning?</option>
+		<option value=0 selected>ML Lecture 0-1: Introduction of Machine Learning</option>
+		<option value=1>ML Lecture 0-2: Why we need to learn machine learning?</option>
 		<option value=2>ML Lecture 1: Regression - Case Study</option>//
 		<option value=3>ML Lecture 1: Regression - Demo</option>
 		<option value=4>ML Lecture 2: Where does the error come from?</option>
@@ -80,7 +80,7 @@
   <tr id="load_caption">
     <td>Load caption: </td>
     <td>
-      <select id="selectbox" onChange="loadurl()">
+      <select id="selectbox-sub" onChange="loadurl()">
     <!--{{{ 35 opt ions here-->
       <option value=0 selected>ML Lecture 0-1: Introduction of Machine Learning</option>
       <option value=1>ML Lecture 0-2: Why we need to learn machine learning?</option>
@@ -194,7 +194,7 @@ function load() {
 
 function loadurl() {
   var theFrame = document.getElementById("frmFile");
-  theFrame.src = "caption/new/" + document.getElementById("selectbox").value + ".sbv";
+  theFrame.src = "caption/new/" + document.getElementById("selectbox-sub").value + ".sbv";
   setTimeout(function() {
     stackedit.openFile({
       name: 'Filename', // with an optional filename
