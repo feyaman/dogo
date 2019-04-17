@@ -36,7 +36,7 @@ window.onload = function () {
 	var slideSelect=document.getElementById("slide-list");
 	var inner = "";
 	for(var i = 0; i < Slide_list.length; i++){
-		inner = inner+'<option value=i>' + Slide_list[i].pdf_name + '</option>';
+		inner = inner+'<option value=i>'+ (i+1)+ '. ' + Slide_list[i].pdf_name + '</option>';
 	}
 	slideSelect.innerHTML=inner;
 	setPdfOnScreen(0)
