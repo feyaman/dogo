@@ -7,20 +7,30 @@ ai.ntu.edu.tw/resource
 http://ai.ntu.edu.tw/aho/
 
 ##### 李衡
+
 11, 12  : 
-ML Lecture 11: Why Deep?, 
-ML Lecture 12: Semi-supervised, 
+
+ML Lecture 11: Why Deep?
+
+ML Lecture 12: Semi-supervised
 
 ##### 青邑
+
 13, 14 : 
-ML Lecture 13: Unsupervised Learning - Linear Methods, 
+
+ML Lecture 13: Unsupervised Learning - Linear Methods
+
 ML Lecture 14: Unsupervised Learning - Word Embedding
 
 ##### 栢淵
+
 15, 16, 17  
-ML Lecture 15: Unsupervised Learning - Neighbor Embedding, 
+
+ML Lecture 15: Unsupervised Learning - Neighbor Embedding <Done>
+
 ML Lecture 16: Unsupervised Learning - Auto-encoder
-ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I), 
+
+ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I),
 
 
 ## 1. 批踢踢推文產生器
