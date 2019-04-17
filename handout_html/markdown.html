@@ -8,7 +8,7 @@
   }
 #mydiv {
   position: absolute;
-  z-index: 9;
+  z-index: 123456788;
   background-color: #f1f1f1;
   border: 1px solid #d3d3d3;
   text-align: center;
@@ -17,7 +17,7 @@
 #mydivheader {
   padding: 5px;
   cursor: move;
-  z-index: 10;
+  z-index: 123456789;
   background-color: #000000;
   color: #fff;
 }
@@ -69,8 +69,8 @@
 	</div>
 
 <iframe id="frmFile" src="caption/new/0.sbv" style="display: none;"></iframe>
-<div >
-  <textarea id="md"></textarea>
+<div>
+  <textarea id="md" style="position: relative; z-index: 2"></textarea>
   <table>
 	<tr id="row_load">
 		<td>Select a File to Load:</td>
