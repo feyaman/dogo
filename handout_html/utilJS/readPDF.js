@@ -59,7 +59,7 @@ function changeSlide(index) {
 }
 
 function copyText(src) {
-	var tmpStr = "![](http://ai.ntu.edu.tw/aho/JPG"+src.split("JPG")[1]+")"
+	var tmpStr = '<img src="http://ai.ntu.edu.tw/aho/JPG'+src.split("JPG")[1]+'" width="70%">'
 	// alert("Test! "+tmpStr)
 	copyStringToClipboard(tmpStr)
 }
