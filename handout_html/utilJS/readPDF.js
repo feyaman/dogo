@@ -10,7 +10,7 @@ var Slide_list = [
 	{ pdf_name: 'Hello_world_of_Deep_Learning', pageNumber: 17},
 	{ pdf_name: 'Tips_for_Deep_Learning', pageNumber: 52},
 	{ pdf_name: 'Convolutional_Neural_Network', pageNumber: 49},
-	{ pdf_name: 'Why_Deep\?', pageNumber: 34},
+	{ pdf_name: 'Why_Deep', pageNumber: 34},
 	{ pdf_name: 'Semi-supervised_Learning', pageNumber: 32},
 	{ pdf_name: 'Unsupervised_Learning-Principle_Component_Analysis', pageNumber: 34},
 	{ pdf_name: 'Unsupervised_Learning-Neighbor_Embedding', pageNumber: 15},
