@@ -10,7 +10,7 @@ var Slide_list = [
 	{ pdf_name: 'Hello_world_of_Deep_Learning', pageNumber: 17},
 	{ pdf_name: 'Tips_for_Deep_Learning', pageNumber: 52},
 	{ pdf_name: 'Convolutional_Neural_Network', pageNumber: 49},
-	{ pdf_name: 'Why_Deep?', pageNumber: 34},
+	{ pdf_name: 'Why_Deep\?', pageNumber: 34},
 	{ pdf_name: 'Semi-supervised_Learning', pageNumber: 32},
 	{ pdf_name: 'Unsupervised_Learning-Principle_Component_Analysis', pageNumber: 34},
 	{ pdf_name: 'Unsupervised_Learning-Neighbor_Embedding', pageNumber: 15},
@@ -30,9 +30,9 @@ var Slide_list = [
 	// { pdf_name: 'W2_Logistic_Regression', pageNumber: 38}
 ];
 
-// Initial 
+// Initial
 window.onload = function () {
-	// alert("It's loaded!") 
+	// alert("It's loaded!")
 	var slideSelect=document.getElementById("slide-list");
 	var inner = "";
 	for(var i = 0; i < Slide_list.length; i++){
@@ -54,7 +54,7 @@ function setPdfOnScreen(index) {
 }
 
 function changeSlide(index) {
-	// alert("Test!") 
+	// alert("Test!")
 	setPdfOnScreen(index)
 }
 
