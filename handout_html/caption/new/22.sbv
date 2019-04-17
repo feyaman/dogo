@@ -2,1138 +2,1756 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-接下來，我們要講的是 Neighbor Embedding
+各位同學大家好，我們來上課吧
 
-我們在這個作業，最後一個作業的投影片裡面啊
+今天的規劃是這樣子
 
-助教有提到一個東西呢
+就是我們等一下，會先公告 final
 
-叫做 t-SNE
+那 final 有三個選擇，所以是需要花時間跟大家講一下的
 
-t-SNE 我相信你在很多不同的場合也常常聽到
+所以，今天的規劃是
 
-但是如果有人問你說，
+我們等一下上課，大概上到 1: 20 以後下課
 
-t-SNE 是什麼的時候
+不對，腦殘了，到 11:20 吧
 
-大家往往都答不出來
+不是 11:20，大概是 10:20 的時候下課
 
-現在我們要來講一下 t-SNE 是什麼
+然後，等一下
 
-那 t-SNE 的 “ＮＥ” 
-其實就是 Neighbor Embedding 的縮寫
+剩下的時間就讓助教來把
 
-那我們現在要做的事情呢
+三個 final 都跟大家講完
 
-其實就是我們之前講過的降維
+那今天我們要講的是 Word Embedding
 
-只是我們要做的事情是「非線性」的降維
+我們之前已經講了 Dimension Reduction
 
-我們想要做到的事情是說
+那 Word Embedding 其實是 Dimension Reduction 一個
 
-我們知道說 Data Point
+非常好、非常廣為人知的應用
 
-它可能是在高維空間裡面的一個 Manifold
+如果我們今天要你用一個 vector
 
-也就是說， Data Point 的分佈
-它其實是分佈在一個低維的空間裡面
+來表示一個 word，你會怎麼做呢？
 
-只是被扭曲了塞到一個高維空間裡面
+最 typical 的作法
 
-那，講到 Manifold 的時候
+叫做 1-of-N encoding
 
-常常舉的例子就是這個「地球」這樣子
+每一個 word，我們用一個 vector來表示
 
-地球的表面就是一個 Manifold
+這個 vector 的 dimension，就是這個世界上
 
-他是一個二維的平面
+可能有的 word 數目
 
-但是被塞到了一個三維的空間裡面
+假設這個世界上可能有十萬個 word
 
-那，在一個這樣子的情況下呢
+那 1-of-N encoding 的 dimension
 
-在一個 Manifold 裡面呢
+就是十萬維
 
-只有，這個，很近的距離的點
+那每一個 word，對應到其中一維
 
-在很近的距離的情況下
+所以，apple 它就是第一維是 1，其他都是 0
 
-Euclidean distance 才會成立
+bag 就是第二維是 1，cat 就是第三維是 1，以此類推，等等
 
-如果今天距離很遠的時候
+如果你用這種方式來描述一個 word
 
-這個，歐式幾何他就不一定成立
+你的這個 vector 一點都不 informative
 
-也就是說，假如我們在這個 S 形的空間裡面
+你每一個 word，它的 vector 都是不一樣的
 
-取某一個點放在這邊
+所以從這個 vector 裡面，你沒有辦法得到任何的資訊
 
-那我們比較，我們用 Euclidean distance 比較
+你沒有辦法知道說
 
-這個點
+比如說，bag 跟 cat
 
-跟這個點之間的距離
+bag 跟 cat，沒什麼關係
 
-比較他跟他之間的距離
-和他跟他之間的距離
+比如說，cat 跟 dog
 
-或許這件事情是 make sense 的
+它們都是動物這件事
 
-他跟他比較不像
-他跟他比較像
+你沒有辦法知道
 
-但是，如果今天是距離比較遠的時候
+那怎麼辦呢？
 
-你要比較，這個點
+有一個方法就叫做建 Word Class
 
-跟這個點的相似程度
+也就是你把不同的 word
 
-跟這個點跟這個點的相似的程度
+有同樣性質的 word
 
-你在高維的空間中
+把它們 cluster 成一群一群的
 
-直接算他們的 Euclidean distance
+然後就用那一個 word 所屬的 class 來表示這個 word
 
-就變得不 make sense 了
+這個就是我們之前，在做 Dimension Reduction 的時候
 
-因為，如果根據 Euclidean distance
+講的 clustering 的概念
 
-他跟他比較近，他跟他比較遠
+比如說，dog, cat 跟 bird，它們都是class 1
 
-但是，實際上呢
+ran, jumped, walk 是 class 2
 
-很有可能，他跟他是比較近的
+flower, tree, apple 是class 3，等等
 
-他跟他是比較像的
+但是，光用 class 是不夠的
 
-他跟他是比較不像
+我們之前有講過說，光做 clustering 是不夠的
 
-所以， Manifold Learning 要做的事情
+因為，如果光做 clustering 的話呢
 
-是把 S 形的這塊東西展開
+我們找了一些 information
 
-把塞在高維空間裡面的低維空間「攤平」
+比如說
 
-攤平的好處就是
+這個是屬於動物的 class
 
-現在，如果我們把這個低維空間攤平以後
+這是屬於植物的 class
 
-我們做降維
+它們都是屬於生物
 
-然後，把這個塞在高維空間裡面的 Manifold 攤平以後
+但是在 class 裡面，沒有辦法呈現這一件事情
 
-那我們就可以在這個 Manifold 上面
+或者是說，class 1 是動物
 
-用 Euclidean distance來
+而 class 2 代表是，動物可以做的行為
 
-我們就可以在這個平面上用 Euclidean distance
+但是， class 3 是植物
 
-在降維以後，我們就可以用 Euclidean distance
+class 2 裡面的行為是 class 3 裡面沒有辦法做的
 
-來計算點和點之間的距離
+所以，class 2 跟 class 1 是有一些關聯的
 
-這會對接下來如果你要做 clustering
+沒有辦法用 Word Class 呈現出來
 
-或者是，你要做接下來的 supervised learning
+所以怎麼辦呢？
 
-都是會有幫助的
+我們需要的，是 Word Embedding
 
-那類似方法有很多
+Word Embedding 是這樣
 
-那我們今天就很快的介紹幾種方法
+把每一個 word
 
-在最後，講一下t-SNE
+都 project 到一個 high dimensional 的 space 上面
 
-那有個方法叫做 Locally Linear Embedding
+把每一個 word 都 project 到一個
 
-這個方法意思是說
+high dimensional space 上面
 
-在原來的空間裡面
-你的點的分佈是長這個樣子
+雖然說，這邊這個 space 是 high dimensional
 
-那有某一個點，叫做 xi
+但是它其實遠比 1-of-N encoding 的 dimension 還要低
 
-然後我們先選出這個 xi 的 neighbor
+1-of-N encoding，你這個 vector 通常是
 
-然後我們叫做 xj
+比如說，英文有 10 萬詞彙，這個就是 10 萬維
 
-那接下來呢，我們要找 xi 跟 xj的關係
+但是，如果是用 Word Embedding 的話呢
 
-那 xi 跟 xj 的關係，我們寫做 “wij”
+通常比如說 50 維、100維這個樣子的 dimension
 
-wij 代表 xi 和 xj 的關係
+這個是一個從 1-of-N encoding 到 Word Embedding
 
-這個 wij 是怎麼找出來的呢？
+這是 Dimension Reduction 的 process
 
-wij 是這個樣子
+那我們希望在這個 Word Embedding 的
 
-我們假設說
+這個圖上
 
-每一個 xi，都可以用它的 neighbor
+我們可以看到的結果是
 
-做 linear combination 以後
+同樣，類似 semantic，類似語意的詞彙
 
-組合而成
+它們能夠在這個圖上
 
-這個 wij 就是
+是比較接近的
 
-拿 j 去組合 i 的時候
+而且在這個 high dimensional space 裡面呢
 
-wij 就是拿 xj 去組合 xi 的時候的 
-linear combination 的 weight
+在這個 Word Embedding 的 space 裡面
 
-那要找這組 wij 怎麼做呢
+每一個 dimension，可能都有它特別的含意
 
-也就是說，我們現在要找一組 wij
+比如說，假設我們現在做完 Word Embedding 以後
 
-這組 wij 對 xi 的所有 neighbor xj 
-做 weighted sum的時候
+每一個 word 的這個
 
-他可以跟 xi 越接近越好
+Word Embedding 的 feature vector長的是這個樣子
 
-或者是 xi 減掉
+所以，可能就可以知道說
 
-summation over 所有的 j
-wij 乘以 xj
+這個 dimension 代表了
 
-他的 two norm 是越接近越好的
+生物和其他的東西之間的差別
 
-xi 跟 xj 的 linear combination 他們是越接近越好
+這個 dimension 可能就代表了，比如說
 
-然後 summation over 所有的 data point i
+這是會動的，跟動作有關的東西
 
-然後，接下來我們就要做 dimension reduction
+動物是會動的，還有這個是動作
 
-把原來所有的 xi 跟 xj 轉成 zi 和 zj
+跟動作有關的東西
 
-但是，現在這邊的原則就是
+和不會動的，是靜止的東西的差別，等等
 
-從 xi 跟 xj 轉成 zi 跟 zj
+那怎麼做 Word Embedding
 
-他們中間的關係 "wij"，是不變的
+Word Embedding 是一個 unsupervised approach
 
-這個東西，就是那個
+也就是，我們怎麼讓 machine
 
-白居易的長恨歌裡面講的這句話這樣子
+知道每一個詞彙的含義，是什麼呢？
 
-我想那句話叫什麼
+你只要透過讓 machine 閱讀大量的文章
 
-這句話是出自長恨歌的結尾，它是
+你只要讓 machine 透過閱讀大量的文章
 
-臨別殷勤重寄詞，詞中有誓兩心知。
-七月七日長生殿，夜半無人私語時。
+它就可以知道，每一個詞彙
 
-在天願作比翼鳥，在地願為連理枝。
-天長地久有時盡，此恨綿綿無絕期。
+它的 embedding 的 feature vector 應該長什麼樣子
 
-並不是我國文特好，謝謝～
+這是一個 unsupervised 的 problem
 
-你不要誤會可能是我國文特別強，我其實沒有很強
+因為我們要做的事情就是
 
-為什麼我會背，其實我可以從頭背到尾，為什麼呢？
+learn 一個 Neural Network
 
-因為小時候我不知道犯了什麼錯，被老師懲罰背長恨歌
+找一個  function
 
-然後我就整首背起來了
+那你的 input 是一個詞彙
 
-你小時候背的東西，到長大其實不會忘
+output 就是那一個詞彙所對應的 Word Embedding
 
-這個是什麼意思呢？所謂的
+它所對應的 Word Embedding
 
-在天就是 xi 跟 xj，在原來的 space 上面
+的那一個 vector
 
-比翼鳥就是 wij
+而我們手上有的 train data
 
-在地就是把 xi 跟 xj transform 到另外一個 space
+是一大堆的文字
 
-就是 zi 跟 zj
+所以我們只有Input，我們只有 input
 
-連理枝就是比翼鳥就等於連理枝
+但是我們沒有 output ，我們沒有 output
 
-所以他們關係還是 Wij
+我們不知道
 
-所以 LLE 它做的事情是這樣的
+每一個 Word Embedding 應該長什麼樣子
 
-首先 wij 在原來的 space 上面找完以後
+所以，對於我們要找的  function
 
-就 fix 住它，不要去動它
+我們只有單項
 
-接下來，你為每一個 xi 跟 xj
+我們只知道輸入，不知道輸出
 
-找另外一個 vector
+所以，這是一個 unsupervised learning 的問題
 
-我們現在要做 dimension reduction
+那這個問題要怎麼解呢？
 
-所以你新找的 vector 要比原本的 dimension 還要小
+我們之前有講過
 
-原本 100 維，降維後要比較小，10 維、2維之類的
+一個 deep learning base 的 Dimension Reduction 的方法
 
-zi 跟 zj 是另外的 vector
+叫做 Auto-encoder
 
-那我們要找這個
+也就是 learn 一個 network，讓它輸入等於輸出
 
-zi 跟 zj 它可以 minimize 什麼呢
+這邊某一個 hidden layer 拿出來
 
-它可以 minimize 下面這個 function
+就是 Dimension Reduction 的結果
 
-也就是說原來這個 xi 
-它可以做 linear combination 產生 x
+在這個地方
 
-原來這些 xj 可以做 linear combination 產生 xi
+你覺得你可以用 Auto-encoder 嗎 ?
 
-這些 zj 也可以用同樣的 linear combination產生 zi
+給大家一秒鐘時間的想一想
 
-這些 zj 也可以用同樣的 linear combination 產生 zi
+你覺得這邊可以用 Auto-encoder 的同學，舉手一下
 
-我們就是要找這組 z 可以滿足 wij 給我們的 constraint
+你覺得不能用 auto-encoder 的同學請舉手一下，謝謝
 
-所以，現在在這個式子裡面
+把手放下，大多數的同學都覺得
 
-wij 變成是已知的
+不能用 Auto-encoder 來處理這一問題
 
-但是我們要找一組 z，讓 zj 透過 wij
+沒錯，這個問題你沒辦法用 Auto-encoder 來解
 
-做 weighted sum 以後，它可以跟 zi 越接近越好
+你沒辦法用 Auto-encoder 來解
 
-zj 用這組 weight 做 linear combination 後，它可以跟 zi 越接近越好
+這件事情有點難解釋
 
-然後 summation over 所有的 datapoint
+或許讓大家自己回去想一想
 
-那這個 LLE 你要注意一下，其實它並沒有一個
+你可以想想看
 
-明確的 function
+如果你是用 1-of-N encoding 當作它的 input
 
-告訴你說我們怎麼做 dimension reduction
+如果你用 1-of-N encoding 當作它的 input
 
-不像我們在做 Auto-encoder 的時候
+對 1-of-N encoding 來說，每一個詞彙都是 independent
 
-你 learn 出一個 encoder 的 network
+你把這樣子的 vector 做 Auto-encoder
 
-input 一個新的 datapoint，然後可以找到它 dimension 的結果
+你其實，沒有辦法 learn 出
 
-今天在 LLE 裡面
+任何 informative 的 information
 
-你並不會找到一個很明確的 function，沒有一個 function 告訴我們說
+所以，在 Word Embedding 這個 task 裡面
 
-怎麼從 x 變到 z
+用 Auto-encoder 是沒有辦法的
 
-z 就是完全憑空找出來的
+如果你這一邊 input 是 1-of-N encoding
 
-其實如果你用 LLE 這種方法
+用 Auto-encoder 是沒有辦法的
 
-如果用 LLE 或其他類似的方法會有一個好處
+除非你說，你用這個
 
-就算是你原來這個 xi、xj 你不知道
+你用 character，比如說你用
 
-你只知道 wij
+character 的 n-gram 來描述一個 word
 
-你不知道 xi、xj 要用什麼 vector 來描述它
+或許，它可以抓到一些字首、字根的含義
 
-你只知道他們的關係
+不過基本上，現在大家並不是這麼做的
 
-你其實也可以用 LLE 這種方法
+那怎麼找這個 Word Embedding 呢
 
-那 LLE 呢，你其實需要好好的調一下你的 neighbor 選幾個
+這邊的作法是這樣子
 
-你 neighbor 選的數目要剛剛好才會得到好的結果
+它基本的精神就是
 
-那這邊，是從原始的 paper 裡面截出來的圖
+你要如何了解一個詞彙的含義呢
 
-原始的 paper 它的題目實在是太潮了
+你要看這個詞彙的 contest
 
-他是 “Think Globally, Fit Locally” 這樣子
+每一個詞彙的含義
 
-太精彩了，很好的一個題目
+可以根據它的上下文來得到
 
-然後，它調了不同的 K
+舉例來說
 
-如果你今天 K 太小
+假設機器讀了一段文字是說
 
-你得出來的結果會不太好
+馬英九520宣誓就職
 
-K 太大，得到的結果也不太好
+它又讀了另外一段新聞說
 
-為什麼 K 太大得到的結果不太好呢？
+蔡英文520宣誓就職
 
-因為我們之前的假設
+對機器來說，雖然它不知道馬英九指的是什麼
 
-就是每一個這個 Euclidean distance
+他不知道蔡英文指的是什麼
 
-只在很近的距離之內，可以被這樣想
+但是馬英九後面有接520宣誓就職
 
-所以，這個點和點之間的
+蔡英文的後面也有接520宣誓就職
 
-data point 和 data point 之間的關係
+對機器來說，只要它讀了大量的文章
 
-在 transform前後可以被 keep 住
+發現說，馬英九跟蔡英文後面都有類似的 contest
 
-只有在距離很近的時候
+它前後都有類似的文字
 
-才能夠成立
+機器就可以推論說
 
-當你 K 選很大的時候
+蔡英文跟馬英九代表了某種有關係的 object
 
-你會考慮一些距離很遠的點
+他們是某些有關係的物件
 
-你會考慮一些 transform 以後
+所以它可能也不知道他們是人
 
-relation 沒有辦法 keep 住的點
+但它知道說，蔡英文跟馬英九這兩個詞彙
 
-有一些關係太弱了，transform 以後沒有辦法 keep 住
+代表了，可能有同樣地位的東西
 
-那它不是這個比翼鳥或連理枝的關係
+那怎麼來體現這一件事呢
 
-它太弱了，無法 keep 住
+怎麼用這個精神來找出 Word Embedding 的 vector 呢
 
-但是你不應該把它考慮進來
+有兩個不同體系的作法
 
-所以你的 K，要選一個適當的值
+一個做法叫做 Count based 的方法
 
-那另外一個方法叫 Laplacian Eigenmap
+Count based 的方法是這樣
 
-它的想法是這樣子
+如果我們現在有兩個詞彙，wi, wj
 
-我們之前有說
+它們常常在同一個文章中出現
 
-我們之前在講這個 Semi-supervised learning 的時候
+它們常常一起 co-occur
 
-我們有講過 smoothness assumption
+那它們的 word vector
 
-我們有說，如果你想要比較這個點跟這個點之間的距離
+我們用 V(wi) 來代表
 
-只算它的 Euclidean distance 是不足夠的
+wi 的 word vector
 
-你要看的是它們在這個 high density 的 region 
-之間的 distance
+我們用 V(wj) 來代表，wj 的 word vector
 
-如果兩個點之間
+如果 wi 跟 wj，它們常常一起出現的話
 
-它們有 high density 的 connection
+V(wi) 跟 V(wj) 它們就會比較接近
 
-那它們才是真正的接近
+那這種方法
 
-這件事情
+有一個很代表性的例子
 
-你可以用一個 graph 來描述這件事情
+叫做 Glove vector
 
-也就是說你把你的 data point
+我把它的 reference 附在這邊
 
-construct 成一個 graph
+給大家參考
 
-你算你的 data point 兩兩之間的相似度
+那這個方法的原則是這樣子
 
-如果相似度超過一個 thereshold
+假設我們知道
 
-就把它們 connect 起來
+wi 的 word vector 是 V(wi)
 
-而建一個 graph 的方法有很多
+wj 的 word vector 是 V(wj)
 
-有很多不同的方法
+那我們可以計算它的 inner product
 
-總之，你就把比較近的點
+假設 Nij 是 wi 跟 wj
 
-把它們連起來變成一個 graph
+它們 co-occur 在同樣的 document 裡面的次數
 
-那你把點變成 graph 以後
+那我們就希望為 wi 找一組 vector
 
-你考慮這個 smoothness 的距離
+為 wj 找一個組 vector
 
-就可以被這個 graph 上面的 connection 來 approximate
+然後，希望這兩個
 
-那我們之前在講 Semi-supervised learning 的時候
-
-我們是這樣說的
-
-如果今天 x1 跟  x2 在 high density 的 region 上面
-
-它們是相近的
-
-那它們的 label
-
-y1\head 和 y2\head，很有可能是一樣的
-
-雖然說 Semi-supervised learning 的時候
-
-我們可以這麼做
-
-我們有一項是考慮有 label 的 data 的項
-
-有另外一項是跟 labeled data 沒有關係的
-
-我們只可以利用這個 unlabeled 的 data
-
-那這一項的作用
-
-它是要考慮說我們現在得到的 label 是不是 smooth 的
-
-它的作用很像一個 regularization 的 term
-
-那這個 S 這一項啊
-
-這個 S 這一項啊
-
-它等於 yi 減 yj 的這個
-
-它跟 yi 跟 yj 的這個距離
-
-然後乘上 wi, j
-
-也就是說，那個 wi, j 是什麼呢
-
-wi, j 是說，如果今天兩個 data point xi 跟 xj
-
-他們在圖上是相連的
-
-那 wi, j 就是他們的相似成度
-
-如果在圖上是沒有相連的
-
-他就是 0
-
-然後我們說
-
-如果今天wi 跟 wj 他們很相近的話
-
-那 wi, j 就有一個很大的值
-
-就是希望yi 跟 yj 越接近越好
-
-反之如果 wi, j 是 0
-
-那 yi 跟 yj 要是什麼值都可以
-
-那這個 S
-
-就是evaluate 說，你現在得到的 label 有多麽的 smooth
-
-那麼還說
-
-這個 S 可以寫成一個 y 的 vector 乘上 L 再乘上 y
-
-這個 L 就是 graph 的 laplacian
-
-L 等於 E 減 W
-
-這個大家回去 check 一下之前的投影片就知道了
-
-那同樣的道理可以被 apply 在完全
-unsupervised 的 test 上面
-
-我們可以說
-
-如果 x1 跟 x2 在 high density 的 region 他們是 close 的
-
-那我們就會希望， z1 跟 z2 他們也是相近的
-
-所以我們可以一樣把剛才那個
-smoothness 的式子寫出來
-
-我們可以寫說
-
-我這邊寫平方可能是比較不好啦
-
-我這邊應該寫  Euclidean distance 比較好
-
-或者寫他的這個 two norm distance 比較好
-
-因為我只是從前面投影片 copy 過來
-
-只是把 y 改成 z 而已
-
-就忘了把它改過來
-
-好沒關係，那今天這個把 x1 跟 x2 變成 z1 跟 z2 以後
-
-你的這個 z1 跟 z2 應該是長什麼樣子呢
-
-你今天應該是這樣子
-
-如果今天 xi 跟 xj
-
-如果這個 i 跟 j 的這兩個 datapoint 他們之間的 wi, j 很像
-
-那 zi 跟 zj 做完 dimension reduction 以後他們的距離就很近
-
-反之呢，如果他們的 wi, j 很小
-
-那他們的距離要怎樣就都可以
-
-你覺得，這樣 ok 嗎？
-
-我們就找一個 zi 跟 zj minimize 這個 S 的值
-
-你不覺得這麼做是有問題的嗎
-
-給大家五秒鐘想想看，這個問題出在哪裡
-
-其實，這個問題是這樣子
-
-你不需要告訴我 wi, j 是什麼
-
-我一秒就可以告訴你說
-
-要 minimize x 的時候，我應該選什麼值
-
-心算就可以得到了
-
-選什麼值呢？
-
-我把所有的 zi 跟 zj 通通設一樣的值就好了
-
-結束
-
-把所有 zi 跟 zj 我通通都設一樣的值，比如說通通都設0
-
-那 S 就等於 0
-
-這個問題就結束了
-
-所以，光是有這個式子是不夠的
-
-那你可能說剛剛在 Semi-supervised learning 的時候
-你怎麼不講這句話呢
-
-之前在 Semi-supervised learning 的時候
-
-我們還有 supervised learning，"supervise" 那個 labeled data給我們的那一項
-
-所以，如果你把所有的 y，所有的 label 都設成一樣的
-
-那你在 supervise 那一項，你得到的 lost 就會很大
-
-那我們要同時 balance supervise 那一項
-跟 semi-supervise 那一項
-
-我們要同時 balance supervise 那一項的 cost 
-跟 regularization 的 term
-
-所以你不會選擇讓所有的 y 通通都是一樣的
-
-但在這邊少了 supervise 的東西
-
-所以變成選擇所有的 z 都是一樣
-
-反而是一個最好的 solution
-
-所以，這件事情是行不通的
-
-怎麼辦呢？
-
-你要給你的 z 一些 constraint
-
-什麼樣的 constraint 呢？
-
-會給的 constraint 是這樣
-
-如果今天 z 他降維以後的空間是 M 維的空間
-
-是 M 維的空間，比方說 M 是 2 之類的
-
-那你不會希望說
-
-你的 z 他還分佈在一個比 M 還要小的 dimension 裡面
-
-因為我們現在要做的事情
-
-是希望把高維空間中塞進去的低維空間展開
-
-那我們不希望說我們展開以後
-
-其實展開的結果他在一個更低維的空間裡面
-
-所以，今天假如你的 z 的 dimension 是 M 的話
-
-你會希望你找出來的那些點
-
-假設現在總共有 N 個點
-
-z1 到 zN
-
-他們做 span 以後，會等於 RM
-
-也就是說 z，他不是活在一個比 M 維更低維的空間裡面
-
-他就會佔據整個 M 維的空間這樣子
-
-其實，如果你要解這個式子的話
-
-你解一解就會發現說
-
-你解出來的這個 z 跟我們前面看到的那個
-graph laplacian L 是有關係的
-
-他其實就是 graph laplacian 的 eigenvector
-
-對應到比較小的 eigenvalue 的那些 eigenvector
-
-這個大家再自己 check 一下文件就好
-
-所以他叫做 Laplacian Eigenmap
-
-因為我們找的是那個 laplacian matrix 的 eigenvector
-
-如果你今天先找出 z 以後
-
-你再去做 cluster
-
-你先找出 z，再用 K-means 做 clustering 的話
-
-這一招有一個很潮的名字，叫做 spectral clustering
-
-那接下來呢，我們就要講 t-SNE
-
-那 t-SNE 他是 T-distributed Stochastic Neighbor Embedding 的縮寫
-
-那 t-SNE 他解決什麼樣的問題呢
-
-前面那些問題啊，有一個最大的問題就是
-
-他只假設相近的點應該要是接近的
-
-但他們沒有假設說，不相近的點沒有要接近
-
-他沒有假設說，不相近的點要分開
-
-所以比如說你用 LLE 在 MNIST 上
-
-你會遇到這樣的情形
-
-他確實會把不同的點呢
-
-他確實會把，
-這個不同的顏色代表不同的 digit 不同的 class，
-
-他確實會把不同的 class都塞在一起
-
-然後他確實會把同個 class 的點都聚集在一起
-
-但他沒有防止說不同 class 的點不要疊成一團
-
-如果他們都疊成一團的時候
-
-沒有這個顏色
-
-這些點還是擠在一起，你還是沒有辦法分開
-
-這是另外一個例子
-
-做在這個 COIL-20上面
-
-COIL 是一個 image 的 corpus
-
-他裡面的 image 就是某一個圖
-
-比如說一個汽車、一個玩具車
-
-然後把它轉一圈，然後拍很多張不同的照片這樣子
-
-這邊同樣的顏色代表同一個 object
-
-你會發現說，它找到一些圈圈
-
-這個圈圈代表什麼意思呢？
-
-這個圈圈代表，同一個 object 在做旋轉的時候
-
-它每一張圖都很像
-
-但是，旋轉的時候每一張圖都很像
-
-但是你看一個東西的正面和側面，他卻是非常不一樣
-
-所以，這個圈圈就顯示你把某一張圖做旋轉以後
-
-你所得到
-
-在做 dimension reduction 以後
-
-你所得到的結果
-
-但是一樣
-
-你會發現說，不同的 object 其實他們是擠成一團的
-
-沒有辦法分開
-
-所以如果做 t-SNE的話，做 t-SNE 是怎樣呢？
-
-做 t-SNE，我們一樣是要做降維
-
-把原來的 data point x
-
-變成比較 low dimension 的 vector z
-
-那在原來的 x 這個 space 上面
-
-我們會計算所有的點的 pair，xi 和 xj 之間的 similarity
-
-這裡先寫成 S(xi, xj)
-
-接下來，會做一個 normalization
-
-我們會計算一個 P(xj | xi)
-
-這個 P(xj | xi)，他是從 xi 跟 xj 的 similarity 來的
-
-我們等下會說這個 similarity 要怎麼算
-
-這個 P(xj | xi)，在分子的地方是 xi 跟 xj 的 similarity
-
-然後分母的地方
-
-就是 summation over 除了 xi 以外，所有其他的點
-
-和 xi 之間所算出來的距離
-
-所以你會發現說
-
-xi 對其他所有的 data point
-
-它所算出來的這個 P(xj | xi)
-
-它的 summation 應該要是 1
-
-另外假設我們今天已經找出了一個 low dimension 的 representation 就是 zi 跟 zj 的話
-
-我們已經把 x 變成 z 的話
-
-那我們也可以計算 zi 和 zj 之間的 similarity
-
-這邊 similarity 我們寫成 S'
-
-那一樣你可以計算一個 Q( zj | zi)
-
-他的分子的地方就是 S'( zi, zj)
-
-分母的地方就是 summation over zi
-跟所有 database 裡面的 data point zk 之間的距離
-
-那今天有做這個 normalization 其實感覺是必要的
-
-因為如果你又做這個 normalization 的話
-
-因為你不知道在高維空間中算出來的距離
-
-S(xi, xj) 跟 S’(zi, zj)，它們的 scale 是不是一樣的
-
-如果，你今天有做這個 normalization
-
-那你最後就可以把他們都變成機率
-
-那這個時候他們值都會介於 0 到 1 之間
-
-他們的 scale 會是一樣的
-
-那接下來我們要做的事情就是
-
-我們現在還不知道 zi 跟 zj 他們的值到底是多少
-
-這是我們要被找出來的
-
-那麼希望找一組 zi 跟 zj
-
-它可以讓這一個 distribution 跟這一個 distribution
+這兩件事情
 
 越接近越好
 
-我們要讓原來在這個
+你會發現說，這個概念
 
-根據 similarity 在 S 這個原來的 space 算出來 distribution
+跟我們之前講的 LSA 是
 
-跟在這個 dimension reduction 以後的 space 算出來的 distribution
+跟我們講的 matrix factorization 的概念
 
-越接近越好
+其實是一樣的
 
-怎麼衡量兩個 distribution 之間的相似度呢？
+其實是一樣的
 
-可以很直覺的衡量兩個 distribution 之間的相似度的方法
+另外一個方法
 
-就是我們之前看到的 KL divergence
+叫做 Prediction based 的方法
 
-所以，我們今天要做的事情
+我發現我這一邊拼錯了
 
-就是找一組 z
+這應該是 Prediction based 的方法
 
-它可以做到這個
+那我不知道說
 
-xi 的這個 distribution，跟 xi 對其他 point 的 distribution
+就我所知，好像沒有人
 
-跟 zi 對其他 point 的 distribution
+很認真的比較過說
 
-這兩個 distribution 之間的 KL divergence 越小越好
+Prediction based 方法
 
-summation over 所有的 data point
+跟 Count based 的方法
 
-然後你要使得這一項，它的值越小越好
+它們有什麼樣非常不同的差異
 
-然後，我把這個值就寫在這邊
+或者是誰優誰劣
 
-這件事情要怎麼做呢？
+如果你有知道這方面的 information，或許
 
-要怎麼做
+你可以貼在我們的社團上面
 
-其實這件事情，實際上並沒有很困難
+我講一下， Prediction based 的方法是怎麼做的呢
 
-實際上你就是用 Gradient descent 做的
+Prediction based 的方法，它的想法是這樣
 
-你想想看，假設你知道這個 similarity 的 matrix
+我們來 learn 一個  neural network
 
-他這個式子長什麼樣子，然後這個式子長什麼樣子
+它做的事情是 prediction，predict 什麼呢？
 
-那你把這些式子代進去，你把這些式子代進去
+這個 neural network 做的事情是 given 前一個 word
 
-然後，接下來你只要對 z 做微分，然後做 Gradient Descent
+假設給我一個 sentence
 
-就搞定這個問題，就結束了
+這邊每一個 w 代表一個 word
 
-那今天有一個問題就是你在做 t-SNE 的時候
+given w(下標 i-1)，這個 prediction 的 model
 
-他會計算所有 data point 之間的 similarity
+這個 neural network，它的工作是要
 
-所以它的運算量有點大，所以 t-SNE 有點麻煩
+predict 下一個可能出現的 word 是誰
 
-如果 data point 比較多的時候，你這電腦會跑不動
+那我們知道說，每一個 word
 
-一個常見的做法是你會先做降維
+我們都用 1-of-N encoding，可以把它表示成一個 feature vector
 
-比如說，你原來的 dimension 很大
+所以，如果我們要做 prediction 這一件事情的話
 
-你不會直接從很高的 dimension 直接做 t-SNE
+我們就是要 learn 一個 neural network
 
-因為你這樣子計算 similarity 的時間太長
+它的 input
 
-你通常會先做，用比較快的方法比如說 PCA
+就是 w(下標 i-1) 的 1-of-N encoding 的 feature vector
 
-先用 PCA 做降維，比如說，先降到 50 維
+1-of-N encoding 的 vector
 
-然後再用 t-SNE 從 50 維降到 2 維
+那它的 output 就是
 
-這個是比較常見的做法
+下一個 word, wi 是某一個 word 的機率
 
-那其實像我們今天講的這些方法啊
+也就是說，這一個 model 它的 output
+
+它 output 的 dimension 就是 vector 的 size
+
+假設現在世界上有 10 萬個 word
+
+這個 model 的 output 就是 10 萬維
+
+每一維代表了某一個 word
+
+是下一個 word 的機率
+
+每一維代表某一個 word
+
+是會被當作 wi
+
+它會是下一個 word, wi 的機率
+
+所以 input 跟 output 都是 lexicon size
+
+只是它們代表的意思是不一樣的
+
+input 是 1-of-N encoding，output 是下一個 word 的機率
+
+那假設這就是一個
+
+一般我們所熟知的
+
+multi-layer 的 Perceptron，一個 deep neural network
+
+那你把它丟進去的時候
+
+你把這個 input feature vector 丟進去的時候
+
+它會通過很多 hidden layer
+
+通過一些 hidden layer，你就會得到一些 output
+
+接下來，我們把第一個 hidden layer 的 input 拿出來
+
+我們把第一個 hidden layer 的 input 拿出來
+
+假設第一個 hidden layer 的 input
+
+我們這一邊寫作，它的第一個 dimension 是 Z1
+
+第二個 dimension 是 Z2，以此類推
+
+這邊把它寫作 Z
+
+那我們用這個 Z
+
+就可以代表一個 word
+
+input 不同的 1-of-N encoding
+
+這邊的 Z 就會不一樣
+
+所以，我們就把這邊的 Z
+
+拿來代表一個詞彙
+
+你 input 同一個詞彙
+
+它有同樣的 1-of-N encoding
+
+在這邊它的 Z 就會一樣
+
+input 不同的詞彙，這邊的 Z 就會不一樣
+
+所以，我們就用這個 Z
+
+這一個 input 1-of-N encoding 得到 Z 的這個 vector
+
+來代表一個 word
+
+來當作那一個 word 的 embedding
+
+你就可以得到這一個現象
+
+你就可以得到這樣的 vector
+
+為什麼用這個 Prediction based 的方法
+
+就可以得到這樣的 vector 呢
+
+Prediction based 的方法
+
+是怎麼體現我們說的
+
+可以根據一個詞彙的上下文
+
+來了解一個詞彙的涵義，這一件事情呢？
+
+這邊是這樣子的
+
+假設我們的 training data 裡面呢
+
+有一個文章是
+
+告訴我們說，馬英九跟蔡英文宣誓就職
+
+另外一個是馬英九宣誓就職
+
+在第一個句子裡面
+
+蔡英文是 w(下標 i-1)，宣誓就職是 w(下標 i)
+
+在另外一篇文章裡面
+
+馬英九是 w(下標 i-1)，宣誓就職是  w(下標 i)
+
+那你在訓練這個 Prediction  model 的時候
+
+不管是 input 蔡英文，還是馬英九
+
+不管是 input 蔡英文還是馬英九的 1-of-N encoding
+
+你都會希望 learn 出來的結果
+
+是宣誓就職的機率比較大
+
+因為馬英九和蔡英文後面
+
+接宣誓就職的機率都是高的
+
+所以，你會希望說 input 馬英九跟蔡英文的時候
+
+它 output，是 output 對應到宣誓就職那一個詞彙
+
+它的那個 dimension 的機率是高的
+
+為了要讓
+
+蔡英文和馬英九雖然是不同的 input
+
+但是，為了要讓最後在 output 的地方
+
+得到一樣的 output
+
+你就必須再讓中間的 hidden layer 做一些事情
+
+中間的 hidden layer 必須要學到說
+
+這兩個不同的詞彙
+
+必需要把他們 project 到
+
+必須要通過這個
+
+必須要通過 weight 的轉換
+
+通過這個參數的轉換以後
+
+把它們對應到同樣的空間
+
+在 input 進入 hidden layer 之前
+
+必須把它們對應到接近的空間
+
+這樣我們最後在 output 的時候
+
+它們才能夠有同樣的機率
+
+所以，當我們 learn 一個 prediction model 的時候
+
+考慮一個 word 的 context這一件事情
+
+就自動的，被考慮在這個 prediction model裡面
+
+所以我們把這個 prediction model 的
+
+第一個 hidden layer 拿出來
+
+我們就可以得到
+
+我們想要找的這種 word embedding 的特性
+
+那你可能會想說
+
+如果只用 w(下標 i-1)去 predict w(下標 i)
+
+好像覺得太弱了
+
+就算是人，你給一個詞彙
+
+要 predict 下一個詞彙
+
+感覺也很難
+
+因為，如果只看一個詞彙，
+
+下一個詞彙的可能性，是千千萬萬的
+
+是千千萬萬的
+
+那怎麼辦呢？怎麼辦呢？
+
+你可以拓展這個問題
+
+比如說，你可以拓展說
+
+我希望 machine learn 的是 input 前面兩個詞彙
+
+w(下標 i-2) 跟 w(下標 i-1)
+
+predict 下一個 word, w(下標 i)
+
+那你可以輕易地把這個 model 拓展到 N 個詞彙
+
+一般我們，如果你真的要 learn 這樣的 word vector 的話
+
+你可能會需要你的 input
+
+可能通常是至少 10 個詞彙
+
+你這樣才能夠 learn 出
+
+比較 reasonable 的結果
+
+只 input 一個或兩個，這都太少了
+
+那我們這邊用 input 兩個 word 當作例子
+
+那你可以輕易地把
+
+這個 model 拓展到 10 個 word
+
+那這邊要注意的事情是這個樣子
+
+本來，如果是一般的 neural network
+
+你就把 input w(下標 i-2) 和 w(下標 i-1) 的
+
+1-of-N encoding 的 vector，把它接在一起
+
+變成一個很長的 vector
+
+直接丟都到 neural network 裡面
+
+當作 input 就可以了
+
+但是實際上，你在做的時候
+
+你會希望 w(下標 i-2) 的
+
+這個跟它相連的 weight
+
+跟和 w(下標 i-1) 相連的 weight
+
+它們是被 tight 在一起的
+
+所謂 tight 在一起的意思是說
+
+w(下標 i-2) 的第一個 dimension
+
+跟第一個 hidden layer 的第一個 neuron
+
+它們中間連的 weight
+
+和 w(下標 i-1) 的第一個 dimension
+
+和第一個 hidden layer 的 neuron，它們之間連的位置
+
+這兩個 weight 必須是一樣的
+
+所以，我這邊故意用同樣的顏色來表示它
+
+這一個 dimension，它連到這個的 weight
+
+跟第一個 dimension，它連到這邊的 weight
+
+它必須是一樣的
+
+所以，我這邊故意用同樣的顏色來表示他
+
+這一個 dimension，它連到它的 weight
+
+跟它連到它的 weight，必須是一樣的
+
+以此類推
+
+希望大家知道知道我的意思
+
+那為什麼要這樣做呢？
+
+為什麼要這樣做呢？
+
+一個顯而易見的理由是這樣
+
+一個顯而易見的理由是說
+
+如果，我們不這麼做
+
+如果我們不這麼做，你把不同的 word
+
+你把同一個 word 放在
+
+w(下標 i-2) 的位置跟放在 w(下標 i-1) 的位置
+
+通過這個 transform 以後
+
+它得到的 embedding 就會不一樣
+
+如果，你必須要讓這一組 weight
+
+和這一組weight 是一樣的
+
+那你把一個 word 放在這邊，通過這個 transform
+
+跟把一個 weight 放在這邊，通過一個 transform
+
+它們得到的 weight 才會是一樣的
+
+當然另外一個理由你可以說
+
+我們做這一件事情的好處是
+
+我們可以減少參數量
+
+因為 input 這個 dimension 很大，它是十萬維
+
+所以這個 feature vector，就算你這一邊是50 維
+
+它也是一個非常非常、碩大無朋的 matrix
+
+有一個已經覺得夠卡了
+
+所以，有兩個更是吃不消
+
+更何況說，我們現在 input 往往是 10 個 word
+
+所以，如果我們強迫讓
+
+所有的 1-of-N encoding
+
+它後面接的 weight 是一樣的
+
+那你就不會隨著你的 contest 的增長
+
+而需要這個更多的參數
+
+或許我們用 formulation 來表示
+
+會更清楚一點
+
+現在，假設 w(下標 i-2) 的 1-of-N encoding 就是 X2
+
+w(下標 i-1) 的 1-of-N encoding 就是 X1
+
+那它們的這個長度
+
+都是 V 的絕對值
+
+它們的長度我這邊都寫成 V 的絕對值
+
+那這個 hidden layer 的 input
+
+我們把它寫一個 vector, Z
+
+Z 的長度，是 Z 的絕對值
+
+那我們把這個 Z 跟
+
+X(i-2) 跟 X(i-1) 有什麼樣的關係
+
+Z 等於 X(i-2) * W1 + X(i-1) * W2
+
+你把 X(i-2) * W1 + X(i-1) * W2，就會得到這個 Z
+
+那現在這個 W1 跟 W2
+
+它們都是一個 Z 乘上一個 V dimension 的 weight matrix
+
+那在這邊，我們做的事情是
+
+我們強制讓 W1 要等於 W2
+
+要等於一個一模一樣的 matrix, W
+
+所以，我們今天實際上在處理這個問題的時候
+
+你可以把 X(i-2) 跟 X(i-1) 直接先加起來
+
+因為 W1 跟 W2 是一樣的
+
+你可以把 W 提出來
+
+你可以把 X(i-1) 跟X(i-2) 先加起來
+
+再乘上 W 的這個 transform
+
+就會得到 z
+
+那你今天如果要得到一個 word 的 vector 的時候
+
+你就把一個 word 的 1-of-N encoding
+
+乘上這個 W
+
+你就可以得到那一個 word 的 Word Embedding
+
+那這一邊會有一個問題，就是我們在實做上
+
+如果你真的要自己實做的話
+
+你怎麼讓這個 W1 跟 W2
+
+它們的位 weight 一定都要一樣呢
+
+事實上我們在 train CNN 的時候
+
+也有一樣類似的問題
+
+我們在 train CNN 的時候
+
+我們也要讓 W1 跟 W2
+
+我們也要讓某一些參數，它們的 weight
+
+必須是一樣的
+
+那怎麼做呢？這個做法是這樣子
+
+假設我們現在有兩個 weight, wi 跟 wj
+
+那我們希望 wi 跟 wj，它的 weight 是一樣的
+
+那怎麼做呢？
+
+首先，你要給 wi 跟 wj 一樣的 initialization
+
+訓練的時候要給它們一樣的初始值
+
+接下來，你計算 wi 的
+
+wi 對你最後 cost function 的偏微分
+
+然後 update wi
+
+然後，你計算 wj 對 cost function 的偏微分
+
+然後 update wj
+
+你可能會說 wi 跟 wj 
+
+如果它們對 C 的偏微分是不一樣的
+
+那做 update 以後
+
+它們的值，不就不一樣了嗎？
+
+所以，如果你只有列這樣的式子
+
+wi 跟 wj 經過一次 update 以後，它們的值就不一樣了
+
+initialize 值一樣也沒有用
+
+那怎麼辦呢？
+
+我們就把 wi 再減掉
+
+再減掉 wj 對 C 的偏微分
+
+把 wj 再減掉 wi 對 C 的偏微分
+
+也就是說 wi 有這樣的 update 
+
+wj 也要有一個一模一樣的 update
+
+wj 有這樣的 update
+
+wi 也要有一個一模一樣的 update
+
+如果你用這樣的方法的話呢
+
+你就可以確保 wi 跟 wj，它們是
+
+在這個 update 的過程中
+
+在訓練的過程中
+
+它們的 weight 永遠都是被 tight 在一起的
+
+永遠都是一樣
+
+那要怎麼訓練這個 network 呢？
+
+這個 network 的訓練
+
+完全是 unsupervised 的
+
+也就是說，你只要 collect 一大堆文字的data
+
+collect 文字的 data 很簡單
+
+就寫一個程式上網去爬就好
+
+寫一個程式爬一下
+
+八卦版的 data
+
+就可以爬到一大堆文字
+
+然後，接下來就可以 train 你的 model
+
+怎麼 train，比如說這邊有一個句子就是
+
+潮水退了，就知道誰沒穿褲子
+
+那你就讓你的 model
+
+讓你的 neural network input "潮水" 跟 "退了"
+
+希望它的 output 是 "就" 這個樣子
+
+你會希望你的 output 跟"就" 的 cross entropy
+
+"就" 也是一個 1-of-N encoding 來表示
+
+所以，你希望你的 network 的 output 
+
+跟 "就" 的 1-of-N encoding
+
+是 minimize cross entropy
+
+然後，再來就 input "退了 " 跟 "就"
+
+然後，希望它的 output 跟 "知道" 越接近越好
+
+然後 output "就" 跟 "知道" 
+
+然後就，希望它跟 "誰" 越接近越好
+
+那剛才講的
+
+只是最基本的型態
+
+其實這個 Prediction based 的 model 
+
+可以有種種的變形
+
+目前我還不確定說
+
+在各種變形之中哪一種是比較好的
+
+感覺上，它的 performance
+
+在不同的 task上互有勝負
+
+所以，很難說哪一種方法一定是比較好的
+
+那有一招叫做
+
+Continuous bag of word, (CBOW)
+
+那 CBOW 是這個樣子的
+
+CBOW 是說，我們剛才是拿前面的詞彙
+
+去 predict 接下來的詞彙
+
+那 CBOW 的意思是說
+
+我們拿某一個詞彙的 context
+
+去 predict 中間這個詞彙
+
+我們拿 W(i-1) 跟 W(i+1) 去 predict Wi
+
+用 W(i-1) 跟 W(i+1)去 predict Wi
+
+那 Skip-gram 是說
+
+我們拿中間的詞彙去 predict 接下來的 context
+
+我們拿 Wi 去 predict W(i-1) 跟 W(i+1)
+
+也就是 given 中間的 word，我們要去 predict 它的周圍
+
+會是長什麼樣子
+
+講到這邊大家有問題嗎？
+
+講到這邊常常會有人問我一個問題
+
+假設你有足夠 word vector 相關的文獻的話
+
+你可能會說
+
+其實這個 network 它不是 deep 的阿
+
+雖然，常常在講 deep learning 的時候
+
+大家都會提到 word vector
+
+把它當作 deep learning 的一個 application
+
+但是，如果你真的有讀過 word vector 的文獻的話
 
 你會發現說
 
-比如說，像 t-SNE，如果你給他一個新的 data point
+這個 neural network，它不是 deep 的
 
-它是沒辦法做的，對不對
+它其實就是一個 hidden layer
 
-他只能夠，你給他一大群
+它其實是一個 linear 的 hidden layer
 
-已經先給他一大堆 x，他幫你把每一個 x 的 z 都找出來
+了解嗎？就是
 
-但你找完這些 z 以後
+這個 neural network，它只有一個 hidden layer
 
-再給他一個新的 x
+所以，你把 word input 以後，你就得到 word embedding
 
-你要重新跑一遍這一整套演算法，很麻煩
+你就直接再從那個 hidden layer，就可以得到 output 
 
-所以，一般你不會
+它不是 deep 的，為什麼呢？
 
-一般 t-SNE 的作用比較不是用在這種 training testing 的這種 base 上面
+為什麼？常常有人 問我這個問題
 
-通常比較常用的做法是
+那為了回答這個問題 
 
-拿來做 visualization
+我邀請了  Tomas Mikolov 來台灣玩這樣
 
-如果你已經有一大堆的 x，他是 high dimensional 的
+Tomas Mikolov 就是 propose word vector 的作者
 
-那你想要 visualize 他們在二維空間的分佈上是什麼樣子
+所以，如果你有用過 word vector 的 toolkit 的話
 
-你用 t-SNE
+你可能有聽過他的名字
 
-那 t-SNE 往往可以給你不錯的結果
+那就問他說，為什麼這個 model不是 deep 的呢？
 
-那 t-SNE 現在可能是最多人使用的一種選擇
+他給我兩個答案
 
-好那我們再來要講 t-SNE 一個非常有趣的地方
+他說，首先第一個就是
 
-就是他的這個 similarity 的選擇是非常的神妙的
+他並不是第一個 propose word vector 的人
 
-我們在這個原來的 data point 的 space 上面
+在過去就有很多這樣的概念
 
-你的 similarity 的選擇
+那他最 famous 的地方是
 
-它是選擇 RBF 的 function
+他把他寫的一個非常好的 toolkit 放在網路上
 
-就選擇說，我們要讓 xi，
+他在他的 toolkit 裡面，如果你看他的 code 的話
 
-我們這個 evaluate similarity 的方式
+他有種種的 tip
 
-是計算 xi 跟 xj 的 Euclidean distance
+所以，你自己做的時候做不出他的 performance 的
 
-然後取一個負號，再取 exponential
+他是一個非常非常強 的 engineer
 
-那我們之前有說如果你要在 graph 上算 similarity 的話
+他有各種他自己直覺的 sense
 
-用這種方法比較好
+所以你自己做，你做不出他的 performance
 
-因為它可以確保說只有非常相近的點才有值
+用他的 toolkit，跑出來的 performance 就是特別好
 
-那 exponential 他掉得非常快
+所以，這是一個
 
-所以只要距離一拉開，similarity 就會變得很小
+他非常厲害的地方
 
-那在 t-SNE之前有一個方法叫做 SNE
+他說，在他之前其實就有很多人做過
 
-就把前面的 t 拿掉
+word vector，也有提出類似的概念
 
-SNE 就是一個很直覺的想法
+他說他寫的，他有一篇 word vector 的文章跟 toolkit
 
-在 data point 原來的 space 上用這個 evaluation 的 measure
+他想要 verify 最重要的一件事情是說
 
-當然在新的 space 上你用同樣的 measure 就好啦
+過去其實其他人就是用 deep
 
-選不同 measure，呃，你直覺就選一樣的 measure 嘛
+他想要講的是說，其實這個 task
 
-那 t-SNE 神妙的地方就是
+不用 deep 就做起來了
 
-他在你 dimension reduction 以後的 space
+不用 deep 的好處就是減少運算量
 
-他選的 measure 跟原來的 space 是不一樣的
+所以它可以跑很大量、很大量、很大量的 data
 
-他在 dimension reduction 以後選的 space
+那我聽他這樣講
 
-是這個 t-distribution 的其中一種
+我就想起來，其實過去確實是
 
-t-distribution 裡面有參數你可以調他
+有人已經做過 word vector
 
-可以產生很多種不同的 distribution
+過去確實已經有做過 word vector 這件事情
 
-t-distribution 的其中⼀一種
+只是那些結果沒有紅起來
 
-他是 1 除以 1 加 Euclidean distance 的平⽅
+我記得說，我大學的時候
 
-那你可能問說，為什麼要這樣做呢
+就看過類似的 paper
 
-我可以提供⼀個很直覺的理由
+我大學的時候就有看過
 
-假設橫軸代表了在原來 space 上的 Euclidean distance
+其實就是一樣，就是 learn 一個 Prediction model
 
-或者是
+predict 下一個 word 的做法
 
-做 dimension reduction 以後的 Euclidean distance
+只是那個時候是 deep
 
-那這個紅⾊這條線，是這⼀項
+在我大學的時候
 
-藍色這條線，是這⼀項
+那時候 deep learning 還不紅
 
-紅色這條線是 RBF function
+我看到那一篇 paper  的時候
 
-藍色這條線是 t-distribution
+他最後講說我 train 了這個 model
 
-你會發現說呢
+我花了 3 週，然後我沒有辦法把實驗跑完
 
-如果原來在這個點跟這個點
+所以結果是很好的
 
-之後做 Dimension reduction 以後
+就其他方法，他可以跑很多的 iteration
 
-要怎麼才能維持它原來的 space 呢?
+然後說這個 neural network 的方法
 
-那你就把它變成這個樣⼦
+我跑了 5 個 epoch，花了 3 週，我實在做不下去
 
-它就可以維持它原來的 space
+所以，performance 沒有特別好
 
-如果你要維持他們原來之間的距離
+而且想說，這是什麼荒謬的做法
 
-如果你今天要維持他們原來的機率的話
+但是，現在運算量不同
 
-要維持原來他們之間相對的關係的話
+所以，現在要做這一件事情呢
 
-那你就把他變成這樣
+都沒有問題
 
-那你會發現說
+其實像 word embedding 這個概念
 
-如果本來距離比較近，他們的影響是比較⼩的
+在語音界，大概是在 2010 年的時候開始紅起來的
 
-如果本來就已經有一段距離
+那個時候我們把它叫做 continuous 的 language model
 
-那從原來的這個 distribution 變到 t-distribution 以後
+一開始的時候
 
-他會被拉得很遠
+也不是用 neural network 來得到這個 word embedding的
 
-t-distribution 他的尾巴特別長
+因為 neural network  的運算量比較大
 
-所以如果你本來距離比較遠的話
+所以，一開始並不是選擇 neural network
 
-變到 t-distribution 以後，他會變得更遠
+而是用一些其他方法來
 
-也就是說，原來在高維空間裡面
+一些比較簡單的方法來得到這個 word 的 embedding
 
-如果距離很近
+只是，後來大家逐漸發現說
 
-那做完 transform 以後他還是很近
+用 neural network 得到的結果才是最好的
 
-如果原來就已經有一段距離了，有⼀個 gap
+過去其他不是 neural network 的方法
 
-那做完 transform 以後他就會被拉得很遠
+就逐漸式微
 
-所以你會發現說 t-SNE，他畫出來的圖往往長得像這樣
+通通都變成 neural network based 的方法
 
-他會把你的 data point 聚集成一群、一群、一群
+還有一個勵志的故事
 
-因為你的 data point 之間本來只要有一個 gap
+就是Tomas Mikolov 那個
 
-做完 t-SNE 以後，它就會把 gap 強化，gap 就會變得特別明顯
+word vector paper不是非常 famous 嗎？
 
-所以這是 t-SNE 做在 MNIST 上面的結果
+它的 citation，我不知道，搞不好都有 1 萬了
 
-那其實這個不是直接做在 MNIST 的 pixel 上⾯
+他說他第一次投那 一篇 paper 的時候
 
-直接做在 pixel 上面的 performance 看起來沒有這麼好
+他先投到一個，我已經忘記名字的
 
-這是先對 pixel 做 PCA 降維以後，再做在 MNIST 上⾯
+很小很小的會，accept rate 有 70%
 
-那不同顏色代表的是不同的數字
+然後就被 reject 了
 
-那你會發現，不同的數字會變成一群一群的
+他還得到一個 comment，就是這是什麼東西
 
-那 t-SNE 在 COIL-20 上的結果，其實還蠻驚人的
+我覺得這東西一點用都沒有
 
-這邊的每一個圈圈就代表一個 object，他只是轉了一圈以後的結果
+所以，這是一個非常勵志的故事
 
-你會發現這邊有一些被扭曲的圈
+那我們知道說
 
-這扭曲的圈圈是什麼意思呢？
+word vector 可以得到一些有趣的特性
 
-那是因為有⼀些東西，比如說杯⼦
+我們可以看到說
 
-他的這個面長這樣
+如果你把同樣類型的東西的 word vector 擺在一起
 
-它轉 180 度過來以後，他還是長得一模⼀樣
+比如說，我們把這個 Italy
 
-所以你把那個杯子轉 360 度轉一圈的時候
+跟它的首都 Rome 擺在一起
 
-你就會發現說，它在中間某一個地方是很像的 image
+我們把Germany 跟它的首都 Berlin 擺在一起
 
-所以，你會看到說這邊有很多看起來很像 8 的符號
+我們把 Japan
 
-那這邊這很多條線
+跟它的首都 Tokyo 擺在一起
 
-其實好像是說，有 4 部都是⼩汽⾞
+你會發現說
 
-4 部小汽車看起來是蠻像的
+它們之間是有某種固定的關係的
 
-所以這邊有四條線是被 align 在一起的
+或者是，你把一個動詞的三態擺在一起
 
-這邊有一個從網路上找到的 t-SNE 動畫
+你會發現說，動詞的三態
 
-他長得是這個樣⼦
+同一個動詞的三態
 
-你看，因為他是用 gradient descent train 的
+它們中間有某種固定的關係
 
-所以你會看到，隨著 iteration 的 process
+成為這個三角形
 
-點會被分得越來越開
+所以從這個 word vector 裡面呢
 
-然後不同的點之間呢
+你可以 discover 你不知道的 word 跟 word 之間的關係
 
-這其實不是做在 MNIST 上，是做在另外⼀個手寫數字辨識的 corpus 上⾯
+比如說，還有人發現說
 
-你會發現說不同的 digit 之間，他是會被分得很開的
+如果你今天把
 
-那 t-SNE 的地方呢，我們就講到這邊
+兩個 word vector 和 word vector 之間，兩兩相減
 
-臺灣大學⼈⼯智慧中心
-科技部⼈工智慧技術暨全幅健康照護聯合研究中⼼
+這個結果是把 word vector 跟 word vector 之間兩兩相減
+
+然後 project 到一個 2 dimensional 的 space 上面
+
+那你會發現說，在這一區
+
+如果今天 word vector 兩兩相減
+
+它得到的結果是落在這個位置的話
+
+那這兩個 word vector 之間，它們就有，比如說
+
+某一個 word 是包含於某一個 word 之間的關係
+
+比如說，你把 (這一邊這個字比較小)
+
+比如說，你把海豚跟會轉彎的白海豚相減
+
+它的 vector 落在這邊
+
+你把演員跟主角相減，落在這一邊
+
+你把工人跟木匠相減，落在這邊
+
+你把職員跟售貨員相減，落在這一邊
+
+你把羊跟公羊相減，落在這邊
+
+如果，某一個東西是
+
+屬於另外一個東西的話
+
+你把它們兩個 word vector 相減
+
+它們的結果呢，會是很類似的
+
+所以用 word vector 的這一個的概念
+
+我們可以做一些簡單的推論
+
+舉例來說， 因為我們知道說
+
+比如說，hotter 的 word vector
+
+減掉 hot 的 word vector 會很接近
+
+bigger 的 word vector 減掉 big 的 word vector 
+
+或是 Rome 的 vector 減掉 Italy 的 vector
+
+會很接近 Berlin 的 vector 減掉 Germany 的 vector 
+
+或是 King 的 vector 減掉 queen 的 vector 會很接近
+
+uncle 的 vector 減掉 aunt 的 vector
+
+如果有人問你說，羅馬之於義大利
+
+就好像 Berlin 之於什麼？
+
+智力測驗都會考這樣的問題
+
+機器可以回答這種問題了
+
+怎麼做呢？因為我們知道說
+
+今天這個問題的答案
+
+Germany 的 vector 會很接近 Berlin 的 vector
+
+減掉 Rome 的 vector 加 Italy 的 vector
+
+因為這 4 個 word vector 中間有這樣的關係
+
+所以你可以把 Germany  放在一邊
+
+把另外三個 vector 放在右邊
+
+所以 Germany 的 vector 會接近 Berlin 的 vector
+
+減掉 Rome 的 vector 再加上 Italy 的 vector
+
+所以，如果你要回答這個問題
+
+假設你不知道答案是 Germany 的話
+
+那你要做的事情就是
+
+計算 Berlin 的 vector
+
+減掉 Rome的 vector，再加 Italy 的 vector
+
+然後看看它跟哪一個 vector 最接近
+
+你可能得到的答案就是 Germany
+
+這邊有一個 word vector 的 demo
+
+就讓機器讀了大量 PTT 的文章以後
+
+它就像這樣
+
+那 word vector 還可以做很多其他的事情
+
+比如說，你可以把不同的語言的 word vector
+
+把它拉在一起
+
+如果，你今天有一個中文的 corpus
+
+有一個英文的 corpus
+
+你各自去、分別去 train 一組 word vector
+
+你會發現說
+
+中文跟英文的 word vector
+
+它是完全沒有任何的關係的
+
+它們的每一個 dimension
+
+對應的含義並沒有任何關係，為什麼？
+
+因為你要 train word vector 的時候
+
+它憑藉的就是上下文之間的關係
+
+所以，如果你今天的 corpus 裡面
+
+沒有中文跟英文的句子混雜在一起
+
+沒有中文跟英文的詞彙混雜在一起
+
+那 machine 就沒有辦法判斷
+
+中文的詞彙跟英文的詞彙他們之間的關係
+
+但是，今天假如你已經事先知道說
+
+某幾個詞彙
+
+某幾個中文的詞彙和某幾個英文的詞彙
+
+它們是對應在一起的
+
+那你先得到一組中文的 vector 
+
+再得到一組英文的 vector
+
+接下來，你可以再 learn 一個  model
+
+它把中文和英文對應的詞彙
+
+比如說，我們知道 "加大" 對應到 "enlarge"
+
+"下跌" 對應到 "fall" 
+
+你把對應的詞彙，通過這個 projection 以後，
+
+把它們 project 在 space上的同一個點
+
+把它們 project 在 space 上面的同一個點
+
+那在這個圖上，綠色的然後下面又有
+
+這個綠色的英文的代表是
+
+已經知道對應關係的中文和英文的詞彙
+
+然後，如果你做這個 transform 以後
+
+接下來有新的中文的詞彙和新的英文的詞彙
+
+你都可以用同樣的 projection
+
+把它們 project 到同一個 space 上面
+
+比如說，你就可以自動知道說
+
+中文的降低跟的英文的 reduce
+
+它們都應該落在這個位置
+
+都應該落在差不多的位置等等這樣
+
+你就可以自動做到
+
+比如說，類似翻譯這個樣子的效果
+
+那這個 embedding不只限於文字
+
+你也可以對影像做 embedding
+
+這邊有一個很好的例子
+
+這個例子是這樣做的
+
+它說，我們先已經找到一組 word vector
+
+比如說，dog 的 vector、horse 的 vector
+
+auto 的 vector 和 cat 的 vector
+
+它們分佈在空間上是這樣子的位置
+
+接下來，你 learn 一個 model 
+
+它是 input 一張 image
+
+output 是跟一個跟 word vector
+
+一樣 dimension 的 vector
+
+那你會希望說
+
+狗的 vector 就散佈在狗的周圍
+
+馬的 vector 就散佈在馬的周圍
+
+車輛的 vector 就散佈在 auto 的周圍
+
+那假設有一些 image 
+
+你已經知道他們是屬於哪一類
+
+你已經知道說這個是狗、這個是馬、這個是車
+
+你可以把它們 project 到
+
+它們所對應到的 word vector 附近
+
+那這個東西有什麼用呢？
+
+假如你今天有一個新的 image 進來
+
+比如說，這個東西，它是個貓
+
+但是你不知道它是貓
+
+機器不知道它是貓
+
+但是你通過它們的 projection 
+
+把它 project 到這個 space 上以後
+
+神奇的是你就會發現它可能就在貓的附近
+
+那你的 machine 就會自動知道說
+
+這個東西叫做貓
+
+當我們一般在做影像分類的時候
+
+大家都已經有做過作業三
+
+作業三就是影像分類的問題
+
+在做影像分類的問題的時候
+
+你的 machine 其實很難去處理
+
+新增加的，它沒有辦法看過的 object
+
+舉例來說，作業 3 裡面
+
+我們就先已經訂好 10 個 class
+
+你 learn 出來的 model
+
+就是只能分這 10 個 class
+
+如果今天有一個新的東西
+
+不在這10個 class 裡面
+
+你的 model 是完全是無能為力 的
+
+它根本不知道它叫做什麼
+
+但是，如果你用這個方法的話
+
+就算有一張 image
+
+是你在 training 的時候，你沒有看過的 class
+
+比如說，貓這個 image
+
+它從來都沒有看過
+
+但是如果貓的這個 image
+
+可以 project 到 cat 的 vector 附近的話
+
+你就會知道說，這一張 image 叫做 cat
+
+如果你可以做到這一件事，就好像是
+
+ machine 先閱讀了大量的文章以後
+
+它知道說，每一個詞彙
+
+指的是什麼意思
+
+它知道說，狗啊，貓啊，馬啊
+
+它們之間有什麼樣的關係
+
+它透過閱讀大量的文章，先了解詞彙間的關係
+
+接下來，在看 image 的時候
+
+它就可以根據它已經閱讀得到的知識
+
+去 mapping 每一個 image
+
+所應該對應的東西
+
+這樣就算是它看到它沒有看過的東西
+
+它也可能可以把它的名字叫出來
+
+那剛才講的呢
+
+都是 word embedding 
+
+也可以做 document 的 embedding
+
+不只是把一個 word 變成一個 vector
+
+也可以把一個 document  變成一個 vector
+
+那怎麼把一個 document 變成一個 vector 呢
+
+最簡單的方法，我們之前已經講過了
+
+就是把一個 document 變成一個 word
+
+然後，用 Auto-encoder
+
+你就可以 learn 出
+
+這個 document 的 Semantic Embedding
+
+但光這麼做是不夠的
+
+我們光用這個 word 來描述一篇 document
+
+是不夠的，為什麼呢？
+
+因為我們知道說，詞彙的順序
+
+代表了很重要的含
+
+舉例來說
+
+這一邊有兩個詞彙，有兩個句子
+
+一個是： white blood cells destroying an infection
+
+另外一個是：an infection destroying white blood cells
+
+這兩句話，如果你看它的 bag-of-word 的話
+
+它們的 bag-of-word 是一模一樣的
+
+因為它們都有出現有這 6 個詞彙
+
+它們都有出現這 6 個詞彙
+
+只是順序是不一樣的
+
+但是因為它們的順序是不一樣的
+
+所以上面這一句話 
+
+白血球消滅了傳染病，這個是 positive
+
+下面這句話，它是 negative
+
+雖然說，它們有同樣的 bag-of-word
+
+它們在語意上，完全是不一樣的
+
+所以，光只是用 bag-of-word
+
+來描述一張 image 是非常不夠的
+
+用 bag-of-word 來描述 一篇 document 是非常不足的
+
+你用 bag-of-word 會失去很多重要的 information
+
+那怎麼做呢？
+
+我們這一邊就不細講
+
+這邊就列了一大堆的 reference  給大家參考
+
+上面這 3 個方法，它是 unsupervised
+
+也就是說你只要 collect
+
+一大堆的 document
+
+你就可以讓它自己去學
+
+那下面這幾個方法算是 supervised
+
+因為，在這一些方法裡面
+
+你需要對每一個 document
+
+進行額外的 label
+
+你不用 label  說，每一個 document 對應的 vector是什麼
+
+但是你要給它其他的 label
+
+才能夠 learn 這一些 vector
+
+所以下面，不算是完全 unsupervised
+
+我把 reference 列在這邊，給大家參考
+
+臺灣大學人工智慧中心
+科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw

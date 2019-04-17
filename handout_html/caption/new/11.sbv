@@ -2,1263 +2,1144 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-如果實作的話，要怎麼做呢？
+各位同學，大家好
 
-那我今天要教大家的 toolkit 阿，是 Keras
+我們開始上課吧
 
-那你可能想說，怎麼不教 TensorFlow
+我們今天要講的是 Backpropagation
 
-TensorFlow 的星星數
+也就是實際上，如果你要用 Gradient Descent 的方法
 
-不是 deep learning 的 toolkit 裡面最多的嗎？
+來 train 一個 neural network 的時候呢
 
-應該要教 TensorFlow
+你應該要怎麼做？
 
-其實是這樣子的
+那我們上次其實已經講過了 neural network 的基本架構
 
-在另外一門 deep learning 的課裡面，
+那我就發現，在作業二裡面
 
-我們教的是 TensorFlow
+好多人都已經 implement neural network 的 approach
 
-其實，TensorFlow 沒有那麼好用
+那或許你已經對這個方法非常地清楚了
 
-該怎麼說呢，應該是這樣
+但是我不知道說，你是不是清楚說
 
-TensorFlow 跟另外一個跟他比較相近的 toolkit，Theano
+到底實際上，在 train neural network 的時候
 
-它們是非常的 flexible
+Backpropagation 這個 algorithm 是怎麼運作的
 
-也就是說，你甚至可以把它想成是一座微分器
+我們就來講一下 Backpropagation 這個 algorithm
 
-它甚至
+是怎麼讓 neural network 的 training 變得比較有效率
 
-它完全可以做 deep leaning 以外的事情
+那在 Gradient Descent 裡面
 
-它做的事情就是幫你算微分
+我們知道說 Gradient Descent 的方法就是
 
-那它把微分的值算給你以後
+假設你的 network 有一大堆的參數
 
-就可以拿去做 Gradient Descent
+一堆 w，一堆 b
 
-所以，它非常的 flexible
+那你先選一個初始的參數
 
-那這麼 flexible 的 toolkit 學起來，是有一些難度的
+你先選一個初始的參數在哪裡
 
-至少我覺得，比如我們在接下來的課裡面
+然後計算這個 θ^0 對你的 loss function 的 Gradient
 
-大概有半個小時的時間
+也就是計算每一個
 
-那你沒有辦法在半個小時以內，精通
+network 裡面的參數，w1, w2, b1, b2 ......等等
 
-熟悉這個 toolkit
+對你的 L(θ) 的偏微分
 
-但是，另外一個 toolkit，Keras 呢
+計算出這個東西以後，這個 gradient 其實是一個 vector
 
-我覺得
+計算出這個 vector 以後，你就可以去更新你的參數
 
-你是可以在數十分鐘內
+你就把 θ^0 減掉 learning rate
 
-就精通，就可以非常熟悉它
+乘上 gradient，然後得到 θ^1
 
-然後，用它來 implement 一個自己的 deep learning
+那這個 process 就持續繼續下去
 
-那這個 Keras，其實是 TensorFlow 跟 Theano
+再算一遍，在 θ^1 的 gradient
 
-interface
+然後，再把 θ^1 減掉 gradient
 
-所以，就有人覺得說，TensorFlow 其實也沒那麼好用
+update 成 θ^2，這個 process 就一直持續下去
 
-所以，它搭了 TensorFlow 的 interface
+所以，在 neural network 裡面呢
 
-就叫做 Keras
+當你用 Gradient Descent 方法的時候，
+跟我們在做 Logistic Regression
 
-所以，你用 Keras 其實就等於你是在用 TensorFlow
+還有 Linear Regression 等等，是沒有太大的差別的
 
-只是有人幫你把
+但是，最大的差別就是
 
-操縱 TensorFlow 那件事情，先幫你寫好
+最大的問題是，在 neural network 裡面
 
-那其實它比較好學
+我們有非常非常多的參數
 
-而且，其實它也有足夠的彈性
+那現在，如果你要做語音辨識系統的話呢
 
-如果，你想要做的事情
+你的 neural network 通常會有，7, 8 層
 
-多數你想要做的，除非你想要做 deep learning 的研究
+每層有 1000 個 neuron，它有上百萬個參數
 
-你想要自己兜奇奇怪怪的 network，不然
+所以，這個 vector 呢
 
-多數你可以想到的 network，這裡面都有現成
+它是非常非常長的
 
-現成的 function 可以 call 了
+這是一個上百萬維的 vector
 
-而且它背後就是 TensorFlow 或是 Theano
+所以，現在最大的困難就是
 
-所以，你永遠可以去
+你要如何有效地去把這一個百萬維的 vector
 
-就是有一天，如果你想更精進自己的
+有效地把它計算出來
 
-能力的話
+那這個就是 Backpropagation 在做的事情
 
-你永遠可以去改 Keras 背後的 TensorFlow 的 code
+所以，Backpropagation 並不是一個
 
-然後，做更厲害的事情
+和 Gradient Descent 不同的
 
-其實，這邊有一個，我知道一個小道消息是
+training 的方法，它就是 Gradient Descent
 
-因為 Keras 的作者，他其實是在 Google 工作
+它只是一個比較有效率的演算法
 
-所以，據說 Keras 即將要變成，這個
+讓你在計算這個 gradient，這個 vector 的時候
 
-TensorFlow 官方的 API
+是可以比較有效率地把這個 vector 計算出來
 
-所以，當時我選擇教 Keras 真的是站對邊了
+其實，Backpropagation 呢，裡面沒有
 
-這邊稍微講一下說 Keras
+特別高深的數學
 
-Keras 其實是牛角的意思
+你唯一需要記得的就只有 Chain Rule
 
-在希臘文裡面，是牛角的意思
+那我們用一張投影片，迅速地幫大家複習一下，
+什麼是 Chain Rule
 
-這個我有特別查過
+假設你現在有兩個 function，h 跟 g
 
-這個來源就是，因為 Keras 就是一個在
+g input x 就得到 y
 
-叫做夢精靈的 project 裡面被 develop 出來的
+h input y 就得到 z
 
-然後，根據伊利亞德，我忘記還是奧德賽裡面的傳說
+所以，如果你今天給 x 一個小小的變化的話
 
-就是夢精靈在來到人世間的時候
+給 x 一個變化的話，它會影響到它的 output y
 
-他會通過兩種門
+所以，y 會跟這有變化
 
-一種門是象牙做的，另一種是牛角做的
+y 有變化以後，又會影響到 z，所以 z 會跟著有變化
 
-那如果是通過象牙做的門的夢精靈呢
+如果我們今天要計算 dz/dx 的話
 
-那個人夢的內容就會被實現
+我們要計算 x 對 z 的微分的話
 
-那如果是通過牛角門，也就是 Keras 來那個夢精靈呢
+要怎麼算呢？你可以把它拆成兩項
 
-那你的夢就會被實現
+x 對 z 的微分
 
-那個 project 叫做夢精靈
+它就等於 y 對 z 的微分
 
-所以，在那個 project 開發出來的 toolkit，就叫做 Keras
+乘上 x 對 y 的微分
 
-底下是一些它的 documentation 還有一些 example
+那這個怎麼來的，你就問一下微積分老師
 
-這個，助教會在助教時間跟大家講一下怎麼安裝 Keras
+你可以就把這個 y 消掉
 
-如果你不會安裝的話
+所以左邊就等於右邊，
+但不要讓你的微積分老師知道這件事情
 
-它的安裝的這個 process
+那第二個 case
 
-它其實是寫得很清楚啦，那如果你不會安裝的話
+我們來看 Chain Rule 第二個 case
 
-助教會跟你講，所以我們等一下就只是
+假設現在有 3 個 function，g, h, k
 
-看一下說
+g input s 就得到 x
 
-Keras 如果運作起來
+h input s 就得到 y
 
-如果你真的在操控
+k input x, y 就得到 z
 
-真的在實作的時候，大概看起來像是甚麼樣子
+所以，今天假如你改變了 s
 
-以下是某位同學使用 Keras 的心得
+改變了 x，改變了 s
 
-那他把他的心得做成 6 格的圖
+你會透過 g 和 h 這兩個 function 改變 x 跟 y
 
-放在 Facebook 上面
+改變了 s，就改變了 x 跟 y
 
-他說，一個 deep learning 的研究生，都在做甚麼事？
+那改變了 x 跟 y 以後，透過 k 這個 function
 
-朋友覺得他在做 AlphaGo
+k 這個 function，input x 跟 y，output 是 z
 
-他媽覺得他坐在電腦前面
+改變了 x 跟 y 以後，你就改變了 z
 
-大家都覺得他在做很潮的東西
+所以，今天如果你要計算 s 對 z 的微分的話
 
-指導教授知道是在解一個 Optimization problem
+那這個 s，是透過兩條路徑去影響 z
 
-他以為自己很潮這樣子
+它可以透過 x 去影響 z，也可以透過 y 去影響 z
 
-我覺得應該是這個意思啦
+所以，s 對 z 的微分
 
-然後，事實上你在做的事情
+就可以寫成，就拆成兩項
 
-就是疊積木
+拆成兩項，根據這兩條 path 拆成兩項
 
-那這個並不是他玩得很開心的意思
+這個 s 對 z 的微分
 
-疊積木的意思就是說，當你在使用 Keras 的時候
+就可以寫成 x 對 z 的微分
 
-它是非常的容易的
+乘上 s 對 x 的微分，就是上面這條路徑
 
-你在做的事情就是把現成的
+加上 y 對 z 的微分乘上 s 對 y 的微分，也就是
 
-module 呢，把現成的 function 呢
+下面這條路徑
 
-疊來疊去而已，所以
+所以，你大一微積分有好好學的話呢
 
-用 Keras 就好像是在疊積木一樣
+這個就是我們都學過的 Chain Rule
 
-那我們等一下就是用，我在前一堂課講的
+那我們等一下呢，會需要用到這個東西
 
-Handwriting 的 Digit Recognition
+那再回到這個 neural network 的 training
 
-來當作例子，來示範 Keras 怎麼使用
+我們知道說，我們會定一個 loss function
 
-如果，你這輩子都還沒有寫過 deep learning 的程式的話
+那這個 loss function 是甚麼呢？
 
-那今天這個，就是 deep learning 的 "Hello world"
+這個 loss function 是 summation over
 
-我用的 data，就是 MNIST 的 data
+所有 training data 的
 
-MNIST 的 data 就好像是
+某一個 loss 值，C^n
 
-machine learning 的果蠅一樣
+我們說，假設給定我們一組 neural network 的參數 θ
 
-果蠅知道嗎？
+我們把一個 training data x^n
 
-果蠅就是，如果你想要很快做一個實驗
+代到這個 neural network 裡面，它會 output 一個 y^n
 
-你就用 MNIST
+那同時呢，我們會有一個
 
-因為它的 data 量少
+我們希望這個 neural network 的 output：y^n\head
 
-做起來又強
+它希望它如果 output y^n\head 的話
 
-然後，這個在 MNIST 裡面阿
+就是最正確的，那我們會
 
-你要 machine 做的事情就是 input 一個 image
+定義一個 y^n 跟 y^n\head 之間距離的 function
 
-然後，output 就是這個 image 是 0~9 的哪一個數值
+這邊寫作 C^n
 
-那 input image 的 size 是 28*28
+C^n 代表 y^n 跟 y^n\head 之間的距離
 
-它是一個 matrix
+如果 C^n 大的話，代表 y^n 跟 y^n\head 之間的距離很遠
 
-28*28 的 matrix
+所以，這個 network 的 parameter 的 loss
 
-那其實 Keras
+是比較大的，是比較不好的
 
-有 provide 自動下載 MNIST 的 data 的 function
+那如果這個 C^n 很小的話，代表
 
-那如果用 Keras 的話
+這個 parameter 是好的
 
-你要怎麼做呢？
+那我們 summation over 所有 training data 的 C^n
 
-那我們之前有講過說
+summation over 所有 training data
 
-deep learning 就是 3 個步驟
+根據這個參數 θ
 
-第一個步驟就是決定一下你的 function set
+它的 output 跟它的目標
 
-決定一下你的 neural network
+它的 output y^n 跟它的目標 y^n\head 之間的距離
 
-要長甚麼樣子
+就是得到我們的 total loss，L
 
-那在 Keras 裡面，你就是先宣告
+那你把這個式子
 
-model = Sequential( )，你就先宣告一個 model
+左右兩邊都對某一個參數 w 做偏微分的話呢
 
-接下來，你就看你的 network 想要長甚麼樣子
+你就得到右邊這個式子
 
-你就自己決定它要長甚麼樣子
+你就得到 ∂L/∂w 等於
 
-舉例來說，我這邊想要疊一個 network
+summation over 所有的 training data
 
-它有，我們把滑鼠叫出來
+n = 1 到 N
 
-我們這邊想要疊一個 network，它有兩個 hidden layer
+∂C^n (θ)/∂w
 
-然後，每一個 layer 都有 500 個 neuron
+這個應該是沒有甚麼問題
 
-我想要做這件事情的話
+之所以寫這個式子，只是要講說
 
-我應該要怎麼做呢？
+接下來，我們就不用
 
-其實很容易
+計算 ∂L/∂w
 
-你先宣告一個 model，接下來就說 model.add
+我們就只考慮，我們如何去計算
 
-加一個東西，加甚麼？
+對某一筆 data 的 ∂C^n (θ)/∂w
 
-這邊我們要加一個 Fully connected 的 layer
+你只要能夠把一筆 data 的
 
-Fully connected 的 layer 就是用 Dense 來表示
+∂C^n (θ)/∂w 算出來
 
-還可以加別的 layer，比如說 convolution 的 layer
+再 summation over 所有的 training data
 
-所以，這邊宣告 Dense
+你就可以把 total loss 對某一個參數的
 
-( input dimension 是 28*28)
+偏微分算出來了
 
-output dimension 是 500
+所以，我們等一下就只 focus 在怎麼計算
 
-那你就是 input 一個 28*28 的 vector
+對某一筆 data，它的 cost C^n 對 w 的偏微分
 
-這個 vector 代表一個 image，然後呢
+我們就只 focus 在怎麼計算這一項上面
 
-output = 500，就是說你今天要有
+怎麼做呢？
 
-500 個 neuron
+我們先考慮某一個 neuron
 
-接下來呢，你要告訴 network 說你的
+我們先從底下這個 neural network 裡面
 
-activation function 要用甚麼，這邊就直接寫說
+拿一個 neuron 出來，考慮它
 
-model.add ( Activation ("sigmoid") )
+那這一個 neuron，它是在第一個 layer 的 neuron
 
-那你就是用 sigmoid 當你的 activation function
+所以，它前面的 input
 
-那你可以選別的
+就是外界給它的 input，x1, x2
 
-Keras 裡面你可以選別的，比如說，softplus, softsign 阿
+假設它只有兩個 input，x1 跟 x2
 
-relu, tanh 等等一大堆別的
+分別乘上 weight w1, w2，再加上 b
 
-而且你要改，加上自己新的 activation function 呢
+會得到 z
 
-其實也滿容易的
+這個我想大家應該都非常熟悉，這個 z 呢
 
-你只要找到 Keras 裡面寫 activation function 的地方
+就是 x1w1 + x2w2 + b
 
-然後，自己再加一個自己的 function 進去就好了
+那得到這個 z 以後，通過了 activation function
 
-然後
+再經過了非常非常多的事情以後
 
-如果要再加一個新的 layer 怎麼辦呢？
+你會得到最終的 output，y1, y2
 
-你就一樣下 model.add 一個 dense layer
+那現在的問題是這樣
 
-它的 output 是 500
+假設我們從這邊拿一個 w 出來
 
-這邊你就不需要再給它 input 了
+等一下，我們就拿 w 當作 z
 
-因為，下一個 layer 的 input
+但是 b 也是一樣，就拿 weight 當作 z
 
-就等於前一個 layer 的 output
+來看怎麼計算，某一個 weight 對 cost
 
-所以，你不需要再 redefine input 的 dimension 是多少
+對 example 的某一個 cost 的偏微分
 
-你只要直接告訴它說，output 你要 500 個 neuron 就好
+那 b 的話，想必你可以以此類推，就把它算出來
 
-不需要告訴它說，input 也是 500 個 neuron
+那 ∂C/∂w 怎麼算？
 
-這個 Keras 自己知道
+這個 ∂C/∂w 阿
 
-activation function 這邊一樣是用 sigmoid
+按照 Chain Rule，你就可以把它拆成兩項
 
-最後，output 是
+∂z/∂w * ∂C/∂z
 
-要做數字分類嘛，要 10 個數字
+這個 z 可以把它消掉，沒有問題
 
-所以你 output 一定要 10 維，不可以設別的數字
+所以 ∂C/∂w 可以根據 Chain Rule 拆成兩項
 
-設 11, 12，那都不 work
+那這兩項，我們就分別去把它計算出來
 
-所以，你這個 output 就是設 10 維
+前面這項是很簡單的
 
-output dimension 就是 10 維
+後面這項，是比較複雜的
 
-那 activation function，你這邊呢
+那計算前面這一項
 
-我們說在 output 的 layer
+計算 ∂z/∂w 的這個 process 呢
 
-如果把它當成一個 multi-class classifier 來看的話
+我們稱之為 Forward pass
 
-我們就用 softmax，但你也可以用別的
+那你等下會知道說為什麼叫 Forward pass
 
-我們完全可以用 sigmoid，甚麼都可以
+那計算前面這一項 ∂C/∂z 的 process
 
-那這邊呢，選擇用 softmax
+我們稱之為 Backward pass
 
-那接下來我們要決定一個 function，
-要 evaluate 一個 function 的好壞
+那我們等一下會講說，為什麼叫做 Backward pass
 
-怎麼 evaluate 一個 function 的好壞呢？
+那我們就先看一下，怎麼來計算這個  ∂z/∂w
 
-你要做的事情就是
+怎麼來計算  ∂z/∂w
 
-model.compile
+好，那我們先看這個 w1
 
-然後，定義你的 loss 是什麼
+那你怎麼計算 ∂z/∂w1 呢？
 
-比如說，如果你要用 cross entropy 的話
+就是秒算
 
-那你的 loss 就是
+就是秒算，因為 z 就長這個樣子嘛
 
-但在 Keras 裡面，cross entropy 它是寫成
+然後，w1 在這邊
 
-categorical cross entropy，就是 cross entropy，OK？
+所以，一眼就可以知道說，它是 x1
 
-寫說你的 loss = cross entropy 就行了
+那 ∂z/∂w2 呢？
 
-其實，它也有支援很多其他的 loss function
+所以，你一眼就可以看出說
 
-在不同的場合，你會需要用到不同的 loss function
+它就是 x2，這個都是秒算這樣子
 
-這就留給大家自己去看 Keras 的 documentation 了
+那它的規律是這樣，它的規律就是
 
-那再來呢，是 training 的部分
+∂z/∂w，就是看這個 w 前面接的東西是什麼
 
-在 training 之前，你要先下一些
+那微分以後就是什麼
 
-Configuration 告訴它你 training 的時候
+這個 w1 前面，它的 input 是接 x1
 
-你打算要怎麼做
+它的 input 是 x1，所以微分以後就是 x1
 
-所以，現在呢
+w2 呢，它前面的 input 是 x2
 
-所以，現在呢
+所以微分以後就是 x2
 
-你要下的第一個東西是 optimizer
+那它的規律就是這個樣子
 
-也就是說，你要找最好的 function 的時候
+所以，今天假如給你一個 neural network
 
-你要用甚麼樣的方式，來找最好的 function
+那它裡面有一大推的參數
 
-雖然說，這邊 optimizer 的後面可以接不同的方式
+一大堆的參數，但是你要
 
-但是，這些不同的方式，其實都是 Gradient Descent
+計算這裡面每一個參數
 
-類似的方法
+對 z 的偏微分
 
-只是他們用的 learning rate
+你要計算這裡面每一個參數的 ∂w 跟 ∂z
 
-learning rate 你可以
+這件事情呢，非常非常的容易
 
-就是我們在做一般的 Gradient Descent 的時候
+因為我們剛才知道，它的規律就是
 
-你要自己設一個 learning rate，對不對？
+∂z/∂w 就是看你這個 w 的 input 是什麼，它就是甚麼
 
-但是，有一些方法是 machine 會
+所以，如果有人問你說，現在 input 是 1 跟 -1
 
-自動的
+那這個 1，它對
 
-跟 empirically 決定 learning rate 的值應該是多少
+它的 activation function 的 input z 的偏微分是什麼呢？
 
-所以，有一些方法是不需要
+你就可以瞬間回答它說，就是 -1
 
-給它 learning rate
+因為這個 1，前面接 -1
 
-machine 自己會決定 learning rate 應該要多少
+所以，這個參數對 z 的偏微分就是 -1
 
-那這邊呢，有支援各式各樣的方法
+同理，比如說這個 -1，它對 z 的偏微分就是 1
 
-那最後就是，決定好
+這個 -2，它對 z 的偏微分就是 1
 
-要怎麼做 Gradient Descent 以後
+這個 1，它對 z 的偏微分就是 1，以此類推
 
-再來就是真的去跑 Gradient Descent
+接下來呢
 
-再來就是真的給它做下去
+接下來假如有人問你說，這個 w
 
-那這一步，很簡單
+對它的 activation function 的 input z 的偏微分是什麼呢？
 
-你就給它 4 個 input，第一個 input 是
+你其實也可以瞬間就回答它
 
-training data，在我們的 case 裡面
+你只要知道說，這個 w 前面接的 weight
 
-training data 就是一張一張的 image
+前面接的 input 是什麼
 
-那你要給每一張 training data label，在這邊我們就是
+那這個 w 前面接的 input 是
 
-要告訴 machine 說，現在 training data 裡面
+某一個 neuron 的 output，對不對？
 
-每一張 image 它對應到 0~9 的哪一個數字
+這個 w 前面接的 input
 
-後面那兩個 flag 我們等一下再解釋
+是第一個 hidden layer 的 neuron 的 output
 
-我們來看一下，實際上
+那這個 hidden layer 的 neuron 的 output 要怎麼算呢？
 
-這個 x_train 跟 y_train 應該是長甚麼樣子
+這個大家都知道，對不對？就是把
 
-在這 case 裡面，你 training 的 image 呢
+1 跟 -1 丟進去，然後根據我們熟悉的 neuron 的運算
 
-就是要存成一個 numpy array 啦
+然後看看它的 output 是什麼，就是什麼
 
-那你就不要問我說，怎麼把一個 image
-存到 numpy array 裡面去
+在這個例子裡面呢
 
-這個，應該作業裡有做過了，對不對？
+假如這個 function 是 sigmoid function
 
-那你要把你的 image 都存到 numpy array 裡面去
+算出來是 0.98, 0.12
 
-那它的存法是這樣子
+如果你可以算出這兩個 neuron 的 output 是
 
-這個 numpy array 是 two-dimension 的
+0.98 跟 0.12 的話
 
-它是一個 two-dimension 的 matrix
+那這個 weight
 
-它的第一個 dimension 代表你有多少個 example
+它做完偏微分以後
 
-假設你有一萬個 example，
-第一個 dimension 就是一萬維
+這個 weight 對
 
-第二個 dimension 就是看你的 image 有多大
+它的 activation function 的 input z 做完偏微分以後
 
-要幾個 pixel，那第二個 dimension 就有多大
+顯然就是 0.12，因為它前面接的 weight 就是 0.12
 
-其實在這個 case 裡面
+這個 -1 也是 0.12
 
-在這個 case 裡面，有 28*28 個 pixel
+這個 -2 是 0.98，這個 2 是 0.98
 
-所以，有 784 個 pixel
+這個也很直覺
 
-所以，每一個 dimension 就是 784 維
+所以，同樣的 process 你就反覆的在做
 
-那我們來看 y_train
+你可以得到這兩個紅色 neuron 的 output 是 0.86, 0.11
 
-y_train 這每一個 image 的 label 怎麼表示呢？
+那你就可以秒反應說，這個
 
-一樣第一個 dimension 代表
-你有幾個 training 的 example
+4 對 z 的偏微分就是 0.11
 
-你有幾個 training 的 example，第
-一個 dimension 就有多維
+所以，你要算出這個 neural network 裡面的
 
-那第二個 dimension 呢，第二個 dimension 就是 10
+每一個 weight
 
-因為我們現在的 output 就是 10 維嘛
+對它的 activation function 的 input z 的偏微分
 
-我們 label 只有 10 個可能，0~9 而已
+你就把你的 input 丟進去
 
-所以，output dimension 就是 10 維
+然後，計算每一個 neuron 的 output
 
-然後，今天這個
+就結束了
 
-這個 image 所對應的數字，它就會是 1
+所以，這個步驟叫做 Forward pass
 
-也就是在那邊是塗黑的，其他是 0
+它是非常容易理解的
 
-舉例來說，第一個 image
+再來，我們要講的是 Backward pass
 
-這個是 5
+也就是怎麼算 ∂C/∂z
 
-所以，在它的 label 裡面
+這個你就不會覺得很困難了
 
-這個數字是 0, 1, 2, 3, 4
+因為，這個 z 阿
 
-它從 0 開始算，所以就是
+它通過 activation function 以後得到 output
 
-對應到 5 的那維是 1，其他是 0
+後面還有非常非常複雜的 process
 
-比如說，第 4 個數字
+它才得到這個 C
 
-就是對應到 1 的那一維是 1，其他是 0
+要經過非常複雜的 process 才能得到 C
 
-那前面還有兩個我沒有解釋過的東西，一個是
+這個 ∂C/∂z 顯然是很複雜的
 
-batch_size，另一個是 nb_epoch
+不過我們可以用 Chain rule 再把這一項做一下拆解
 
-他們是甚麼意思呢？
+假設這個 activation function 是 sigmoid function
 
-所謂的 batch_size 是這樣，首先呢
+我這邊就寫一個 σ(z)
 
-這邊有一個秘密，就是
+z 通過 sigmoid function 得到 a
 
-我們其實在做 Gradient Descent 的時候，
-在做 deep learning 的時候
+這個 neuron 的 output 是 a
 
-我們並不會真的去
+那接下來會發生甚麼事呢？
 
-minimize total loss
+這個 a 會通過某一個 weight，乘上某一個 weight
 
-我們做的是甚麼呢？我們會把
+再加其他一大堆的 value，得到 z'
 
-training data 分成一個一個的 batch
+它是下一個 neuron activation function 的 input
 
-也就是說你把你的 training data
+這個 a 會再乘上另一個 weight，這邊寫成 w4
 
-比如說，一萬張 image 拿出來
+再加上其他一大堆東西，得到 z"
 
-然後，每一次 random 的選
+後面這個 z' 跟 z"
 
-100 張進來，作為一個 batch
+之後可能還會發生很多很多的事情
 
-那這個 batch 你要隨機的分
+不過我們就先只考慮下一步會發生什麼事情
 
-如果你 batch 沒有隨機的分
+所以呢
 
-比如說，你某一個 batch 裡面通通都是 1
+我們知道說 ∂C/∂z
 
-那另外一個 batch 裡面通通都是數字 2
+你可以寫成 ∂a/∂z * ∂C/∂a
 
-這個你可以自己試試看
+那這個就沒有什麼問題，∂a 可以消掉
 
-你 train 起來，會有問題的
+那 ∂a/∂z 是什麼呢？
 
-對你的 performance 會有不小的影響
+我們知道說，a = σ(z)
 
-接下來，怎麼做呢？
+那這個 ∂a/∂z 呢
 
-首先，你先 randomly initialize network 的參數
+其實就是這個 sigmoid function 的微分
 
-就跟一般的 Gradient Descent 一樣
+那 sigmoid function 長這個樣子
 
-接下來，隨機的選一個 batch 出來
+長這個樣子，綠色這條線
 
-比如說，我們選了第一個 batch 出來
+那它的微分，你就算一下，長這個樣子
 
-然後，接下來我們計算
+長這樣子，我們之前已經看過很多次了
 
-對第一個 batch 裡面的 element 的 total loss
+所以，∂a/∂z 也沒有問題
 
-不是全部 training data 的 total loss 哦
+接下來的問題就是，∂C/∂a
 
-是第一個 batch 裡面的 element 的 total loss
+應該長甚麼樣子呢？
 
-我們計算說 L'
+它應該長甚麼樣子呢？
 
-等於 l1 + l31
+那我們就接下來看說，這個 a
 
-加上別的 batch 的 loss
+∂a 跟 C 的關係是怎樣
 
-不是別的 batch，
-同一個 batch 裡面其他 example 的 loss
+你知道 a 它會影響 z'
 
-然後，接下來根據 L' update 參數
+然後，z' 會影響 z
 
-也就是去計算參數對 L' 的偏微分
+a 會影響 z"，z" 會影響 C
 
-然後，update 參數
+a 透過 z' 跟 z" 去影響 C
 
-接下來，再隨機選一個 batch
+所以，∂C/∂a 你可以寫成
 
-比如說，這邊選的是第二個 batch
+∂z'/∂a * ∂C/∂z'
 
-那你就計算說，現在你的 total loss
+加上 ∂z"/∂a * ∂C/∂z"
 
-變成 L"
+我們假設 a 後面，就是這個藍色 neuron 的下一個 layer
 
-它不是 total L，它是 l2 + l16
+就是紅色的 neuron 只有兩個
 
-再加同一個 batch 裡面其他的 example
+所以，這邊就只有兩項
 
-接下來，計算你的參數對 L" 的偏微分
+這個 a 只會影響 z' 跟 z"
 
-然後，去 update 你的參數
+如果這邊有 1000 個 neuron 的話
 
-你就反覆做這個 process
+那這邊這個 Chain rule
 
-直到把所有的 batch
-
-通通選過一次
-
-所以，今天假設你有 100 個 batch 的話
-
-你就把這個參數 update 100 次
-
-那把每一個 batch 都看過以後
-
-那你就等於
-
-把所有的 batch 都看過一次，叫做一個 epoch
-
-叫做一個 epoch
-
-那我們要做的事情就是
-
-重複以上的 process
-
-所以，你在 train  一個 network 的時候
-
-你會需要好幾十個 epoch
-
-不是只有一個 epoch
-
-所以，這邊這兩個 flag，一個是 batch_size
-
-就是告訴 Keras 說，我們的一個 batch
-
-要有多大
-
-舉例來說，這邊 batch_size = 100
-
-就是說，我們要把 100 個 example
-
-放在一個 batch 裡面
-
-那 Keras 會幫你隨機的放
-
-所以這個部分你就不需要自己寫 code
-
-那 number of epoch 就是說呢
-
-每一個 batch 看過一次，叫做一個 epoch
-
-那我們到底要用幾個 epoch 呢？
-
-這邊 epoch  = 20 就是以上這個 process
-
-重複 20 次，也就是每一個 batch
-
-被看過 20 次，那你要注意
-
-我們並不會在一個
-
-在一個 batch 裡面阿
-
-我們已經 update 很多次參數了
-
-我們每看一個 batch 就 update 一次參數
-
-假設我們現在有 100 個 batch
-
-那一個 epoch 裡面，我們就已經 update 100 次參數了
-
-20 個 epoch 就是 20*100，就是 2000 次參數
-
-所以，並不是說這邊設 20 個 epoch
-
-我們就只 update 20次參數的意思
-
-在一個 epoch 裡面
-
-我們會 update 很多次參數
-
-那我們記得我們之前
-
-林宗男老師應該有講過 Stochastic Gradient Descent
-
-今天如果我們的 batch_size 設為 1 的話
-
-那就是 equivalent to Stochastic Gradient Descent
-
-對不對？
-
-那我們之前有講過 Stochastic Gradient Descent 的好處
-
-它的好處就是，它的速度比較快
-
-對不對，相較於 full 的
-
-原來的 Gradient Descent
-
-它的速度是比較快的
-
-因為原來的 Gradient Descent，你 update 參數的時候
-
-你用 Stochastic Gradient Descent
-
-假設你有 100 個 training data 的話
-
-那你已經 update 100 次參數了
-
-雖然說，每一次 update 參數的方向
-
-是不穩定的，但是就是天下武功，唯快不破
-
-雖然它的出拳可能會落空
-
-但是，它可以在別人出一拳的時候，它已經出 100 拳了
-
-所以，它是比較強的
-
-那你可能會想說，既然是這樣子的話
-
-為甚麼我們不用 Stochastic Gradient Descent 就好
-
-還要用 Mini-batch 呢？
-
-接下來，就是一些實作上的問題
-
-讓我們必須要用 Mini-batch
-
-Mini-batch 這件事很重要
-
-但是，最主要要用 Mini-batch 的理由
-
-其實是一個實作上的 issue
-
-我們之前有講說
-
-你在一個 epoch
-
-在一個 epoch
-
-舉例來說，我們這邊有 50000 個 example
-
-那我們的 batch_size，如果你設 1
-
-也就是 Stochastic Gradient Descent 的話
-
-那在一個 epoch 裡面，你會 update 50000 次參數
-
-如果今天你的 batch_size 設為 10 的話
-
-在一個 epoch 裡面
-
-你會 update 5000 次參數
-
-這樣看起來，好像是
-
-Stochastic Gradient Descent 比較快
-
-Mini-batch 設為 10
-
-你在一個 epoch 裡面
-
-才 update 5000 次參數
-
-那 Stochastic Gradient Descent
-
-它可以 update 50000 次參數
-
-它的速度好像應該是它的 10 倍
-
-但是
-
-實際上阿
-
-實際上
-
-當你 batch_size 設不一樣的時候
-
-一個 epoch 需要的時間
-
-是不一樣的
+你的 summation 就是 summation over 1000 項
 
 這樣大家了解我的意思嗎？
 
-就是你想說，這個 training data 不是都是五萬筆嗎？
+這邊呢，經過前面我們簡化上課的說明
 
-就是這個 training data 不一定都是五萬筆
+我們假設只有兩個 neuron，這邊只有兩項
 
-你設 batch_size = 1，你設 batch_size = 10
+只有兩項，a 只會影響 z' 跟 z"
 
-運算量是一樣多的嗎？
+接下來，∂z"/∂a
 
-就是說，雖然運算量不是一樣多
+會算嗎？這個就是秒算，對不對？這個就是 w3
 
-你要把五萬筆 example，每一筆 example 都
+z' 等於 a 乘上 w3，再加上一些有的沒的東西
 
-都看過一遍
+所以，這個 z' 對 a 做偏微分
 
-那同一個 epoch 裡面，它要做的運算量不是一樣多的嗎
+根據這個式子，顯然就是 w3
 
-一樣多的運算跟一樣多的時間
+所以，同理，這個 z" 對 a 做偏微分
 
-但是 batch_size 設成 1
+得到的結果顯然就是 w4
 
-你可以 update 五萬次，聽起來好像是比較厲害
+所以，這兩項算起來，也不是個問題
 
-但是，實際上，在實作上
+最後的問題就是，z" 對 C 的偏微分怎麼算呢？
 
-當你 batch_size 設不一樣的時候
+這個 z" 對 C 的偏微分怎麼算呢？
 
-運算的時間是不一樣的
+因為我們不知道
 
-就算是同樣多的 example，但它的運算時間是不一樣的
+z' 對 C 有什麼關係
 
-那等一下會解釋為甚麼
+z" 對 C 有什麼關係
 
-我們先來看實際上的例子
+這後面還有發生很多很多的事情
 
-這個就是在 GTX 980
+是很複雜的，所以我們搞不清楚後面會發生什麼事情
 
-然後，跑在 MNIST 的五萬個 training example 上面
+所以，我們一下子不知道這兩項怎麼算
 
-一個 batch 需要的時間，當我
-設不同的 batch_size 的時候
+不過沒關係，我們就假設我們知道
 
-如果今天 batch_size 設 1，
-也就是 Stochastic Gradient Descent
+假設這兩項的值，我們已經 somehow 透過
 
-一個 epoch 要 166 秒
+某種方法把它算出來
 
-也就是接近 3 分鐘
+我們透過一個等一下會講，但你還不知道怎麼做的方法
 
-如果，今天 batch_size 設 10 的話
+就已經把這兩項做出來了
 
-那一個 epoch 是 17 秒
+那把這兩項算出來以後
 
-你會發現說
+把這兩項算出來以後呢
 
-如果你今天設 100, 1000, 10000
+我們就可以把 ∂C/∂z
 
-那它就是越來越快，每一個 epoch 都是越來越快
+輕易的算出來
 
-所以，你會發現說今天過了 166 秒
+把這兩項算出來以後
 
-它才算一個 epoch
+我們就可以算 ∂C/∂z
 
-166 秒
+你會算 ∂C/∂z' 跟 ∂C/∂z"
 
-在下面這個 batch_size 設為 10 這個 case
+你就會算 ∂C/∂z
 
-它已經算 10 個 epoch 了
+然後，再把這些值
 
-幾乎已經算 10 個 epoch 了
+代到我們剛才看到的 ∂C/∂z 的式子裡面
 
-所以，這樣比較起來，因為
+就得到這樣一個式子，σ'(z) * [w3 * ∂C/∂z' + w4 * ∂C/∂z"]
 
-它算一個 epoch 要 166 秒
+你就算出這樣一個式子，那這個式子
 
-同樣時間，它已經算 10 個 epoch 了
+還滿簡單的
 
-它一個 epoch update 五萬次
+但是，我們會從另外一個觀點，來看待這個式子
 
-它一個 epoch update 五千次
+你可以想像說
 
-但是，在同樣時間，它已經跑 10 個 epoch
+現在有另外一個 neuron 
 
-所以，會變成說
+這個 neuron 並不在我們原來的 network 裡面
 
-參數 update 的數目
+有另外一個 neuron 
 
-batch_size 設 1 跟 batch_size 設 10
+我把它簡化成這個三角形
 
-幾乎是一樣的
+把它畫成三角形
 
-然後，再來呢
+那這個 neuron 的 input，就是 ∂C/∂z' 跟 ∂C/∂z"
 
-如果今天幾乎，這兩件事情
+那第一個 input ∂C/∂z'，就乘上 w3
 
-在同樣時間內
+∂C/∂z" 它就乘上 w4
 
-參數 update 的數目幾乎是一樣的
+再乘上 activation function， σ'(z)
 
-那你其實會想要選 batch_size  = 10
+得到 output，就是 ∂C/∂z
 
-為甚麼？因為如果你選 batch_size = 10 的時候
+上面這個 neuron 所做的運算
 
-是會比較穩定阿
+跟下面這個式子，是一模一樣的
 
-我們之前之所以從 Gradient 換成 Stochastic Gradient
+我們只是把下面這個式子
 
-目標就是因為這樣比較快
+把它畫出來，讓它看起來像是一個 neuron 一樣
 
-你 update 次數比較多
+那這個 σ'(z) 阿
 
-可是，如果你現在用  Stochastic Gradient
+這個 σ'(z) 其實是一個常數
 
-其實也不會比較快
+對不對，它不是一個 function，它是一個constant
 
-那你為甚麼不選一個比較穩定，update 次數比較多的呢
+因為，z 其實在計算 Forward pass 的時候
 
-所以，這邊你就會選擇
+就被決定好了
 
-batch_size = 10 的 case
+z 是一個已經固定的值
 
-那接下來有人就會想說
+z 我們已經知道它是多少，所以
 
-接下來我們的下一個問題就是，為甚麼
+在給定 z 的情況下
 
-為甚麼 batch_size 設比較大的時候
+這個 σ'(z)，它就是一個常數
 
-速度會比較快
+所以，這個 neuron
 
-這個就是因為我們使用了平行運算
+跟我們之前看到的 sigmoid function 是不一樣的
 
-用了 GPU，這個我在下一頁會再更仔細的解釋啦
+它並不是把 input 通過一個 non-linear 的轉換
 
-你就先知道說，因為我們用了平行運算
+而是直接把 input 乘上一個 constant，σ'(z)
 
-所以，這 10 個 example 它是同時運算
+就得到一個 output 這樣
 
-所以，你算 10 個 example 的時間
+所以，我把這個 neuron 畫成三角形的
 
-一個 batch 裡面 10 個 example 的時間
-跟算一個 example 的時間
+代表它跟我們之前看到的圓形 neuron
 
-其實，是可以幾乎一樣的
+的運作方式是不一樣的，它是直接乘上一個 constant
 
-那你會想說，既然 batch_size 越大
+那你可能會問說，為甚麼是三角形呢
 
-那既然 batch_size 越大
+因為我是電機系的，我覺得這是一個 op-amp 這樣子
 
-既然 batch_size 越大
+op-amp 就會乘上一個 constant，它是一個放大器這樣
 
-它會越穩定
+聽不懂就算了，這不太重要
 
-batch_size 變大的話
+然後，這樣問題都解決了
 
-你還是可以平行運算，那你為甚麼不把 batch_size
+都解決了，對不對，我們現在最後的問題就只有
 
-開超級大就好了呢？
+怎麼算這兩項而已
 
-這邊有兩個 claim，一個 claim 就是
+假設能夠算這兩項，問題也就都解決了
 
-如果你把 batch_size 開到很大
+那現在怎麼算這兩項呢？
 
-最終，GPU 會沒有辦法平行運算
+怎麼算這兩項呢？
 
-它終究是有它的極限，也就是說
+我們現在假設兩個不同的 case
 
-它同時考慮 10 個 example 跟 1 個 example 的時間
+第一個 case 是，我們假設現在紅色的這兩個 neuron
 
-是一樣的，但它同時考慮一萬個 example 的時候
+就已經是 output layer
 
-它的時間就不會跟 1 個 example 一樣
+這兩個紅色 neuron 是在 output layer 裡面
 
-所以，batch_size 考慮到硬體真正的限制的話
+它們的 output 就已經是整個 network 的 output 了
 
-你也沒有辦法無窮盡的增長
+這邊寫成 y1, y2
 
-那撇開硬體的限制不談
+它的 output 就已經是整個 network 的 output 了
 
-另外一個，batch_size 不應該設太大的理由是
+所以，今天你要算 ∂C/∂z'
 
-你其實可以自己試試看
+就很簡單，根據 Chain rule 算 ∂(y1)/∂z' * ∂C/∂(y1)
 
-如果你把 batch_size 設很大
+∂(y1)/∂z' 沒什麼問題
 
-在 train Gradient Descent，在做 deep learning 的時候
+你只要知道這個 activation function 長甚麼樣子
 
-你跑兩下，你的 network 就卡住了
+這項就輕而易舉地算出來了
 
-你跑兩下，你就陷到 saddle point
+∂C/∂(y1)，y1 對 C 有什麼影響，depend on 你的
 
-或是 local minimum 裡面去了
+你的 cost function 是怎麼定義的
 
-如果那個 neural network 的 error surface 上面
+你的 output 跟 target 間是怎麼 evaluate 的
 
-它不是一個 convex optimization problem
+你可以用 cross entropy，你可以用 mean square error
 
-它有很多的坑坑洞洞
+你用不同的定義，這邊這項就不一樣，但總之
 
-它有很多坑坑洞洞
+它是一個比較簡單的東西，你可以把它算出來
 
-如果，你今天是 full 的 batch
+那 ∂C/∂z"，這你也可以算，沒有甚麼問題
 
-原來的 Gradient Descent 裡面有一些 mini batch
+就是 ∂(y2)/∂z" * ∂C/∂(y2)
 
-那你就是完全順著 total loss 的方向走
+這兩項一樣都是可以秒算
 
-你可以發現說，你每走兩步，就卡住了
+所以，今天假設這個藍色的 neuron 後面
 
-這件事情，你可以回去自己試試看
+它的下一個 layer 就已經是 output layer 了
 
-你把 batch_size 設成 full batch
+這個藍色的 neuron，它在最後一個 hidden layer 裡面
 
-那如果你的 GPU 跑得動的話呢
+它後面就已經是 output layer 了
 
-你還是可以得到它的結果
+那根據我們剛才所學的東西
 
-但是你的 performance 就會很差，因為
+你就結束了，你就可以把 w1 跟 w2 對 C 的偏微分算出來
 
-你會發現說你的那個
+所以，這個沒有甚麼問題
 
-在 training set 上的 loss
+那我們真正煩惱的問題是 case 2
 
-它跑兩下，整個就卡了
+假設現在紅色的 neuron 它並不是整個 network 的 output
 
-你就沒有辦法再 train，它就卡到一個 local minimum
+它後面還有其他東西的話，怎麼辦呢？
 
-local minimum 或是 saddle point 的地方，你就無法再 train
+那它後面的其他東西，可能長甚麼樣子呢
 
-但是，如果你用 Stochastic 的好處就是
+它可能長這樣，就是 z' 再通過 activation function 得到 a'
 
-如果你有隨機性
+再乘上另外一個 weight，w5
 
-每一次你走的方向，會是隨機的
+再加上一些其他的東西，得到 za
 
-所以，如果你今天從某一步陷到 local minimum 裡面去
+然後，你再把 a' 乘上
 
-如果那個 local minimum 不是一個很深的 local minimum
+w6 再加上其他一大堆東西
 
-或是那個 saddle point
+得到 zb，然後再丟進另外兩個
 
-是一個特別麻煩的 saddle point
+activation function 裡面
 
-你只要下一步再加一點 random
+那現在的問題是這樣
 
-你就可以跳出那個
+我們想要求 ∂C/∂z'
 
-Gradient 是 0 的區域了
+如果我們知道 ∂C/∂(za) 跟 ∂C/∂(zb)
 
-所以，如果你沒有這個隨機性的話
+我們就可以計算 ∂C/∂z'
 
-你 train Neural network 其實是會有問題的
+對嗎？
 
-你如果沒有這個 mini batch 的隨機性的話
+我們剛才已經有講過說，假設我們知道
 
-你每 update 兩次參數
+∂C/∂z' 跟 ∂C/∂z"
 
-你就會卡住，所以，這個 mini batch 是需要的
+我們就可以算前面一個 layer 的 ∂C/∂z
 
-接下來，我們要解釋說
+所以，按照一模一樣的式子
 
-為甚麼當有 batch 的時候
+如果知道 ∂C/∂(za) 跟 ∂C/∂(zb)
 
-GPU 是如何平行地加速
+我們就可以算 ∂C/∂z'
 
-那我們剛才有講過說
+按照一模一樣的式子
 
-整個 network 你就可以把它看成是一連串的
+就是我們剛才算看到那個 op-amp 的式子
 
-矩陣運算的結果
+所以，你就把 ∂C/∂(za) 乘上 w5
 
-不管是 Forward pass 或是 Backward pass
+∂C/∂(zb) 乘上 w6，加起來再通過 op-amp
 
-都可以看成是一連串矩陣運算的結果
+乘上 σ'(z')
 
-Forward pass 就是我們圖上看到這樣
+再乘上 op-amp 就得到這個 ∂C/∂z' 的 output
 
-Backward pass 我們前一份投影片有解釋過，就是
+那現在這個問題，就反覆地繼續下去
 
-把整個 network 逆轉
+我們剛才說知道 z' 跟 z" 的偏微分就可以算 z
 
-然後，把 neuron 變成 op-amp
+現在知道 za 跟 zb 的偏微分就可以算 z'
 
-那我們今天就可以比較  Stochastic Gradient Descent
+但是，我們又不知道 za 跟 zb 的偏微分
 
-也就是 batch_size = 1，還有 batch_size = 10 的差別
+怎麼算，對不對？
 
-如果，batch_size = 1
+你不知道這兩項怎麼算
 
-我們看第一個 layer，你 input 一個 x
+如果你會這兩項的話，你就把這一項算出來
 
-然後，你乘上 W^1
+但問題就是，你不知道
 
-你就得到 z^1
+那怎麼辦呢？
 
-在 Forward pass 的時候，你要做這個計算嘛
+我們就再往下一層去看
 
-在 Backward pass 你也會做一個類似的計算
+了解嗎？就是這個綠色的 neuron
 
-在 Forward pass，你就會做這樣一個 matrix operation
+如果它是 output layer 的話
 
-這是第一筆 data，那你做完這些 matrix 的計算以後
+如果這個綠色的 neuron，它是 output layer 的話
 
-你會 update 你的參數
+要計算這兩個東西，就是秒算，沒有問題
 
-接下來，你第二筆預測的 x 進來
+假設它不是 output layer 的話
 
-再乘 W^1
+你就繼續走下去
 
-再得到另外一個 z^1，再 update 參數
+再看下一個 layer
 
-但是，在 Mini-batch 的時候
+它的 activation function input 對 C 的偏微分
 
-你會把同一個 batch 裡面的 input 通通集合起來
+那你就可以把這一項算出來
 
-每一個 input 都是一個 vector 嘛
+你就可以把這兩項算出來，再把這一項算出來
 
-假設我們現在 batch_size 就是 2
+你如果沒辦法算這兩項，他們不是 output layer 的話
 
-那你裡面有黃色這個 vector，也有綠色這個 vector
+你就再去推，下一個 layer 它的偏微分會是甚 麼樣子
 
-那你就把黃色的 vector 和綠色的 vector 拼起來
+把這兩個東西推出來，然後再往前把這兩個東西推出來
 
-變成一個 matrix
+那你可能會想說，這個方法聽起來還頗崩潰
 
-再把這個 matrix 乘上 W^1
+就是你每次要算一個微分的值
 
-你就可以直接得到 z^1 跟 z^2
+你要一直往後走，走到 network 的 output
 
-我們可以把 x 乘上 W^1 得到 z^1
+如果 network 有 10 層，那你從第一層開始往後展開
 
-把 x 乘上 W^1 得到 z^1
+感覺應該是一個很可怕的式子
 
-這兩件事情分開來做
+但是實際上，並不是這樣子做的
 
-也可以把這兩個東西
+實際上，你只要換一個方向
 
-併在一起
+從 output layer 的 ∂C/∂z 開始算
 
-再乘上 W^1，直接得到 z^1
+你就會發現說，它的運算量
 
-或者 z^2
+跟原來的 network 的 Feedforward path
 
-這兩件事情理論上
+其實是一樣的
 
-運算量是一模一樣多的
+假設我們現在有 6 個 neuron
 
-對不對？上面這件事
+每一個 neuron，它的 activation function
 
-跟下面這件事
+input 分別是 z1, z2, z3 一直到 z6
 
-它在理論上的運算量是一樣多的
+我們現在要計算這些 z 對 C 的偏微分
 
-但是，就實作上
+那本來呢，我們應該是想要知道 z1 的偏微分
 
-你覺得哪一件事情是比較快的呢？
+你就要算 z3, z4 的偏微分
 
-你覺得上面比較快的同學舉手一下
+假如想知道 z3 的偏微分，你就要算 z5 跟 z6 的偏微分
 
-你覺得下面比較快的同學舉手一下
+想要知道 z4 的偏微分，你就要算 z5 跟 z6 的偏微分
 
-所有同學都覺得下面比較好，手放下
+那你要先算出 z5, z6 的偏微分，你才能算出
 
-沒錯，下面就是比較快的
+z3 的偏微分，z4 的偏微分
 
-因為，如果你今天讓 GPU 做這個運算
+你才能夠算出 z1 的偏微分，z2 的偏微分
 
-和讓 GPU 做這個運算
+那如果我們今天是從
 
-它的時間，其實是一樣的
+z1, z2 的偏微分開始算
 
-對 GPU 來說，你在矩陣運算裡面相乘的每一個 element
+那就沒有效率
 
-都是可以平行運算的
+但是，如果你反過來先算 z5, z6 的偏微分的話
 
-所以，今天上面這個運算的時間
+這個 process，就突然之間變得有效率起來了
 
-反而會變成下面這個 GPU 運算的時間的兩倍
+我們就先算 z5, z6 對 C 的偏微分
 
-所以，這就是為甚麼我們用 Mini-batch
+然後，算出這兩項以後
 
-再加上 GPU 的時候，你是可以加速的
+你就可以算出 z3, z4 對 C 的偏微分
 
-但是，如果你今天用 GPU
+然後，你就可以算出 z1, z2 對 C 的偏微分
 
-但是，你沒用 Mini-batch 的話
+這樣大家懂嗎？講到這邊大家有問題嗎？
 
-你其實就加速不了太多
+沒有哦，那這整件事情可以說
 
-所以，這就是有人買了 GPU
+這兩個東西怎麼得到它的偏微分
 
-有人凹了他的老師買了 GPU 來
+這兩個東西怎麼得到它的偏微分呢？
 
-但他不知道要設 Mini-batch
+我們剛才已經看過了，就是用一個 op-amp 來算
 
-所以，裝了 GPU 以後，也沒變快
+這每一個 op-amp 它放大的倍率呢
 
-那 Keras 當然可以 save 和 load model
+就是 σ'(z1), σ'(z2), σ'(z3), σ'(z4)
 
-你可以把 train 好的 model 存起來
+所以，你算出了
 
-然後以後再用另外一個程式讀出來
+你就先很快地計算 ∂C/∂(z5), ∂C/∂(z6)
 
-那它也可以幫你做 testing
+然後，再把這一個偏微分的值，跟這個偏微分的值
 
-有兩個 testing 的 case，第一個 case 是這個
+乘上一些 weight
 
-evaluation
+乘上一些 weight
 
-也就 evaluation case 是
+再通過 op-amp
 
-我今天有一組 testing set
+你就得到這兩個偏微分的值
 
-testing set 的答案我也知道
+再乘上一些 weight
 
-那 Keras 就幫你算說你現在的正確率
+再乘上一些 weight
 
-有多少，那這個 evaluation 有兩個 input
+再通過一個 op-amp，就得到一些偏微分的值
 
-就是 testing 的 image 和 testing 的 label
+就這樣，就計算完了
 
-那在這 case 2 呢，case 2 要做 predict
+就計算完了，所以，你再算 Backpropagation 的時候
 
-這個時候，你沒有任何的 label data
+你在這個步驟，叫做 Backward pass
 
-你只有 image，就是你真的 train 好這個 model
+你在做這個 Backward pass 的時候
 
-你要放到網路上讓人家用
+你實際上的做法就是，建另外一個 neural network
 
-別人會輸入一個 image，然後你就告訴他你的
+我們本來有一個正向的 neural network，裡面的
 
-分類好的數字是多少
+activation function 都是 sigmoid function
 
-這個時候，你 input 就只有 x，就只有 image
+那現在，你在算 Backward pass 的時候
 
-output 就直接是分類的結果
+你就是建一個反向的 neural network
+
+反向的 neural network
+
+從右邊到左邊，反向的 neural network
+
+這個反向的 neural network，它的 activation function 呢
+
+你要先算完 Forward pass 以後
+
+你才算得出來，然後，接下來呢
+
+這個反向的 neural network，它的 input 就是這兩項
+
+這兩項
+
+然後，其他部分就跟一般的 neural network 運算一樣
+
+你就做一個 Backward pass
+
+但是，其實就是做一個 neural network 的運算
+
+你就可以把每一個 z 對 C 的偏微分
+
+就都算出來了，這個就是 Backward pass
+
+所以，我們就 summarize 一下
+
+Backpropagation 是怎麼做的
+
+首先，你做一個 Forward pass
+
+在做 Forward pass 的時候，你可以算出
+
+只要你知道每一個 activation function 的 output
+
+那 activation function 的 output 就是
+
+它所連接的 weight 的 ∂z/∂w
+
+那在 Backward pass 裡面，你要把
+
+原來的 neural network 的方向呢
+
+倒過來，你把原來的 neural network 的方向倒過來
+
+那在這個倒過來的 neural network
+
+它的每一個三角形的 output 呢
+
+就是 ∂C/∂z
+
+然後，把它們乘起來
+
+你就知道某一個 weight
+
+對 w 的偏微分是什麼了
+
+就結束，這樣
+
+講到這邊，大家有沒有甚麼問題呢？
+
+就算你沒有聽懂這個東西
+
+其實，也沒有什麼關係啦
 
 臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心

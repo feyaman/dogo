@@ -2,433 +2,1263 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-那我們來講一下，如果在改版以後的 Keras 長甚麼樣子
+如果實作的話，要怎麼做呢？
 
-那現在是這個樣子的
+那我今天要教大家的 toolkit 阿，是 Keras
 
-現在是說
+那你可能想說，怎麼不教 TensorFlow
 
-這個大概你在作業三的時候
+TensorFlow 的星星數
 
-我們作業三是一個有關 CNN 影像辨識的作業
+不是 deep learning 的 toolkit 裡面最多的嗎？
 
-所以，這個時候會先想要做 CNN
+應該要教 TensorFlow
 
-之後也會講說怎麼實作 CNN，而且
+其實是這樣子的
 
-在助教的教學裡面
+在另外一門 deep learning 的課裡面，
 
-手把手的教學裡面，會教你怎麼把 Keras 安裝起來
+我們教的是 TensorFlow
 
-那我們在講 CNN 之前，我們先講一下你要
+其實，TensorFlow 沒有那麼好用
 
-implement 一個最 basic 的
- Fully Connected Feedforward Network
+該怎麼說呢，應該是這樣
 
-如果你用 Keras 的話，你要怎麼做
+TensorFlow 跟另外一個跟他比較相近的 toolkit，Theano
 
-那現在假設我們要做的事情是手寫數字的辨識
+它們是非常的 flexible
 
-那我們要兜一個 network
+也就是說，你甚至可以把它想成是一座微分器
 
-建了一個 network 的 structure
+它甚至
 
-它 input 是 28*28 的 dimension
+它完全可以做 deep leaning 以外的事情
 
-28*28 的 dimension 意思就是說
+它做的事情就是幫你算微分
 
-這其實是一張 image
+那它把微分的值算給你以後
 
-image 的解析度是 28*28
+就可以拿去做 Gradient Descent
 
-我們把它拉直，變成長度是一個 28*28 維的向量
+所以，它非常的 flexible
 
-output 呢，現在做的是手寫數字的辨識
+那這麼 flexible 的 toolkit 學起來，是有一些難度的
 
-手寫數字辨識就是 input 一張 image
+至少我覺得，比如我們在接下來的課裡面
 
-要決定它是 0~9 的哪一個數字
+大概有半個小時的時間
 
-所以，我們的 output 就是每一維
+那你沒有辦法在半個小時以內，精通
 
-對應那一個數字，所以 output 就是 10 維
+熟悉這個 toolkit
 
-中間呢，假如你要有兩個 hidden layer
+但是，另外一個 toolkit，Keras 呢
 
-每一個 hidden layer 是 500 個 neuron 的話
+我覺得
 
-那你會怎麼做呢？
+你是可以在數十分鐘內
 
-如果是用 Keras 的話
+就精通，就可以非常熟悉它
 
-你要宣告一個 network，你的做法就是
+然後，用它來 implement 一個自己的 deep learning
 
-首先，你先宣告說 model = Sequential( )
+那這個 Keras，其實是 TensorFlow 跟 Theano
 
-再來，你要把第一個 hidden layer 加進去的話，怎麼做呢
+interface
 
-這很簡單，你只要下 add 就好
+所以，就有人覺得說，TensorFlow 其實也沒那麼好用
 
-add 你就 add 一個 layer
+所以，它搭了 TensorFlow 的 interface
 
-然後，add 的這個指令後面呢
+就叫做 Keras
 
-你加了一個 Dense 的意思就是說
+所以，你用 Keras 其實就等於你是在用 TensorFlow
 
-你加的是一個 fully connected 的 layer
+只是有人幫你把
 
-如果你把這個 Dense 改成別的，比如說改成
+操縱 TensorFlow 那件事情，先幫你寫好
 
-convolution 2D，那你就加一個  convolution 的 layer
+那其實它比較好學
 
-所以，這個其實都非常地簡單
+而且，其實它也有足夠的彈性
 
-那 input dimension 就是告訴我們說
+如果，你想要做的事情
 
-input 的 dimension 要是多少
+多數你想要做的，除非你想要做 deep learning 的研究
 
-那原來在 Keras 1.0版裡面
+你想要自己兜奇奇怪怪的 network，不然
 
-output 的 dimension 或是 neuron 的數目
+多數你可以想到的 network，這裡面都有現成
 
-它是用 output dimension 來表示啦
+現成的 function 可以 call 了
 
-不過，現在在新版裡面，它改成 unit
+而且它背後就是 TensorFlow 或是 Theano
 
-我想這更直觀了，每一個 neuron 它就是一個 unit
+所以，你永遠可以去
 
-那 unit = 500，就是說
+就是有一天，如果你想更精進自己的
 
-我們有 500 個 unit，我們有 500 個 neuron
+能力的話
 
-然後，接下來就是下 activation function
+你永遠可以去改 Keras 背後的 TensorFlow 的 code
 
-那這邊就看你想要選哪一個 activation function 都可以啦
+然後，做更厲害的事情
 
-有很多的 activation function 是你可以選擇的
+其實，這邊有一個，我知道一個小道消息是
 
-每一個 activation function 都只是一個
+因為 Keras 的作者，他其實是在 Google 工作
 
-一個英文的詞彙，你把那個詞彙打上去就好了
+所以，據說 Keras 即將要變成，這個
 
-你要自己加新的 activation function，其實還滿容易的
+TensorFlow 官方的 API
 
-你在 Keras 的 code 裡面找到
+所以，當時我選擇教 Keras 真的是站對邊了
 
-它定義 activation 那個 function 的地方
+這邊稍微講一下說 Keras
 
-就可以自己直接插新的 activation function
+Keras 其實是牛角的意思
 
-這都還蠻容易的
+在希臘文裡面，是牛角的意思
 
-那再加第二個 layer
+這個我有特別查過
 
-如果加第二個 layer 的話
+這個來源就是，因為 Keras 就是一個在
 
-你就不需要再宣告 input 的 dimension 了
+叫做夢精靈的 project 裡面被 develop 出來的
 
-因為，第二個 layer 的 input dimension
+然後，根據伊利亞德，我忘記還是奧德賽裡面的傳說
 
-就是前一個 layer 的 unit
+就是夢精靈在來到人世間的時候
 
-前一個 layer 已經說是 500 個 unit，所以
+他會通過兩種門
 
-第二個 layer 的 input 就是 500，不需要再定義一次
+一種門是象牙做的，另一種是牛角做的
 
-那這邊你只需要告訴它說
+那如果是通過象牙做的門的夢精靈呢
 
-接下來第二個 layer 會有多少個 unit
+那個人夢的內容就會被實現
 
-unit = 500，然後 activation function
+那如果是通過牛角門，也就是 Keras 來那個夢精靈呢
 
-等於__，就隨便選一個你想要用的 activation function
+那你的夢就會被實現
 
-每一層要選不一樣的，也都是可以的
+那個 project 叫做夢精靈
 
-那最後一個 layer
+所以，在那個 project 開發出來的 toolkit，就叫做 Keras
 
-因為 output 要是 10 個數字
+底下是一些它的 documentation 還有一些 example
 
-所以，最後一個 layer 的 output 一定要是 10 維
+這個，助教會在助教時間跟大家講一下怎麼安裝 Keras
 
-你說 11 或 9 都是不行的
+如果你不會安裝的話
 
-就是 10 個數字，所以就是 10 維
+它的安裝的這個 process
 
-所以，unit 就設 10
+它其實是寫得很清楚啦，那如果你不會安裝的話
 
-activation function 這邊你其實選別的
+助教會跟你講，所以我們等一下就只是
 
-compile 也會過，不過我們通常會選
+看一下說
 
-softmax，如果選 softmax 的話
+Keras 如果運作起來
 
-意味著 output 的每一個 dimension
+如果你真的在操控
 
-值會介於 0~1 之間
+真的在實作的時候，大概看起來像是甚麼樣子
 
-然後它的總和是 1
+以下是某位同學使用 Keras 的心得
 
-你就可以把它當做是一個很像機率的東西來看待
+那他把他的心得做成 6 格的圖
 
-那 softmax 在前面的課程裡面也是講過的
+放在 Facebook 上面
 
-再來，第二個步驟
+他說，一個 deep learning 的研究生，都在做甚麼事？
 
-你要做一下 Configuration
+朋友覺得他在做 AlphaGo
 
-這邊包括了你要定義 loss function
+他媽覺得他坐在電腦前面
 
-你就下 model.compile()
+大家都覺得他在做很潮的東西
 
-然後，loss 等於甚麼東西
+指導教授知道是在解一個 Optimization problem
 
-然後，選一個你自己喜歡的 loss function
+他以為自己很潮這樣子
 
-那有非常多不同的、可能的選擇
+我覺得應該是這個意思啦
 
-那你要選一個 optimizer
+然後，事實上你在做的事情
 
-那其實所有的 optimizer
+就是疊積木
 
-都是 Gradient Descent base 的
+那這個並不是他玩得很開心的意思
 
-那你下不同的英文單字
+疊積木的意思就是說，當你在使用 Keras 的時候
 
-只是有不同的方法來幫你決定
+它是非常的容易的
 
-你的 learning rate，像我們之前已經知道了一個
+你在做的事情就是把現成的
 
-Adagrad 的做法
+module 呢，把現成的 function 呢
 
-那其實還有很多其他的做法
+疊來疊去而已，所以
 
-再來，下完 Configure 以後
+用 Keras 就好像是在疊積木一樣
 
-你就可以開始 train 你的 network
+那我們等一下就是用，我在前一堂課講的
 
-那 train 你的 network 非常簡單，就是一行
+Handwriting 的 Digit Recognition
 
-雖然說，Backpropagation 是一個非常複雜的東西
+來當作例子，來示範 Keras 怎麼使用
 
-但是，其實當你在用這些
+如果，你這輩子都還沒有寫過 deep learning 的程式的話
 
-現代的 deep learning framework 的時候
+那今天這個，就是 deep learning 的 "Hello world"
 
-就是一行
+我用的 data，就是 MNIST 的 data
 
-所以，你就 call model.fit
+MNIST 的 data 就好像是
 
-它就開始用 Gradient Descent 呢
+machine learning 的果蠅一樣
 
-幫你去 train 你的 network
+果蠅知道嗎？
 
-那你要給它你的 training data
+果蠅就是，如果你想要很快做一個實驗
 
-你要給它你的 training data 的 input
+你就用 MNIST
 
-還有你的 training data 的 label
+因為它的 data 量少
 
-那這邊這個 x_train 呢
+做起來又強
 
-代表了 image
+然後，這個在 MNIST 裡面阿
 
-y_train 代表這是一個 image 的 label
+你要 machine 做的事情就是 input 一個 image
 
-我們現在做的是手寫數字的辨識
+然後，output 就是這個 image 是 0~9 的哪一個數值
 
-那 input 就是那些手寫數字的 image
+那 input image 的 size 是 28*28
 
-而 label 就是每一張 image 它實際對應的數字
+它是一個 matrix
 
-是哪一個
+28*28 的 matrix
 
-那 batch_size 跟 epoch 我們今天就不解釋
+那其實 Keras
 
-其實在 video 裡面，我們已經解釋過了
+有 provide 自動下載 MNIST 的 data 的 function
 
-那有關 x_train 跟 y_train 的格式
+那如果用 Keras 的話
 
-我想這個大家來說，應該也不是太難的問題
+你要怎麼做呢？
 
-你這個 x_train 跟 y_train，你都必須要存成 numpy array
+那我們之前有講過說
 
-不要問我說怎麼把 image 存成 numpy array
+deep learning 就是 3 個步驟
 
-這個是你的責任這樣
+第一個步驟就是決定一下你的 function set
 
-那這個 numpy array 長甚麼樣子呢？
+決定一下你的 neural network
 
-現在，在我們等一下要示範的 task 裡面
+要長甚麼樣子
 
-第幾個軸，代表有幾個 training example
+那在 Keras 裡面，你就是先宣告
 
-第一個軸如果是一萬維
+model = Sequential( )，你就先宣告一個 model
 
-代表說有一萬個 training example
+接下來，你就看你的 network 想要長甚麼樣子
 
-第二個軸呢，第二個軸
+你就自己決定它要長甚麼樣子
 
-代表說，現在每一個 training example
+舉例來說，我這邊想要疊一個 network
 
-每一個 image 我們用多長的 vector 來表示
+它有，我們把滑鼠叫出來
 
-我們用多少的數字表示一個 image
+我們這邊想要疊一個 network，它有兩個 hidden layer
 
-那這邊是用 28*28，也就是 784 維 vector
+然後，每一個 layer 都有 500 個 neuron
 
-來表示這個 image，所以這個 x_train
+我想要做這件事情的話
 
-它就是一個 matrix
+我應該要怎麼做呢？
 
-這個 matrix 的其中一維
+其實很容易
 
-它代表了這個
+你先宣告一個 model，接下來就說 model.add
 
-這個 training 的 example 數目，另外一維呢
+加一個東西，加甚麼？
 
-代表每一個 example
+這邊我們要加一個 Fully connected 的 layer
 
-它用多少的數值來表示
+Fully connected 的 layer 就是用 Dense 來表示
 
-那在 y_train 的部分
+還可以加別的 layer，比如說 convolution 的 layer
 
-在 label 的部分，怎麼表示你的 label 呢？
+所以，這邊宣告 Dense
 
-這邊的作法是
+( input dimension 是 28*28)
 
-label 也存成一個二維的 matrix
+output dimension 是 500
 
-第一個維度一樣代表了 training example 數目
+那你就是 input 一個 28*28 的 vector
 
-第二個維度
+這個 vector 代表一個 image，然後呢
 
-代表了現在總共有多少個不同的 class
+output = 500，就是說你今天要有
 
-現在因為總共有 10 個 class，就 0~9
+500 個 neuron
 
-所以，第二個維度的長度就是 10
+接下來呢，你要告訴 network 說你的
 
-那對每一個 example 來說，它的這個 vector 阿
+activation function 要用甚麼，這邊就直接寫說
 
-都是只有一維是 1，其他都是 0
+model.add ( Activation ("sigmoid") )
 
-只有一維是 1，其他都是 0
+那你就是用 sigmoid 當你的 activation function
 
-1 的部分這邊就用黑色來表示
+那你可以選別的
 
-那每一維就對應到一個數字
+Keras 裡面你可以選別的，比如說，softplus, softsign 阿
 
-這邊是從 0 開始算，0, 1, 2, 3, 4, 5
+relu, tanh 等等一大堆別的
 
-今天如果說
+而且你要改，加上自己新的 activation function 呢
 
-第一張 image 對應的是數字 5
+其實也滿容易的
 
-那就是對應到數字 5 的那一個 dimension
+你只要找到 Keras 裡面寫 activation function 的地方
 
-它的值是 1，其他 dimension 值是 0
+然後，自己再加一個自己的 function 進去就好了
 
-那你就實際算算看
+然後
 
-從 0 開始算，0, 1, 2, 3, 4, 5
+如果要再加一個新的 layer 怎麼辦呢？
 
-它確實是對應到 5 的那個維度是 1
+你就一樣下 model.add 一個 dense layer
 
-其他是 0
+它的 output 是 500
 
-就代表說第一張 image 它是數字 5
+這邊你就不需要再給它 input 了
 
-第二張 image 是數字 0
+因為，下一個 layer 的 input
 
-所以就對應到 0 那個維度是 1，其它是 0
+就等於前一個 layer 的 output
 
-所以，你看第四張 image 是數字 1
+所以，你不需要再 redefine input 的 dimension 是多少
 
-那就對應到數字 1 的那個維度
+你只要直接告訴它說，output 你要 500 個 neuron 就好
 
-它的值放 1，其他維度值就放 0
+不需要告訴它說，input 也是 500 個 neuron
 
-接下來 train 完以後
+這個 Keras 自己知道
 
-你就得到一個 model
+activation function 這邊一樣是用 sigmoid
 
-你可以把 model 存起來
+最後，output 是
 
-然後之後再把它讀出來
+要做數字分類嘛，要 10 個數字
 
-那這個部分，大家就自己參考一下 Keras 的說明
+所以你 output 一定要 10 維，不可以設別的數字
 
-它這個 documentation 的說明
+設 11, 12，那都不 work
 
-那接下來，你要真的拿這個 network 來使用
+所以，你這個 output 就是設 10 維
 
-使用有兩個不同的情境
+output dimension 就是 10 維
 
-這兩個不同的情境，一個是
+那 activation function，你這邊呢
 
-叫做 evaluation
+我們說在 output 的 layer
 
-所以，evaluation 的意思就是說
+如果把它當成一個 multi-class classifier 來看的話
 
-你實際上有 testing data 的 label
+我們就用 softmax，但你也可以用別的
 
-你想要知道說，你的 model 表現的
+我們完全可以用 sigmoid，甚麼都可以
 
-在 testing data 上到底表現得怎麼樣
+那這邊呢，選擇用 softmax
 
-這個時候，你就 call evaluation 這個 function
+那接下來我們要決定一個 function，
+要 evaluate 一個 function 的好壞
 
-然後，你就把 training data 的 image
+怎麼 evaluate 一個 function 的好壞呢？
 
-跟 training data 的 label 丟給 evaluation 這個 function
+你要做的事情就是
 
-它就自動幫你算出你的 model 的正確率
+model.compile
 
-那它會 output 一個二維的向量
+然後，定義你的 loss 是什麼
 
-這邊就寫作 score
+比如說，如果你要用 cross entropy 的話
 
-那這二維向量的第一個維度
+那你的 loss 就是
 
-代表了在 testing set 上的 loss
+但在 Keras 裡面，cross entropy 它是寫成
 
-第二個維度代表在 testing set 上的 accuracy
+categorical cross entropy，就是 cross entropy，OK？
 
-那這個 score 跟 accuracy 之間的值是不一樣的
+寫說你的 loss = cross entropy 就行了
 
-大家可以理解嗎？因為算 loss 的時候，你可能用
+其實，它也有支援很多其他的 loss function
 
-cross entropy，可能用 mean square error
+在不同的場合，你會需要用到不同的 loss function
 
-那你算出來是 cross entropy，或 mean square error
+這就留給大家自己去看 Keras 的 documentation 了
 
-accuracy 是對與不對
+那再來呢，是 training 的部分
 
-那你會量出一個正確率
+在 training 之前，你要先下一些
 
-所以，這兩個的值是不一樣的
+Configuration 告訴它你 training 的時候
 
-那第二個 case 是做 predict
+你打算要怎麼做
 
-所謂做 predict 的意思是說
+所以，現在呢
 
-你現在的系統真正上線了
+所以，現在呢
 
-你沒有正確答案
+你要下的第一個東西是 optimizer
 
-你真的要拿你這個系統來做手寫數字辨識
+也就是說，你要找最好的 function 的時候
 
-使用者真的輸給你一個手寫數字的圖片
+你要用甚麼樣的方式，來找最好的 function
 
-你要真的去預測它的結果是多少
+雖然說，這邊 optimizer 的後面可以接不同的方式
 
-得到 network 的 output
+但是，這些不同的方式，其實都是 Gradient Descent
 
-那這個時候，你沒有正確答案
+類似的方法
 
-所以你 x_test 只有把 image 丟進去
-這個時候你要 call predict 這個 function
+只是他們用的 learning rate
+
+learning rate 你可以
+
+就是我們在做一般的 Gradient Descent 的時候
+
+你要自己設一個 learning rate，對不對？
+
+但是，有一些方法是 machine 會
+
+自動的
+
+跟 empirically 決定 learning rate 的值應該是多少
+
+所以，有一些方法是不需要
+
+給它 learning rate
+
+machine 自己會決定 learning rate 應該要多少
+
+那這邊呢，有支援各式各樣的方法
+
+那最後就是，決定好
+
+要怎麼做 Gradient Descent 以後
+
+再來就是真的去跑 Gradient Descent
+
+再來就是真的給它做下去
+
+那這一步，很簡單
+
+你就給它 4 個 input，第一個 input 是
+
+training data，在我們的 case 裡面
+
+training data 就是一張一張的 image
+
+那你要給每一張 training data label，在這邊我們就是
+
+要告訴 machine 說，現在 training data 裡面
+
+每一張 image 它對應到 0~9 的哪一個數字
+
+後面那兩個 flag 我們等一下再解釋
+
+我們來看一下，實際上
+
+這個 x_train 跟 y_train 應該是長甚麼樣子
+
+在這 case 裡面，你 training 的 image 呢
+
+就是要存成一個 numpy array 啦
+
+那你就不要問我說，怎麼把一個 image
+存到 numpy array 裡面去
+
+這個，應該作業裡有做過了，對不對？
+
+那你要把你的 image 都存到 numpy array 裡面去
+
+那它的存法是這樣子
+
+這個 numpy array 是 two-dimension 的
+
+它是一個 two-dimension 的 matrix
+
+它的第一個 dimension 代表你有多少個 example
+
+假設你有一萬個 example，
+第一個 dimension 就是一萬維
+
+第二個 dimension 就是看你的 image 有多大
+
+要幾個 pixel，那第二個 dimension 就有多大
+
+其實在這個 case 裡面
+
+在這個 case 裡面，有 28*28 個 pixel
+
+所以，有 784 個 pixel
+
+所以，每一個 dimension 就是 784 維
+
+那我們來看 y_train
+
+y_train 這每一個 image 的 label 怎麼表示呢？
+
+一樣第一個 dimension 代表
+你有幾個 training 的 example
+
+你有幾個 training 的 example，第
+一個 dimension 就有多維
+
+那第二個 dimension 呢，第二個 dimension 就是 10
+
+因為我們現在的 output 就是 10 維嘛
+
+我們 label 只有 10 個可能，0~9 而已
+
+所以，output dimension 就是 10 維
+
+然後，今天這個
+
+這個 image 所對應的數字，它就會是 1
+
+也就是在那邊是塗黑的，其他是 0
+
+舉例來說，第一個 image
+
+這個是 5
+
+所以，在它的 label 裡面
+
+這個數字是 0, 1, 2, 3, 4
+
+它從 0 開始算，所以就是
+
+對應到 5 的那維是 1，其他是 0
+
+比如說，第 4 個數字
+
+就是對應到 1 的那一維是 1，其他是 0
+
+那前面還有兩個我沒有解釋過的東西，一個是
+
+batch_size，另一個是 nb_epoch
+
+他們是甚麼意思呢？
+
+所謂的 batch_size 是這樣，首先呢
+
+這邊有一個秘密，就是
+
+我們其實在做 Gradient Descent 的時候，
+在做 deep learning 的時候
+
+我們並不會真的去
+
+minimize total loss
+
+我們做的是甚麼呢？我們會把
+
+training data 分成一個一個的 batch
+
+也就是說你把你的 training data
+
+比如說，一萬張 image 拿出來
+
+然後，每一次 random 的選
+
+100 張進來，作為一個 batch
+
+那這個 batch 你要隨機的分
+
+如果你 batch 沒有隨機的分
+
+比如說，你某一個 batch 裡面通通都是 1
+
+那另外一個 batch 裡面通通都是數字 2
+
+這個你可以自己試試看
+
+你 train 起來，會有問題的
+
+對你的 performance 會有不小的影響
+
+接下來，怎麼做呢？
+
+首先，你先 randomly initialize network 的參數
+
+就跟一般的 Gradient Descent 一樣
+
+接下來，隨機的選一個 batch 出來
+
+比如說，我們選了第一個 batch 出來
+
+然後，接下來我們計算
+
+對第一個 batch 裡面的 element 的 total loss
+
+不是全部 training data 的 total loss 哦
+
+是第一個 batch 裡面的 element 的 total loss
+
+我們計算說 L'
+
+等於 l1 + l31
+
+加上別的 batch 的 loss
+
+不是別的 batch，
+同一個 batch 裡面其他 example 的 loss
+
+然後，接下來根據 L' update 參數
+
+也就是去計算參數對 L' 的偏微分
+
+然後，update 參數
+
+接下來，再隨機選一個 batch
+
+比如說，這邊選的是第二個 batch
+
+那你就計算說，現在你的 total loss
+
+變成 L"
+
+它不是 total L，它是 l2 + l16
+
+再加同一個 batch 裡面其他的 example
+
+接下來，計算你的參數對 L" 的偏微分
+
+然後，去 update 你的參數
+
+你就反覆做這個 process
+
+直到把所有的 batch
+
+通通選過一次
+
+所以，今天假設你有 100 個 batch 的話
+
+你就把這個參數 update 100 次
+
+那把每一個 batch 都看過以後
+
+那你就等於
+
+把所有的 batch 都看過一次，叫做一個 epoch
+
+叫做一個 epoch
+
+那我們要做的事情就是
+
+重複以上的 process
+
+所以，你在 train  一個 network 的時候
+
+你會需要好幾十個 epoch
+
+不是只有一個 epoch
+
+所以，這邊這兩個 flag，一個是 batch_size
+
+就是告訴 Keras 說，我們的一個 batch
+
+要有多大
+
+舉例來說，這邊 batch_size = 100
+
+就是說，我們要把 100 個 example
+
+放在一個 batch 裡面
+
+那 Keras 會幫你隨機的放
+
+所以這個部分你就不需要自己寫 code
+
+那 number of epoch 就是說呢
+
+每一個 batch 看過一次，叫做一個 epoch
+
+那我們到底要用幾個 epoch 呢？
+
+這邊 epoch  = 20 就是以上這個 process
+
+重複 20 次，也就是每一個 batch
+
+被看過 20 次，那你要注意
+
+我們並不會在一個
+
+在一個 batch 裡面阿
+
+我們已經 update 很多次參數了
+
+我們每看一個 batch 就 update 一次參數
+
+假設我們現在有 100 個 batch
+
+那一個 epoch 裡面，我們就已經 update 100 次參數了
+
+20 個 epoch 就是 20*100，就是 2000 次參數
+
+所以，並不是說這邊設 20 個 epoch
+
+我們就只 update 20次參數的意思
+
+在一個 epoch 裡面
+
+我們會 update 很多次參數
+
+那我們記得我們之前
+
+林宗男老師應該有講過 Stochastic Gradient Descent
+
+今天如果我們的 batch_size 設為 1 的話
+
+那就是 equivalent to Stochastic Gradient Descent
+
+對不對？
+
+那我們之前有講過 Stochastic Gradient Descent 的好處
+
+它的好處就是，它的速度比較快
+
+對不對，相較於 full 的
+
+原來的 Gradient Descent
+
+它的速度是比較快的
+
+因為原來的 Gradient Descent，你 update 參數的時候
+
+你用 Stochastic Gradient Descent
+
+假設你有 100 個 training data 的話
+
+那你已經 update 100 次參數了
+
+雖然說，每一次 update 參數的方向
+
+是不穩定的，但是就是天下武功，唯快不破
+
+雖然它的出拳可能會落空
+
+但是，它可以在別人出一拳的時候，它已經出 100 拳了
+
+所以，它是比較強的
+
+那你可能會想說，既然是這樣子的話
+
+為甚麼我們不用 Stochastic Gradient Descent 就好
+
+還要用 Mini-batch 呢？
+
+接下來，就是一些實作上的問題
+
+讓我們必須要用 Mini-batch
+
+Mini-batch 這件事很重要
+
+但是，最主要要用 Mini-batch 的理由
+
+其實是一個實作上的 issue
+
+我們之前有講說
+
+你在一個 epoch
+
+在一個 epoch
+
+舉例來說，我們這邊有 50000 個 example
+
+那我們的 batch_size，如果你設 1
+
+也就是 Stochastic Gradient Descent 的話
+
+那在一個 epoch 裡面，你會 update 50000 次參數
+
+如果今天你的 batch_size 設為 10 的話
+
+在一個 epoch 裡面
+
+你會 update 5000 次參數
+
+這樣看起來，好像是
+
+Stochastic Gradient Descent 比較快
+
+Mini-batch 設為 10
+
+你在一個 epoch 裡面
+
+才 update 5000 次參數
+
+那 Stochastic Gradient Descent
+
+它可以 update 50000 次參數
+
+它的速度好像應該是它的 10 倍
+
+但是
+
+實際上阿
+
+實際上
+
+當你 batch_size 設不一樣的時候
+
+一個 epoch 需要的時間
+
+是不一樣的
+
+這樣大家了解我的意思嗎？
+
+就是你想說，這個 training data 不是都是五萬筆嗎？
+
+就是這個 training data 不一定都是五萬筆
+
+你設 batch_size = 1，你設 batch_size = 10
+
+運算量是一樣多的嗎？
+
+就是說，雖然運算量不是一樣多
+
+你要把五萬筆 example，每一筆 example 都
+
+都看過一遍
+
+那同一個 epoch 裡面，它要做的運算量不是一樣多的嗎
+
+一樣多的運算跟一樣多的時間
+
+但是 batch_size 設成 1
+
+你可以 update 五萬次，聽起來好像是比較厲害
+
+但是，實際上，在實作上
+
+當你 batch_size 設不一樣的時候
+
+運算的時間是不一樣的
+
+就算是同樣多的 example，但它的運算時間是不一樣的
+
+那等一下會解釋為甚麼
+
+我們先來看實際上的例子
+
+這個就是在 GTX 980
+
+然後，跑在 MNIST 的五萬個 training example 上面
+
+一個 batch 需要的時間，當我
+設不同的 batch_size 的時候
+
+如果今天 batch_size 設 1，
+也就是 Stochastic Gradient Descent
+
+一個 epoch 要 166 秒
+
+也就是接近 3 分鐘
+
+如果，今天 batch_size 設 10 的話
+
+那一個 epoch 是 17 秒
+
+你會發現說
+
+如果你今天設 100, 1000, 10000
+
+那它就是越來越快，每一個 epoch 都是越來越快
+
+所以，你會發現說今天過了 166 秒
+
+它才算一個 epoch
+
+166 秒
+
+在下面這個 batch_size 設為 10 這個 case
+
+它已經算 10 個 epoch 了
+
+幾乎已經算 10 個 epoch 了
+
+所以，這樣比較起來，因為
+
+它算一個 epoch 要 166 秒
+
+同樣時間，它已經算 10 個 epoch 了
+
+它一個 epoch update 五萬次
+
+它一個 epoch update 五千次
+
+但是，在同樣時間，它已經跑 10 個 epoch
+
+所以，會變成說
+
+參數 update 的數目
+
+batch_size 設 1 跟 batch_size 設 10
+
+幾乎是一樣的
+
+然後，再來呢
+
+如果今天幾乎，這兩件事情
+
+在同樣時間內
+
+參數 update 的數目幾乎是一樣的
+
+那你其實會想要選 batch_size  = 10
+
+為甚麼？因為如果你選 batch_size = 10 的時候
+
+是會比較穩定阿
+
+我們之前之所以從 Gradient 換成 Stochastic Gradient
+
+目標就是因為這樣比較快
+
+你 update 次數比較多
+
+可是，如果你現在用  Stochastic Gradient
+
+其實也不會比較快
+
+那你為甚麼不選一個比較穩定，update 次數比較多的呢
+
+所以，這邊你就會選擇
+
+batch_size = 10 的 case
+
+那接下來有人就會想說
+
+接下來我們的下一個問題就是，為甚麼
+
+為甚麼 batch_size 設比較大的時候
+
+速度會比較快
+
+這個就是因為我們使用了平行運算
+
+用了 GPU，這個我在下一頁會再更仔細的解釋啦
+
+你就先知道說，因為我們用了平行運算
+
+所以，這 10 個 example 它是同時運算
+
+所以，你算 10 個 example 的時間
+
+一個 batch 裡面 10 個 example 的時間
+跟算一個 example 的時間
+
+其實，是可以幾乎一樣的
+
+那你會想說，既然 batch_size 越大
+
+那既然 batch_size 越大
+
+既然 batch_size 越大
+
+它會越穩定
+
+batch_size 變大的話
+
+你還是可以平行運算，那你為甚麼不把 batch_size
+
+開超級大就好了呢？
+
+這邊有兩個 claim，一個 claim 就是
+
+如果你把 batch_size 開到很大
+
+最終，GPU 會沒有辦法平行運算
+
+它終究是有它的極限，也就是說
+
+它同時考慮 10 個 example 跟 1 個 example 的時間
+
+是一樣的，但它同時考慮一萬個 example 的時候
+
+它的時間就不會跟 1 個 example 一樣
+
+所以，batch_size 考慮到硬體真正的限制的話
+
+你也沒有辦法無窮盡的增長
+
+那撇開硬體的限制不談
+
+另外一個，batch_size 不應該設太大的理由是
+
+你其實可以自己試試看
+
+如果你把 batch_size 設很大
+
+在 train Gradient Descent，在做 deep learning 的時候
+
+你跑兩下，你的 network 就卡住了
+
+你跑兩下，你就陷到 saddle point
+
+或是 local minimum 裡面去了
+
+如果那個 neural network 的 error surface 上面
+
+它不是一個 convex optimization problem
+
+它有很多的坑坑洞洞
+
+它有很多坑坑洞洞
+
+如果，你今天是 full 的 batch
+
+原來的 Gradient Descent 裡面有一些 mini batch
+
+那你就是完全順著 total loss 的方向走
+
+你可以發現說，你每走兩步，就卡住了
+
+這件事情，你可以回去自己試試看
+
+你把 batch_size 設成 full batch
+
+那如果你的 GPU 跑得動的話呢
+
+你還是可以得到它的結果
+
+但是你的 performance 就會很差，因為
+
+你會發現說你的那個
+
+在 training set 上的 loss
+
+它跑兩下，整個就卡了
+
+你就沒有辦法再 train，它就卡到一個 local minimum
+
+local minimum 或是 saddle point 的地方，你就無法再 train
+
+但是，如果你用 Stochastic 的好處就是
+
+如果你有隨機性
+
+每一次你走的方向，會是隨機的
+
+所以，如果你今天從某一步陷到 local minimum 裡面去
+
+如果那個 local minimum 不是一個很深的 local minimum
+
+或是那個 saddle point
+
+是一個特別麻煩的 saddle point
+
+你只要下一步再加一點 random
+
+你就可以跳出那個
+
+Gradient 是 0 的區域了
+
+所以，如果你沒有這個隨機性的話
+
+你 train Neural network 其實是會有問題的
+
+你如果沒有這個 mini batch 的隨機性的話
+
+你每 update 兩次參數
+
+你就會卡住，所以，這個 mini batch 是需要的
+
+接下來，我們要解釋說
+
+為甚麼當有 batch 的時候
+
+GPU 是如何平行地加速
+
+那我們剛才有講過說
+
+整個 network 你就可以把它看成是一連串的
+
+矩陣運算的結果
+
+不管是 Forward pass 或是 Backward pass
+
+都可以看成是一連串矩陣運算的結果
+
+Forward pass 就是我們圖上看到這樣
+
+Backward pass 我們前一份投影片有解釋過，就是
+
+把整個 network 逆轉
+
+然後，把 neuron 變成 op-amp
+
+那我們今天就可以比較  Stochastic Gradient Descent
+
+也就是 batch_size = 1，還有 batch_size = 10 的差別
+
+如果，batch_size = 1
+
+我們看第一個 layer，你 input 一個 x
+
+然後，你乘上 W^1
+
+你就得到 z^1
+
+在 Forward pass 的時候，你要做這個計算嘛
+
+在 Backward pass 你也會做一個類似的計算
+
+在 Forward pass，你就會做這樣一個 matrix operation
+
+這是第一筆 data，那你做完這些 matrix 的計算以後
+
+你會 update 你的參數
+
+接下來，你第二筆預測的 x 進來
+
+再乘 W^1
+
+再得到另外一個 z^1，再 update 參數
+
+但是，在 Mini-batch 的時候
+
+你會把同一個 batch 裡面的 input 通通集合起來
+
+每一個 input 都是一個 vector 嘛
+
+假設我們現在 batch_size 就是 2
+
+那你裡面有黃色這個 vector，也有綠色這個 vector
+
+那你就把黃色的 vector 和綠色的 vector 拼起來
+
+變成一個 matrix
+
+再把這個 matrix 乘上 W^1
+
+你就可以直接得到 z^1 跟 z^2
+
+我們可以把 x 乘上 W^1 得到 z^1
+
+把 x 乘上 W^1 得到 z^1
+
+這兩件事情分開來做
+
+也可以把這兩個東西
+
+併在一起
+
+再乘上 W^1，直接得到 z^1
+
+或者 z^2
+
+這兩件事情理論上
+
+運算量是一模一樣多的
+
+對不對？上面這件事
+
+跟下面這件事
+
+它在理論上的運算量是一樣多的
+
+但是，就實作上
+
+你覺得哪一件事情是比較快的呢？
+
+你覺得上面比較快的同學舉手一下
+
+你覺得下面比較快的同學舉手一下
+
+所有同學都覺得下面比較好，手放下
+
+沒錯，下面就是比較快的
+
+因為，如果你今天讓 GPU 做這個運算
+
+和讓 GPU 做這個運算
+
+它的時間，其實是一樣的
+
+對 GPU 來說，你在矩陣運算裡面相乘的每一個 element
+
+都是可以平行運算的
+
+所以，今天上面這個運算的時間
+
+反而會變成下面這個 GPU 運算的時間的兩倍
+
+所以，這就是為甚麼我們用 Mini-batch
+
+再加上 GPU 的時候，你是可以加速的
+
+但是，如果你今天用 GPU
+
+但是，你沒用 Mini-batch 的話
+
+你其實就加速不了太多
+
+所以，這就是有人買了 GPU
+
+有人凹了他的老師買了 GPU 來
+
+但他不知道要設 Mini-batch
+
+所以，裝了 GPU 以後，也沒變快
+
+那 Keras 當然可以 save 和 load model
+
+你可以把 train 好的 model 存起來
+
+然後以後再用另外一個程式讀出來
+
+那它也可以幫你做 testing
+
+有兩個 testing 的 case，第一個 case 是這個
+
+evaluation
+
+也就 evaluation case 是
+
+我今天有一組 testing set
+
+testing set 的答案我也知道
+
+那 Keras 就幫你算說你現在的正確率
+
+有多少，那這個 evaluation 有兩個 input
+
+就是 testing 的 image 和 testing 的 label
+
+那在這 case 2 呢，case 2 要做 predict
+
+這個時候，你沒有任何的 label data
+
+你只有 image，就是你真的 train 好這個 model
+
+你要放到網路上讓人家用
+
+別人會輸入一個 image，然後你就告訴他你的
+
+分類好的數字是多少
+
+這個時候，你 input 就只有 x，就只有 image
+
+output 就直接是分類的結果
 
 臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心

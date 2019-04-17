@@ -2,2539 +2,1447 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-那我們上次講了 generation 這件事情
+好，接下來我要來講一下 Generation 的 model
 
-然後，可以用 PixelRNN 來做
+有關 Generation 的 model
 
-這邊 create 了一個 generative 的 task
+你可以看一些很好的 reference
 
-上次還講了 VAE
+這個是 OpenAI 寫的一篇科普的文章
 
-我們沒有講太多它的原理
+那我把它列在這一邊
 
-我們來複習一下 VAE 做的事情
+在這篇文章裡面呢
 
-Auto-encoder 我想大家都很熟悉了
+它開頭是引用費曼的話
 
-那 VAE 做的事情是甚麼呢？
+這句話，來歷是什麼呢？
 
-VAE 做的事情是說
+據說是，費曼過世以後
 
-你一樣有一個 encode，有一個 decoder
+有人去他的辦公室，拍一下他的黑板
 
-你現在 decoder 會 output 兩組 vector
+他在黑板上留下了這一句話
 
-這邊一組是 m1 到 m3
+這個是他辦公室的黑板
 
-另外一組是 σ1 到 σ3
+這一句話寫在左上角 ，他說
 
-接下來，你會 generate 一個 normal distribution
+What I cannot create, I do not understand.
 
-你會 generate 一個 vector
+所以，如果一個東西
 
-這個 vector 是從 normal distribution sample 出來的
+他沒有辦法，他不知道怎麼產生它的話
 
-接下來，你把 σ 這個 vector 取 exponential
+他就不算是真的完全理解
 
-然後，再乘上 random sample 出來的這個 vector
+所以，對 machine 來說 ，或許也是一樣
 
-再加上原來 m 這個 vector
+比如說 ，現在 machine 在影像處理上
 
-得到你的 code, c，然後把那個 code 丟進
+machine 可以做到分類
 
-decoder 裡面，產生 image，那你希望說
+你可以讓他見識貓和狗的不同
 
-input 跟 output 越接近越好
+但他或許並不真的了解
 
-另外 Auto-encoder 還有另外一項 constraint
+貓是什麼， 或許它並不真的了解狗是什麼
 
-那我回去的時候，我發現我上次的投影片呢
+也許在未來，有一天
 
-寫的是相反的，所以
+machine 它可以自己畫出一隻貓的時候
 
-差了一個負號
+它對於貓這個東西的概念
 
-所以如果按照原來的寫法，這邊應該是 maximize
+或許就不一樣了
 
-那如果是用 minimize 的話，下面就應該再加一個負號
+而這個是現在一個非常熱門的主題
 
-再來的問題就是
+有很多相關的研究
 
-為甚麼要用 VAE 這個方法
+我們就來稍微講一下
 
-原來的 Auto-encoder 會有甚麼樣的問題呢？
+我們稍微來 overview 一下
 
-如果你看文獻上的話
+相關的研究
 
-VAE，如果你看它原來的 paper 的話
+在這些研究裡面
 
-它有很多很多的式子，你就會看的一頭霧水的
+大概可以分成 3 個方法
 
-那在講那些式子之前呢
+這邊分別是 PixelRNN
 
-我們先來看 intuitive 的理由
+VAE (Variational Autoencoder)
 
-為甚麼要用 VAE？
+和 Generative Adversarial Network (GAN)
 
-如果是原來的 Auto-encoder 的話
+那這些方法呢，其實都非常的新
 
-原來的 Auto-encoder 它做的事情是
+其中最舊的是 VAE
 
-我們把每一張 image
+VAE 是 2013 年提出來的
 
-變成一個 code，假設我們現在的 code 是一維
+像 GAN 是 2014 年提出來
 
-就是圖上的這條紅色的線
+它提出來還不到兩年
 
-那你把滿月的這個圖
+你知道，我們一般在上課的時候
 
-變成 code 上的一個 value
+尤其是在必修課裡面
 
-然後，再從這個 value 做 decode
+你聽到的每一個東西往往都是，比如說
 
-把它變成原來的圖，那如果是弦月的圖
+50 年前，100 年前 propose 出來的
 
-也是一樣變成 code 上的一個 value
+但是在 machine learning，這邊這個領域裡面
 
-接下來，你再把它從 code 上的一個 value 變回原來的圖
+它的變化是非常非常快速的
 
-假設我們今天是在滿月和弦月的 code 中間
+所以，有很多很多
 
-sample 一個點，你覺得它原來
+未來可能會成為非常經典的方法
 
-然後，再把這個點做 decode
+它是這幾年，才不斷地推陳出新
 
-變回一張 image，它會變成甚麼樣子呢？
+所以，我試著在課程裡面
 
-你心裡或許期待著說
+cover 一些比較新的技術
 
-它會變成滿月和弦月中間的樣子
+讓大家知道說
 
-但是，這只是你的想像而已
+這個領域它的變化，是非常非常快的
 
-其實，因為我們今天用的 encoder 和 decoder
+那我們先來講一下 PixelRNN
 
-我們今天用的 encoder 和 decoder，它都是 non-learner
+我們今天就先講一下這些方法
 
-它都是一個 neural network
+大概是怎麼運作的
 
-所以，你其實很難預測說
+然後下一次，再細講它的原理
 
-在這個滿月和弦月中間到底會發生甚麼事情
+我們來講一下 ，這個 Pixel RNN
 
-你可能想像是，滿月和弦月中間的月象
+雖然我還沒有講過 RNN 是什麼
 
-但未必，它可能根本就是另外一個東西
+但我相信這個方法，你是可以聽得懂的
 
-那如果用 VAE 有甚麼好處呢？
+因為它非常的，非常的直覺
 
-如果用 VAE 的好處是
+非常的直覺
 
-實際上，VAE 在做的事情
+假設我們今天要產生一個
 
-就等於我下面說的這件事情
+我們今天的目標是要讓 machine 自己畫一張圖出來
 
-當你把這個滿月的圖變成一個 code 的時候
+比如說，我們今天要讓 machine 畫出一個
 
-它會在這 code 上面再加上 noise
+解析度是 3*3，有 9 個 pixel 的 image
 
-它會希望，在加上 noise 以後
+怎麼做呢？
 
-這個 code reconstruct 以後，還是一張滿月
+我們讓 machine 每一次畫一個 pixel
 
-也就是說，原來的 Auto encoder 只有這個點
+它每一次就點一個點
 
-需要被 reconstruct 回滿月的圖
+點完 9 個點，就畫出一張圖了
 
-但是對 VAE 來說，你會將上 noise
+那怎麼做呢？
 
-在這個範圍之內的圖 reconstruct 回來以後
+假設我們先隨機給它第一個
 
-都應該仍然要是滿月的圖
+隨機給這個 image ，塗一個紅色的 pixel
 
-這個弦月的圖也是一樣
+接下來呢，你就 learn 一個 model
 
-弦月的 code 再加一個 noise
+它 input ，就是已經在圖上的紅色 pixel
 
-reconstruct 回來以後
+它的 output，就是接下來 
 
-這個 range 的 code 都要變成弦月的圖
+要吐出什麼顏色的 pixel
 
-你會發現說，在這個位置
+假設，它吐出藍色的 pixel
 
-在這個地方，這個 code 的點
+那就把藍色的 pixel 再擺到 image 上面
 
-它同時希望被 reconstruct 回弦月的圖
+那你說，怎麼描述一個 pixel 呢？
 
-同時也希望被 reconstruct 回滿月的圖
+一個 pixel 不就是 RGB 三個顏色所構成的嗎？
 
-那可是你只能夠 reconstruct 回一張圖而已
+所以，一個 pixel 就是一個三維的 vector
 
-怎麼辦？
+所以，你就是 learn 一個 neural network
 
-那 VAE training 的時候
+它可以吃一個三維的 vector
 
-你要 minimize  這個 mean square error
+然後，output 另外一個 3 維的 vector
 
-所以，最後產生這個位置
+這個 3 維的 vector，3個值
 
-所產生的圖
+就代表了，這個 pixel 的 RGB 3 個值
 
-會是一張介於滿月和弦月中間的圖
+你要把這個 neural network 的 output
 
-同時讓它最像滿月，也最像弦月
+轉成一個顏色，然後，把它塗上去就結束了
 
-那你產生的圖會是甚麼樣子呢？
+接下來，這個圖上有兩個點
 
-或許就是，界於滿月和弦月之間的月象圖
+那你就再用同一個 model
 
-所以，如果你用 VAE 的話
+它 input 紅色和藍色的 pixel
 
-你從你 code 的 space上面
+接下來，它就 output 下一個 pixel
 
-去 sample 一個 code
+比如說，它是淺藍色的 pixel
 
-在產生 image 的時候
+那這邊呢，你可能會有個問題就是
 
-你可能會得到比較好的 image
+neural network 不是  input 一個 pixel length  的 vector
 
-如果是原來的 Auto-encoder 的話
+output 另外一個 pixel length 的 vector 嗎？
 
-你 random sample 一個 point
+比如說，你 input 3 維
 
-你得到的，可能看起來都不像是一個真實的 image
+它就固定只能 input 3 維
 
-所以，VAE 就是這樣
+你怎麼 input 一個 pixel
 
-這個 m，這個 encoder 的 output, m 代表是原來的 code
+又用同一個 network，input 2個 pixel 呢？
 
-那這個 c，代表是加上 noise 以後的 code
+這個就是 RNN 可以處理的地方
 
-decoder 要根據加上 noise 以後的 code
+RNN 它可以處理 variable length 的 input
 
-把它 reconstruct 回原來的 image
+因為我們還沒有講過 RNN
 
-那這個 σ 跟 e 是甚麼意思呢？
+如果，你覺得你無法理解
 
-這個 σ，它就代表了
+怎麼處理一個 variable length 的 pixel 的話
 
-現在這個 noise的 variance
+那你就想像說
 
-它代表了你的 noise 應該要有多大
+還沒有 pixel 的地方，我就補零
 
-因為 variance 是正的
+就想像說，我這一邊空白的地方
 
-所以，這一邊會取一個 exponential
-
-因為 neural network 的 output
-
-假設你沒有用 activation function 去控制它的話
-
-它的 output 可正可負
-
-假設你這一邊是 linear的 output 的話
-
-那 output 可正可負
-
-所以取一個 exponential 確保它一定是正的
-
-可以被當做是 variance 來看待
-
-那現在當你把這個 σ
-
-乘上這個 e
-
-這個 e 是從一個 normal distribution sample 出來的值
-
-當你把這個 σ 乘上 e 再加到 m 的時候
-
-就等於是你把這個 m 加上了 noise
-
-就等於是你把原來 code 加上 noise
-
-那這個 e 呢
-
-是從 normal distribution sample 出來的
-
-所以，它的 variance 是固定的
-
-但是，乘上不同 σ 以後呢
-
-它的 variance 的大小就有所改變
-
-所以這一個 variance 決定了 noise的大小
-
-而這一個 variance大小
-
-這個 variance 是從 encoder 產生的
-
-也就是說 machine 在 training 的時候
-
-它會自動去 learn 說，這個 variance 應該要有多大
-
-但是，如果就只是這樣子是不夠的
-
-假如你現在的 training 就只考慮說
-
-我現在 input 一張 image
-
-然後，我中間有這個加 noise 的機制
-
-noise 的 variance 是自己 learn 的
-
-然後，decoder 要 reconstruct 回原來的 image
-
-那你要 minimize 這個 reconstruction error
-
-如果你只有做這一件事情的話，是不夠的
-
-你 train 出來的結果呢
-
-是不會，並不會如同你預期的樣子
-
-為甚麼呢？
-
-因為這個 variance 現在自己學的
-
-假設你讓 machine 自己決定說 variance 是多少
-
-那它一定會決定說
-
-variance 是 0 就好了 ，對不對
-
-就讓大家自己決定分數是多少
-
-那每一個人都會是 100 分
-
-所以，這邊這個 variance
-
-如果你只讓 machine 自己決定的話
-
-它就會覺得說，variance 是 0 就好了
-
-那你就等於是原來的 Auto-encoder
-
-因為 variance 是 0 的話，就不會有這個
-
-不同的 image overlap的情形
-
-這樣你 reconstruction error 是最小的
-
-所以，你要在這個 variance 上面呢
-
-去做一些限制
-
-你要強迫它的 variance 不可以太小
-
-怎麼做呢？所以，我們另外再加了這一項
-
-其實就是對 variance 做了一些限制
-
-怎麼說呢，這一項是這樣子
-
-你看它這一邊有 exp(σi) - (1 + σi)
-
-那 exp(σi) 畫在圖上的話
-
-它是藍色的這一條線
-
-(1+σi) 畫在圖上，它是紅色的這一條線
-
-當你把藍色這一條線減紅色這一條線的時候
-
-你得到是綠色的這一條線
-
-綠色這一條線的最低點呢
-
-是落在 σ = 0 的地方
-
-注意一下，σ 之後會再乘 exponential，所以σ = 0
-
-意味這說，它的 variance 是 1
-
-exp = 0，是 1
-
-所以 σ = 0 的時候，loss 最低
-
-意味著說， 你的 variance 等於 1 的時候
-
-loss 最低
-
-所以，machine 就不會說，讓 variance 等於 0，然後
-
-minimizes reconstruction error，它還要考慮說
-
-variance 是不能夠太小
-
-那最後這一項 ( mi )^2
-
-對這個 code 做這個
-
-要 minimize code 的這個 L2-norm
-
-怎麼解釋呢，其實很容易解釋
-
-你就想成是我們現在加了 L2 的 regularization
-
-我們本來常常在 train Auto-encoder 的時候
-
-你就會在你的 code 上面呢
-
-加一些 regularization
-
-讓它結果比較 sparse
-
-比較不會 overfitting
-
-比較不會 learn 出太多 trivial 的 solution
-
-那這個是直觀的理由
-
-如果比較正式解釋的話
-
-要怎麼解釋它呢
-
-以下就是 paper 上，比較常見的說法
-
-假設我們回歸到我們到底要做的事情是什麼
-
-假設你現在要叫 machine 做的事情
-
-是 generate 寶可夢的圖
-
-每一張寶可夢的圖
-
-你都可以想成是高維空間中的一個點
-
-一張 image，假設它是 20*20 的 image
-
-它在高維的空間中
-
-就是一個 20*20，也就是一個 400 維的點
-
-我們這邊寫做 x
-
-雖然在圖上，我們只用一維來描述它
-
-但它其實是一個高維的空間
-
-那我們現在要做的事情
-
-其實就是 estimate 高維空間上面的機率分佈，P(x)
-
-我們要做的事情就是 estimate 這個 P(x)
-
-只要我們能夠 estimate 出這個 P(x) 的樣子
-
-注意，這個 x 其實是一個 vector
-
-假設我們可以 estimate 出 P(x) 的樣子
-
-我們就可以根據這個 P(x)
-
-去 sample 出一張圖
-
-那找出來的圖
-
-就會像是寶可夢的樣子
-
-因為你取 P(x) 的時候，你會從機率高的地方
-
-比較容易被 sample 出來
-
-所以，這個 P(x) 理論上應該是在
-
-有寶可夢的圖的地方
-
-這有寶可夢的圖，如果你今天
-
-這個圖長得像一隻寶可夢的話，它的機率是大的
-
-它的機率是大的
-
-這個是噴火龍家族，他們的機率是大的
-
-這個是水箭龜家族，他們機率是大的
-
-如果是一張怪怪的圖的話
-
-比如說，這一個看起來像是皮卡丘，又有一點不像
-
-這個看起來像是一隻綿羊，又像是一個雲
-
-這一邊呢，機率是低的
-
-這一邊機率是低的
-
-如果我們今天能夠 estimate 出
-
-這一個 probability distribution
-
-那就結束了
-
-那怎麼 estimate 一個 probability 的 distribution 呢？
-
-我們可以用 Gaussian mixture model
-
-我不知道在座有多少人知道 Gaussian mixture model
-
-我好奇問一下
-
-知道 Gaussian mixture model 的同學舉手一下
-
-好手放下，謝謝
-
-很多人都知道 Gaussian mixture model
-
-那太好了
-
-有學過語音課的話，就聽過 Gaussian mixture model
-
-Gaussian mixture model 在做甚麼呢？
-
-我們現在有一個 distribution，它長這個樣子
-
-黑色的、很複雜
-
-我們說這個很複雜的黑色 distribution，它其實是
-
-很多的 Gaussian
-
-我這一邊藍色的代表 Gaussian
-
-有很多的 Gaussian
-
-用不同的 weight 疊合起來的結果
-
-假設你今天 Gaussian 的數目夠多
-
-你就可以產生很複雜的 distribution
-
-所以，雖然黑色很複雜
-
-但它背後其實是有很多 Gaussian 疊合起來的結果
-
-那這個式子怎麼寫它呢？
-
-你會把它寫成這樣
-
-首先，如果你要從 P(x) sample 一個東西的時候
-
-你怎麼做？
-
-你先決定你要從哪一個 Gaussian sample 東西
-
-假設現在有一把 Gaussian
-
-有一把 Gaussian
-
-每一個 Gaussian 背後都有一個 weight
-
-每一個 Gaussian 都有自己的 weight
-
-這一邊有一把 Gaussian，每一個都有它自己的 weight
+我其實是，就是補一個白色的 pixel 而已
 
 那接下來呢
 
-你再根據每一個 Gaussian 的 weight
+你給它紅色、藍色跟淺藍色的 pixel
 
-去決定你要從哪一個 Gaussian sample data
+接下來，它吐出一個灰色的 pixel
 
-然後，再從你選擇的那個 Gaussian 裡面 sample data
+那你就再把灰色的 pixel 放到圖上
 
-如果你選擇 1 這個 Gaussian的話
+接下來，重複剛才的步驟，給它這 4 個 pixel
 
-那你就從這個地方sample data
+然後，把下一個 pixel 再補上去
 
-如果選擇 2 的話，就從這個地方
+那你就把 9 個 pixel 都補完 
 
-3 就從這個地方、4 就從這個地方、5 就從這個地方
+就畫完一張圖了
 
-以此類推
+那要 train 這種 network 很簡單
 
-所以，怎麼從 Gaussian mixture model 
-sample 一個 data 呢？
+它完全就是 unsupervised
 
-你就這樣做
+你不需要任何的 label ，你想在作業 3 裡面
 
-首先，你有一個 multinomial  的 distribution
+你要知道某一些 image，它的 label 是什麼
 
-你從這一個 multinomial distribution 裡面
+你才能夠 train 一個 image 的 classifier
 
-決定你要去 sample 哪一個 Gaussian
+這一邊不用，你就收集一大堆的 image
 
-今天 m 代表第幾個 Gaussian
+然後，machine 就會知道說
 
-它是一個 integer
+看到第一個 pixel 是這個顏色
 
-決定好你要從哪一個 m sample Gaussian 以後
+第二個 pixel 應該是甚麼
 
-你要從哪一個 Gaussian sample data 以後
+看到第一個和第二個 pixel 這個顏色
 
-決定哪一個 Gaussian 以後
+第三個應該是甚麼
 
-每一個 Gaussian 有自己的 mean
+看到1, 2, 3 個pixel
 
-μ(上標 m)，有一個自己的 variance,  Σ(上標 m)
+第四個 pixel 應該是甚麼
 
-所以，你有了這個 m 以後
+這個就叫 PixelRNN
 
-你就可以從，你就可以找到這個
+你可能想說，這招這麼簡單
 
-mean 跟 variance
+它會 work 嗎？
 
-根據這個 mean 跟 variance
+也讓我蠻驚奇的
 
-你就可以 sample 一個 x 出來
+它其實是 work 的
 
-所以，今天整個 P(x) 寫成
+而且在不同的 generate image 的方法裡面
 
-summation over 所有的 Gaussian
+現在，就我所知
 
-那一個 Gaussian 的 weight, P(m) 再乘上
+應該是 PixelRNN 它產生的圖
 
-有了那一個 Gaussian以後
+是最清晰的
 
-從那一個 Gaussian sample 出 x 的機率，P(x|m)
+其他的方法產生的圖
 
-那在 Gaussian mixture model 裡面
+沒有辦法像 PixelRNN 這麼清晰
 
-有種種的問題，比如說你需要決定 mixture 的數目
+這個是，DeepMind paper 的一個例子
 
-但是，如果你知道 mixture的數目的話
+這個是真實的 image，就是一隻狗
 
-接下來給你一些 data，x
+如果我們現在把這一隻狗的下半身
 
-你要 estimate 這一把 Gaussian
+遮掉，把下半身遮掉
 
-跟它的每一個 Gaussian 的 weight
+接下來，我們就要讓 machine
 
-跟它的 mean 跟 variance
+去 predict 說，given 這些 pixel
 
-其實是很容易的
+接下來這隻狗的下半身
 
-你只要用 EM Algorithm 就好了
+應該要長什麼樣子
 
-你不知道這個是甚麼沒有關係
+machine 把狗的下半身畫出來
 
-反正這是很容易的事情
+那 machine 畫出了這樣子的狗
 
-現在每一個 x
+還有這樣子的狗
 
-它都是從某一個 mixture 被 sample 出來的
+還有這樣子的狗
 
-這件事情其實就很像是
+有看起來看像猩猩的狗
 
-在做 classification 一樣
+還有看起來像雞的狗這樣
 
-每一個我們所看到的 x
+然後，這個方法
 
-它都是來自於某一個分類
+其實也可以被用在
 
-它都是來自於某一個 class
+不只是影像上
 
-但是，我們之前有講過說
+它也可以被用在語音上
 
-把 data 做 classification
+非常著名的例子呢
 
-做 clustering 其實是不夠的
+就是 WaveNet
 
-更好的表示方式是用
+我們知道 WaveNet 可以做語音合成
 
-Distributed 的 representation
+但是 WaveNet 到底是怎麼做的呢？
 
-也就是說，每一個 x
+其實，它的概念非常簡單
 
-它並不是屬於某一個 class
+就是 input 一大堆的
 
-某一個 cluster，而是它有一個 vector
+這邊底下的每一個 node
 
-來描述它的各個不同面相的 attribute
+藍色的圈圈，代表的就是 wave form
 
-描述它各個不同面向的特質
+wave form 大家知道嗎？就是
 
-所以 ，VAE 其實就是 Gaussian mixture model 的
+反正，你就把聲音取進來
 
-distributive representation 的版本
+然後，直接去取樣
 
-怎麼說？首先呢
+然後看它的 amplitude
 
-我們要 sample 一個 z
+等於完全不用做任何 feature transform
 
-這個 z 是從一個 normal distribution sample 出來的
+通通都不要，這邊每一個藍色的點
 
-z 是一個 vector
+就是聲音訊號上面的一個 sample
 
-它從一個 normal distribution 被 sample 出來
+好，那今天就是這樣
 
-那這個 z 是一個 vector
+我們等這個動畫跑完
+
+給定前面一段的聲音訊號
+
+然後，predict下一個 sample 的結果
+
+然後把它放下來，再 predict 下一個 sample
+
+再放下來，再 predict 下一個 sample
+
+再放下來 ，就這樣
+
+然後接下來就是
+
+硬 train 下去，就結束了
+
+然後，你就可以合出一段聲音
+
+這個是在語音上的應用
+
+在影像上也有應用
+
+在 影像上，你也可以做一樣的事情
+
+只要讓 machine 看過很多的 video
+
+然後，它就可以 predict 說
+
+給它一段 video，接下來會發生甚麼事情
+
+比如說， 在 Google 的 demo 裡面
+
+它會 DEMO 說
+
+它的那些影像都是機器人手背上的影像
+
+它在機器人手背上裝了一個攝影機
+
+所以，它可以錄說
+
+機器人的手背看到的影像
+
+你就可以看到說
+
+影像的前半段是
+
+機械人的手伸向一塊抹布
+
+然後，影像的後半段
+
+就是機器人把抹布拿起來
+
+把抹布拿起來的那一些影像
+
+是機器自己腦補的結果
+
+並不存在於現實生活中
+
+機器自己 predict 接下來會發生什麼事情
+
+那如果你想要練習
+
+這個 generation 的話
+
+一個最簡單的 application，當然是做 MNIST
+
+不過做 MNIST，我覺得有一點虛弱
+
+generate digit 有點虛弱，而且那個有點簡單
+
+所以，我 create 另外一個 task
+
+如果你想要練習 generative model 的話
+
+你可以用這個 task
+
+這一個 task 是 Pokémon Creation
+
+這邊，我們有 792 張寶可夢的小圖
+
+我們要讓 machine 看過這些小圖以後
+
+它自己產生新的寶可夢出來，這一邊的口號就是
+
+用創造代替捕抓這樣
+
+過去我們是抓寶可夢
+
+在野外抓寶可夢
+
+像我們在實驗室裡面
+
+是你創造新的寶可夢出來
+
+image 的 source 是來自於 Pokémon 的 Wiki
+
+我看了一下它的 copyright
+
+它的 image 都可以任意使用
+
+和變造的，所以應該是沒有版權的問題
+
+原來的 image 是 40*40 的 pixel
+
+其實，我覺得 40*40 有點稍微太大
+
+所以，我把它 cut 小一點
+
+只取了中間的部分
+
+中心的部分，變成 20*20 的 image
+
+那看起來大概像是這樣子
+
+這個是喵喵
+
+這個是，我也不知道它是什麼
+
+我只知道它好像跟果然翁在一起
+
+其實，我沒有把動畫仔細看完
+
+反正就是這些，你可以
+
+雖然說，影像的解析度沒有很高
+
+但是，還是可以很清楚的看到說，它就是寶可夢
+
+那這邊有一些 tips
+
+因為，我其實自己實際做了一下
+
+我覺得有一些 tips
+
+首先，就是你可能很直覺的覺得說
+
+一個 image、一個 pixel 應該就是用一個三維的 vector
+
+用三個數字來描述它
+
+每一個數字代表了 RGB
+
+比如說，這樣的 pixel
+
+你可能就用 3 個 vector
+
+你可能用三個數值
+
+50，150 和 100 來描述它
+
+但是，我覺得實際上這樣做以後呢
+
+我發現這樣做，結果感覺不是太好
+
+那我覺得，原因是因為
+
+你用這樣做，你產生的圖
+
+都很灰，看起來都灰灰髒髒的
+
+我覺得一個原因是因為
+
+如果你要產生非常鮮明的顏色的話
+
+非常鮮明的顏色往往是
+
+某一個RGB 裡面的某一個 value 特別高
+
+其他都接近零
+
+像灰色，就是三個 RGB 的 value 都差不多
+
+就是灰色
+
+所以，如果你要這個
+
+那它產生非常鮮明的顏色的話
+
+你這三個值，要差得夠大才行
+
+但是，你在 learn 的時候
+
+你往往沒有辦法真的讓，比如說
+
+G 是 0、B 是 0
+
+你往往做不到這一件事
+
+尤其，你今天如果是 output
+
+你 output 把 0 到 255
+
+normalize 到 0 到 1 之間的話
+
+output 你用 sigmoid function 的話
+
+sigmoid function 的值，通常都落在 0.5 左右
+
+通常都落在中間，它很難落在這種極端的值
+
+所以，它產生的值
+
+都是 RGB 3 個值差不多
+
+所以，你看起來每一張圖，看起來都是灰色，
+
+棕色，這感覺不太好看
+
+所以，我就稍微做了一下前處理
+
+怎麼做前處理呢？
+
+我把每一個 pixel
+
+都用一個 1-of-N encoding 的 vector 來表示
+
+但是 1-of-N encoding 裡面
+
+每一個 dimension
+
+就代表了一個顏色
+
+也就是說每一個 pixel
+
+都是用一個 vector來表示
 
 這個 vector 的每一個 dimension
 
-就代表了某種 attribute
+比如說，第一個 dimension 就代表黃色
 
-代表你現在要 sample 的那個東西的某種特質
+第二個 dimension 就代表藍色
 
-z 的每一個 dimension
+第三個 dimension 就代表綠色
 
-就代表了它要 sample 的某種東西的特質
+第四個 dimension 就代表黑色，等等
 
-假設 z 它長這樣
+也就是說，不讓它產生 RGB
 
-假設 z 長這樣
+去合成顏色
 
-它是一個 Gaussian distribution
+而是直接讓它產生一個顏色
 
-現在我們在這個圖上呢
+所以，比如說
 
-就假設它是一維的
+這個顏色進來， 這個綠色進來
 
-但在實際上 z 可能是一個 10 維的、100 維的 vector
+那它就是這一維是 1
 
-到底有幾維，是由你自己決定
+然後其他是 0
 
-假設現在 z 呢，就是一維的 Gaussian
+所以，一個 pixel，我們用這個方式來描述它
 
-接下來，你sample 出這個 z 以後
+但是，這邊會有一個問題就是
 
-根據 z ，你可以決定 μ 跟 σ
+你可能的顏色太多了
 
-你可以決定 Gaussian 的 mean 跟 variance
+RGB 每一個都有 255 種可能
 
-剛才在 Gaussian mixture model 裡面
+256種可能
 
-你有 10 個 mixture，你就是 10 個 mean
+256 的 3 次方
 
-跟 10 個 variance
+有太多可能的顏色
 
-但是，今天在這個地方
+怎麼辦呢？
 
-你的 z 有無窮多個可能
+我先做 clustering
 
-它是 continuous，不是 discrete
+把同樣接近的顏色 cluster 在一起
 
-所以你的 z，有無窮多的可能
+也就是說
 
-所以，你的 mean 跟 variance
+這個綠，跟這個綠，跟這個綠
 
-也有無窮多的可能
+它們算是同一個顏色
 
-那怎麼找到這個 mean 跟 variance 呢？
+都用上面這個綠來表示它
 
-怎麼給一個 z，找 mean 跟 variance 呢？
+那我就把在 corpus 裡面
 
-你這一邊的做法就是
+出現次數比較少的這個顏色
 
-假設 mean 跟 variance 都來自一個 function
+跟出現次數比較多的顏色呢
 
-都來自一個 function
+把它合併起來
 
-你把 z 代進產生 mean 的這個 function
+所以，我們得到了 167 個不同的顏色
 
-它就給你 μ(z)
+那我 release 了這個 corpus
 
-μ(z)代表說，現在，如果你的
+大家可以任意使用
 
-你的 hidden 的東西
+這個 corpus 是這個樣子
 
-你的 attribute 是 z 的時候
+原來 image 在這一邊，然後，我裁過的結果在這邊
 
-你在這個 x 這個 space 上的 mean是多少
+那我這邊就直接存 pixel
 
-同理，σ(z) 代表說你的 variance 是多少
+所以你也不用做 preprocessing 了，都幫你做好了
 
-代表說，你現在如果從
+在這個 data 裡面
 
-這個 latent 的 space 裡面得到 z 的時候
+每一個 row，就代表了一張 image
 
-你的 variance 是多少
+然後，每一個數字，就代表了一個顏色
 
-所以，實際上
+就代表了一個顏色
 
-所以，實際上這個 P(x) 是怎麼產生的呢？
+那怎麼知道每個數字代表什麼顏色呢？
 
-在 z 這個  space上面
+它的 mapping 在這一邊
 
-每一個點都有可能被 sample到
+比如說，0，它的 RGB 就都是 255, 255, 255
 
-只是在中間這邊呢
+所以，0 代表白色
 
-這個點被 sample 到的機率比較大
+然後，比如說，這一邊
 
-在 tail 的地方，點被 sample 到的機率比較小
+這個 2，2 代表三個都是49, 49, 49
 
-當你 sample 出一個點以後
+這個其實是一個灰色，等等 
 
-你在 z 的 space 上面 sample 出一個 point 以後
+那我等一下就做這個 PixelRNN 的實驗
 
-那一個 point 會對應到 一個 Gaussian
+我發現，其實，你可能會懷疑說只有 700 多張圖
 
-這一個點對應到這一個 Gaussian
+你 train 得起來嗎？
 
-這個點對應到這一個 Gaussian
+我 train 得起來，是 train 得起來
 
-這一個 點對應到這一個Gaussian，等等
+但問題就是，你可以得出什麼正常的好的結果嗎？
 
-每一個點都對應到一個 Gaussian
+我發現驚人的就是
 
-至於某一個點對應到什麼樣的 Gaussian
+其實是可以的
 
-它的 mean 跟 variance是多少
+然後，我沒有花太多時間調參數
 
-是由某一個 function 所決定的
+我就用了一個一層的 LSTM
 
-所以，當你用這一個概念
+還有 512 個 cell
 
-當你今天你的這個 Gaussian
+你不知道 LSTM 是什麼也沒有關係
 
-是從一個 normal distribution 所產生的時候
+反正，就是 learn 一個很簡單的 model
 
-現在你等於就是有無窮多的 Gaussian
+做出來的結果，就還算尚可
 
-原來 Gaussian mixture model 裡面
+我相信，你認真調一下參數
 
-最多甚麼 512 的，那個太少
+一定可以做得比我好的，好的更多
 
-我們現在有無窮多個 Gaussian
+這個是實驗的結果
 
-那另外一個問題就是
+首先要強調的是
 
-我們怎麼知道每一個 z
+我特意留了 3 張寶可夢
 
-應該對應到怎樣的 mean 跟 variance
+是 machine 沒有看過的
 
-這個 function 怎麼找呢？
+你在 training data 裡面
 
-我們知道說 neural network 就是一個 function
+是沒有這三張寶可夢
 
-所以，你可以說我就是 traing 一個 neural network
+接下來，我給 machine 看這個寶可夢的前半部
 
-這個 neural network input z
+把剩下的半部，把它蓋起來
 
-然後，它的 output  就是兩個 vector
+只給 machine 看前半部
 
-第一個 vector 代表了 input 是 z 的時候
+然後，讓它 predict 這個寶可夢應該長什麼樣子
 
-你 Gaussian 的 mean
+這個，你覺得它是什麼呢？
 
-這個 σ 代表了 variance
+它看起來像是個兔子
 
-那 variance 時常說，它是一個 matrix
+紅色的兔子
 
-你可以說，你可以把 matrix 拉直當作它的 output
+然後，把它的下半身 generate 出來
 
-或者是你可以只 output diagonal 的地方
+它長這樣
 
-然後，假設 non-diagonal 的地方都是 0
+它原來是有穿吊帶褲的兔子
 
-這樣都是可以的
+但它其實是長這樣子
 
-反正，我們有一個 neural network
+那你覺得這隻是什麼呢？
 
-它可以告訴我們說
+這一隻是甚麼？
 
-在 z 這一個 space 上每一個點
+感覺像是鐵甲蛹之類的東西
 
-它對應到 x space 的時候呢
+那 machine generate 出來結果是這個樣子
 
-你的這一個 distribution，mean 跟 variance 分別是多少
+它是一個長的綠毛蟲
 
-那現在這個 P(x) 的 distribution 會長什麼樣子呢？
+它是一個長的綠毛蟲
 
-這個 P(x) 的 distribution 呢
+這個還有一個尾巴，這樣
 
-就會變成是 P(z)的機率
+它是一個綠毛蟲
 
-跟我們知道 z 的時候，x 的機率
+但實際上，它是一隻蜥蜴
 
-再對所有可能的 z 做積分
+然後，這個呢，這個是什麼？
 
-這邊不能夠是相加
+這個是什麼，這個 machine generate 出來
 
-不能夠是 summation，必須要是積分
+它覺得是一個類似狗或是狐狸的東西
 
-因為這個 z 是 continuous 的
+它的臉很長
 
-那有人可能會有一個困惑就是
+然後，這個是它的腳
 
-為甚麼這邊一定是這個 Gaussian 呢
+這個是它的腳
 
-為什麼這邊一定是 Gaussian 呢？
+machine還是要配色，你看
 
-你可以不是 Gaussian 這個樣子
+你看本來
 
-它可以是一種花的樣子
+本來這一邊它是沒有很多深紫色
 
-在文獻上確實有人會把它弄成一朵花的樣子
+但是到腳這邊，幫它塗一下深紫色這樣
 
-它可以是任何的東西
+我覺得還蠻強的，還蠻強的
 
-這個是你自己決定的
+但實際上，它其實是長這個樣子
 
-當然這個 Gaussian，說起來是合理的
+如果，我們今天給它看
 
-你就假設說，每一個 attribute 它的分佈就是 Gaussian
+只有 25% 的圖 ，它會得到什麼
 
-比較極端的 case 總是比較少的嘛
+只給它看一個耳朵
 
-比較沒有特色的東西總是比較多的嘛
+它會覺得接下來是什麼
 
-然後，attribute 跟 attribute之間是 independent 的
+它產生這個臘腸兔這個樣子
 
-這樣子的假設其實也是合理的
+臘腸兔
 
-不過，這個形狀是你自己假設的
+而且其實，我覺得 machine 還算蠻強的
 
-你可以假設是任何的形狀
+你看它有手
 
-你可以假設任何形狀
+它有手，它都把手畫出來
 
-那現在這個
+臘腸的兔，嘴巴跟眼睛，這個樣子
 
-但是，你不用擔心說
+我覺得還蠻強的
 
-你如果假設 Gaussian 會不會對 P(x) 帶來很大的限制
+這個給它看一個角
 
-會不會說，如果假設 z 是 Gaussian distribution 的話
+它會覺得是甚麼呢？
 
-有一些 P(x)，你就沒有辦法描述
+它覺得是鐵甲蛹這樣
 
-其實，你不用太擔心這個問題
+類似鐵甲蛹，看起來像右邊
 
-你不要忘了這個 NN 是非常 powerful 的
+自己產生了一個，看起來很不爽的眼睛
 
-NN 可以 represent 任何 function
+鼻子，嘴巴這樣
 
-只要 neuron 夠多，NN 可以 represent 任何 function
+這個，給它看上面一點點
 
-所以，今天從 z 到 x 中間的 mapping 可以是很複雜
+也不知道是什麼東西
 
-所以，就算你的 z 是一個 normal distribution
+然後，它判斷出來，它覺得是這個樣子
 
-最後這個 P(x) 呢
+你看它產生一個臉
 
-它也可以是一個非常複雜的 distribution
+它產生一個兔子的臉，這個是它的耳朵
 
-再來呢，所以我們現在的式子是這樣子的
+這個是眼睛
 
-我們知道 P(x) 可以寫成對 z 的積分
+這個是眼睛，想要翻白眼
 
-然後乘上P(z)，還有乘上 P(x|z)
+然後，這個是它的鼻子
 
-P(z) 是一個 normal distribution
+它產生一個臉
 
-這個 x given z 呢
+所以，我就覺得還蠻強的
 
-我們先知道 z 是什麼，然後我們就可以決定 x
+而且，我覺得在做這種 task
 
-它是從什麼樣子的 mean 跟 variance 的 Gaussian裡面
+有一個難點就是，你很難 evaluate 這個 task
 
-被 sample 出來的
+因為，所謂創造這件事情
 
-但是這一個 function 有 z
+是無法 evaluate 的
 
-它有什麼樣的 mean 跟 variance
+你不能說，我覺得這個臘腸兔也很合理
 
-它們中間的關係是不知道的
+我覺得搞不好還比這個蛞蝓更合理一點
 
-是等著要被找出來的
+就是說，它建得出來，並不一定要跟光圈一樣
 
-但是，問題是要怎麼找呢？
+它建出來的結果跟光圈不一樣
 
-它的 criterion 就是要 maximize 我們的  likelihood
+並不代表說，它畫的是錯的
 
-我們現在手上已經有一筆 data x
+所以，像這種 task
 
-那你希望找到一組
+是很難被，很難被 evaluate 的
 
-找到一個 μ 的 function
+這是現在做這種
 
-找到一個 σ 的 function
+generation 的一個難點
 
-它可以讓這個
+剛才，是有給 machine 一個開頭
 
-你現在已經觀察到的 data
+然後讓它畫下去
 
-你現在手上已經有的 image
+接下來，你就什麼都不給他
 
-它的每一個 x 代表了一個 image
+讓它從頭開始畫
 
-你現在手上已經有的 image
+但是，如果你只是什麼都不給它
 
-它的 P(x) 取 log 以後
+讓它從頭開始畫的話
 
-它的值相加以後是被 maximize 的
+它可能每一張 image 都是一樣的
 
-這個就是 maximize 我們已經看到 image 的  likelihood
+所以你要故意加一些 random
 
-這邊只是複習一下這個 z 怎麼產生這個 μ 跟 σ 呢
+也就是說，它在 predict 下一個 pixel 的時候
 
-它是透過了一個 NN
+不見得是選機率最高的，那個 pixel
 
-所以，我們要做的事情就是，調這個 NN 裡面的參數
+它會有一定的機率，選一個
 
-調這個 NN 裡面每一個 neuron 的 weight 跟 bias
+機率比較低的顏色出來
 
-使得這個 likelihood 可以被 maximize
+畫在圖上面，這樣它每一次畫的圖
 
-但是在這邊，等一下會引入另外一個 distribution
+都才會有點不一樣
 
-它叫做 q(z|x)
+那其實蠻多都是不知道是在做什麼的圖
 
-它跟這個 NN 是相反的
+比如說，像這個我都不知道在做什麼
 
-它是 given z，決定這個 x 的 mean 跟 variance
+這個看起來像是鳥的嘴巴
 
-這邊是 given x，決定在 z 這個 space 上面的
+那，這個也許，也許是兩個眼睛
 
-mean  跟 variance
+我也不知道它在畫什麼
 
-也就是說，我們有另外一個 NN
+這個是，看起來像是個兔子，像是個兔子
 
-這邊寫成 NN'，你 input x 以後
+難道這個是它的臉嗎
 
-它會告訴你說，對應的 z 的 mean
+難道這個是它戴了一個頭盔
 
-跟對應的 z  的 variance
+我也不知道它在畫甚麼
 
-你給它 x 以後
+有一些，我覺得比較清楚
 
-它會決定這個 z 要從什樣的 mean 跟甚麼樣的 variance
+像這個，我覺得它是一隻飛鳥
 
-被 sample 出來
+這是它的手
 
-上面這個 NN，其實就是 VAE 裡面的 decoder
+這個是一個大嘴鳥
 
-下面這個 NN，其實就是 VAE 裡面的 encoder
+這是它的嘴巴這樣
 
-那我們現在先不要管 NN 這一件事情
+這個是一隻比較慘的鴕鳥
 
-我們現在就先只看 這個式子就好
+它是一個戴綠帽的駝鳥
 
-P(x|z) 我們就先不要在意它是不是從 NN 產生的
+然後，這個是地鼠
 
-反正這個就是一個機率，我們要去把它找出來
+這個畫得還不錯，它還有配色
 
-怎麼找呢？
+淺藍色配白色，這是個地鼠
 
-這個 log P(x)
+它是有眼睛的
 
-它可以寫成積分
+這個也是另外一隻比較大隻的地鼠
 
-over z 的積分，然後 q(z|x) * logP(x) dz這樣
+它頭上有一些藍藍紅紅的
 
-我們想說為什麼是這樣呢？
+它是比較大隻的地鼠
 
-因為 q(z|x)，它是一個 distribution
+然後，這個是，我們胡亂給它取個名字
 
-這個式子對任何 distribution 都成立
+叫做岩漿模糊好了
 
-我們假設 q(z|x) 是一個從路邊撿來的 distribution
+它下面是岩漿，上面是雲
 
-它可以是任何一個 distribution
+叫岩漿雲模糊好了
 
-那任何一個 distribution，你都可以寫成
+它上面，這個是有眼睛
 
-寫成這個樣子
+不要小看它，它是有眼睛的，兩個眼睛都點出來了
 
-對不對？因為這個積分跟 P(x) 是無關的
+這個是飛行骷髏
 
-所以，可以把 P(x)這一項提出 來
+它也是有眼睛的
 
-然後，積分的部分就會變成 1
+我發現這個 model 還蠻強的
 
-所以，左式就等於右式
+它還蠻喜歡點眼睛出來
 
-這個沒有什麼好講的，這式子什麼都沒有做
+然後，還有其他方法
 
-再來呢，也是一個其實什麼都沒有做的式子
+細節我們或許下次再講
 
-這個 P(x) 可以寫成 P(z,x) / P(z|x)
+我們可以稍微看一下它的結果
 
-那你把 P(z|x) 展開 一下就會發現說
+這個東西那叫做 Variational Autoencoder
 
-這一項等於這一項，這也沒什麼好講的
+那我們之前，已經有講過說
 
-那接下來又是一個甚麼都沒有做的式子
+已經有講過 Auto-encoder
 
-就是，本來我們把 P(z, x) / q(z|x)
+我們之前講過 Auto-encoder
 
-然後，再把 q(z|x) / P(z|x)
+那我們之前在講 Auto-encoder 的時候
 
-左式也等於右式
+我們說，你現在呢
 
-因為這個 q 其實是可以消掉的
+Auto-encoder 的 training criteria
 
-這個小學生應該就知道
+就是 input 一張 image
 
-這個式子也等於是什麼事都沒有做這樣子
+通過 encoder 就變成一個 code
 
-接下來，這個東西被放在 log 裡面
+再通過 decoder 把 image 解回來
 
-我們知道 log 相乘等於拆開後相加
+那你希望 input 跟 output
 
-所以，log 這一項乘這一項
+越接近越好
 
-等於 log 這一項加 log 這一項
+希望 input 跟 output 越接近越好
 
-那接下來呢，觀察一下這兩項到底代表什麼事情
+那你 learn 完這個 Auto-encoder 以後
 
-右邊這一項，它代表了一個 KL divergence
+你其實就可以把這 decoder 拿出來
 
-這個 P(z|x) 是一個 distribution
+你就把 decoder 拿出來
 
-q(z|x) 是另外一個 distribution
+然後，你再給它 input 一個
 
-現在 x 是給定的，所以你有兩個 distribution
+random 的東西
 
-當有兩個 distribution 的時候
+你再給它 input 一個
 
-你可以算一個東西，叫做 KL divergence
+你 generate 一個 random 的 vector
 
-KL divergence 代表的是這兩個 distribution 相近的程度
+把這個 random vector 當作是 一個 code
 
-它們兩個相近的程度
+你這個 code 10 維
 
-如果 KL divergence 它越大
+你就 generate 一個 10 維的 vector
 
-代表這兩個 distribution 越不像
+然後，希望丟到這個 decoder 裡面
 
-這兩個 distribution 一模一樣的時候，
-KL divergence 會是 0
+它 output ，就可以是一張完整的 image
 
-所以，KL divergence 它是一個距離的概念
+但，實際上這麼做呢
 
-它衡量了兩個 distribution 之間的距離
+你得到的 performance 通常不一定很好
 
-這一項就是 KL divergence 的式子
+你要用一個方法叫做
 
-這一項是一個距離
+Variation Autoencoder ，VAE
 
-所以，它一定是大於等於 0 的
+你得到的結果會比較好
 
-最小也是 0 而已
+這個 VAE 怎麼做呢？
 
-至於這個為什麼 KL divergence的這個
+它的結構跟 Auto-encoder 非常像
 
-反正你就記起來就是了
+它只是在中間加了一些神妙的小 trick
 
-那因為這一項一定是大於等於 0 的
+為什麼要加神妙的小 trick
 
-所以，這一項會是
+或許我們下一次再講
 
-L 的 lower bound
+這個神妙的小 trick 是什麼
 
-L 一定會大於等於這一項
+它說，input一個 encoder
 
-這一項你可以再拆一下，P(z, x) = P(x|z) * P(z)
+然後，這 encoder 跟 decoder 的部分維持原狀
 
-所以，L 一定會大於這一項
+維持原狀不動
 
-那這一項就是一個 lower bound
+但是，現在在 encoder 的地方
 
-我們叫它 L(下標 b)
+我們不是直接 output code
 
-那現在我們知道事情是這樣
+我們先 output 兩個 vector
 
-這個 log Probability，就是我們要 maximize  的對象
+我們先 output 兩個 vector
 
-它是由這兩項加起來的結果
+假設你的 code
 
-Lb 它長成這個樣子
+你打算要做的 code 是三維的話
 
-它長成這個樣子
+那你 output 的這兩個 vector 呢
 
-在這個式子裡面
+也都是 3 維
 
-P(z)是 normal distribution，是已知的
+這個 vector 是 m1, m2, m3
 
-我們不知道的是 P(x|z)  跟 q(z|x)
+這個 vector 是 σ1, σ2, σ3
 
-那我們本來要做的事情
+接下來，你用 normal distribution
 
-我們本來要做的事情是要找 P(x|z)
+去 generate 另外一個也是 3 維的 vector
 
-讓這個 P，讓這個 likelihood 越大越好
+它的 3 維分別是 e1, e2, e3
 
-現在我們要做的事情
+接下來，你把 σ1, σ2, σ3 取 exponential
 
-變成找 P(x|z) 和 q(z|x)
+跟 e1, e2, e3 相乘
 
-讓 Lb 越大越好
+跟 e1, e2, e3 相乘
 
-我們本來只要找這一項，本來只要找這一項
+然後，把它跟 m1, m2, m3 加起來
 
-現在順便也要找這一項
+你得到這個 c1, c2, c3
 
-把這兩項合起來
+這個東西呢，才是你的 code
 
-我們希望同時找這兩項
+這邊每一個 c 呢
 
-然後去 maximize 這個 Lb
+這個 ci = exp(σi) * ei + mi
 
-突然多找一項是要做什麼呢？
+然後，丟到 decoder 裡面
 
-如果我們現在只找這一項的話
+希望說 decode 能夠 minimize reconstruction error
 
-如果假設我們現在只找這一項
+你希望你的 decoder 可以 minimize
 
-然後去 maximize Lb 的話
+reconstruction error
 
-你如果 maximize 這一項
+但是，光只有這麼做是不夠的
 
-你如果調整這一項
+它還有第二項
 
-你如果找這一項 P(x|z)
+這一項是說
 
-讓 Lb 被 maximize 的話
+這一項非常的神妙
 
-那因為你要找的這一個 log
+我們之後再解釋
 
-你要找的這個 likelihood，它是 Lb 的 upper bound
+這一項是怎麼樣啊
 
-所以，你增加 Lb 的時候
+你看，覺得很怪
 
-你有可能會增加你的 likelihood
+這一項是，我們把它的三個 dimension 加起來
 
-但是，你不知道你的這個 likelihood
+然後我們要去 minimize：1 + σi - (mi)^2 - exp(σi)
 
-跟你的 lower bound 之間到底有什麼樣的距離
+有這麼一項
 
-你想像你希望能做到的事情是
+minimize reconstruction error
 
-當你的 lower bound 上升的時候
+同時 minimize 這一項
 
-當你的 lower bound 上升的時候
+那你用 VAE 做出來結果怎麼樣呢？
 
-你的 likelihood 是會比 lower  bound 高，
-然後你的 likelihood 也跟著上升
+這個是 OpenAI 做的結果
 
-但是，你有可能會遇到一個比較糟糕的狀況是
+他們是做在 Cifar-10 上面
 
-你的 lower bound 上升的時候
+那你會發現說，其實用 VAE 得到的圖呢
 
-likelihood 反而下降
+它是不太清楚的
 
-雖然，它還是 lower bound，它還是比 lower bound 大
+它是不太清楚的
 
-但是，它有可能下降
-因為根本不知道它們之間的差距是多少
+這些圖你都
 
-所以，引入 q 這一項呢
+你看得出來，好像想要畫點什麼
 
-其實可以解決剛才說的那一個問題
+但是你又搞不清楚，它到底在畫什麼
 
-為什麼呢？因為你看這個是 likelihood
+但是用 VAE 跟剛才的 PixelRNN 有什麼不一樣的地方呢
 
-likelihood = Lb + KL divergence
+用 VAE 的話
 
-如果你今天去這個調這個 q(z|x)，調 q 這一項
+你可以做以下的事情
 
-去 maximize Lb 的話，會發生什麼事呢？
+你可以 control 你要 generate 的 image，理論上
 
-你會發現說，首先 q 這一項
-
-跟 log P(x) 是一點關係都沒有的
-
-對不對？log P(x) 只跟 P(x|z) 有關
-
-這個 q 代什麼東西，這個值都是不變的
-
-所以，這個值都是不變的
-
-藍色這一條長度都是一樣的
-
-但是，我們現在卻去 maximize Lb
-
-maximize Lb 代表說你 minimize 了這個 KL divergence
-
-也就是說你會讓
-
-你的 lower bound 跟你的這個 likelihood
-
-越來越接近
-
-如果你 maximize q 這一項的話
-
-所以，今天假如你固定住這個
-
-假如你固定住這個 P，假如你固定住 P(x|z) 這一項
-
-然後一直去調 q(z|x) 這一項的話
-
-你會讓這個 Lb 一直上升，一直上升，一直上升
-
-最後這一個 KL divergence 會完全不見
-
-假如你最後可以找到一個 q
-
-它跟這個 p(z|x) 正好完全 distribution 一模一樣的話
-
-你就會發現說你的 likelihood 就會跟
-
-lower bound 完全停在一起
-
-它們就完全是一樣大
-
-這個時候呢，如果你再把 lower bound 上升的話
-
-因為你的 likelihood 一定要比 lower bond 大
-
-所以這個時候你的 likelihood 呢
-
-你就可以確定它一定會上升
-
-所以，這個就是引入 q 這一項它有趣的地方
-
-今天我會得到一個副產物
-
-當你在 maximize q 這一項的時候
-
-你會讓這個 KL divergence 越來越小
-
-意謂這說，你就是讓這個 q 跟 P(z|x)
-
-注意一下，這兩項是不一樣的
-
-這個方向是不一樣的
-
-你會讓這個 q(z|x) 跟 P(z|x) 越來越接近
-
-所以我們接下要做的事情呢
-
-就是找這一個跟這一個
-
-然後可以讓 Lb 越大越好
-
-讓 Lb 越大越好
-
-就等同於我們可以讓 likelihood 越來越大
-
-而且你順便會找到
-
-這個 q 可以去 approximation of p(z|x)
-
-那這一項 Lb 它長什麼樣子呢
-
-這一項 Lb 我們剛才講過它就是長這個樣子
-
-然後 log 裡面相乘，可以把它拆開
-
-可以把它拆開
-
-我們把 P (z) 跟 q(z|x) 放在一邊
-
-把這一項放在另外一邊
-
-那如果你觀察一下的話
-
-會發現 P(z) 是一個 distribution
-
-q(z|x) 也是一個 distribution
-
-所以，這一項是一個 KL divergence
-
-這一項是 P(z) 跟 q(z|x) 的 KL divergence
-
-那如果複習一下，這個 q 是什麼呢
-
-q 是一個 neural network
-
-q是一個 neural network
-
-當你給 x 的時候，它會告訴你說
-
-q(z|x) 它是從什麼樣的
-
-mean 跟 variance 的 Gaussian 裡面 sample 出來的
-
-所以，我們現在如果你要
-
-minimize 這個 P(z) 跟 q(z|x) 的 KL divergence 的話呢
-
-你就是去調這個 output、這個 output
-
-你去調你的這個 q 對應的那一個 neural network
-
-你去調你的那個 q 對應的那一個 neural network
-
-讓它產生的 distribution 可以跟這個
-
-一個 normal distribution 越接近越好
-
-這一件事情的這個推導呢
-
-我們就把他放在，你就參照 VAE 原始的 paper
-
-那 minimize 這一項
-
-其實就是我們剛才說的這一項
-
-剛才說的在 reconstruction error 外
-
-另外再加的那一個，看起來像是 regularization 的式子
-
-它要做的事情就是 minimize 這個 KL divergence
-
-它要做的事情就是希望說
-
-這一個 q(z|x) 的 output
-
-跟 normal distribution 是接近的
-
-那我們還有另外一項
-
-另外一項是這樣子
-
-另外一項是要這個積分
-
-over q(z|x) * log[P(x|z)] 對 z 做積分
-
-這一項的意思就是
-
-你可以想像，我們有一個 log P(x|z)
-
-然後，它用 q(z|x) 來做這個 weighted sum
-
-所以，你可以把它寫成
-
-[log P(x|z)] 根據 q(z|x) 的這個期望值
-
-根據它的期望值
-
-所以這一邊這個式子的意思呢
-
-這一邊這個式子的意思就好像是說
-
-我們從 q(z|x)  去 sample data
-
-給我們一個 x 的時候
-
-我們去計算，我們去根據這個 q(z|x)，這個機率分佈
-
-去 sample 一個 data
-
-然後，要讓 log P(x|z) 的機率越大越好
-
-那這一件事情其實就 Auto-encoder 在做的事情
+你可以 control 你要 generate 的 image
 
 什麼意思呢？
 
-怎麼從 q(z|x) 去 sample 一個 data 呢？
+假設，我們現在把 VAE 用在 Pokémon creation 上面
 
-你就把 x 丟到 neural network 裡面去
+那我們 training 的時候
 
-它產生一個 mean 跟一個 variance
+就是 input 一個 Pokémon
 
-根據這個 mean 跟 variance
+然後 reconstruct 一樣的 Pokémon
 
-你就可以 sample 出一個 z
+然後 learn 出來這個 code
 
-接下來，我們要做的事情
+然後 learn 出來這個 code
 
-你已經做這一項了
+我們就設 10 維
 
-這一邊就是這一項
+learn 好 這一個 Pokémon 的 VAE 以後
 
-你已經根據現在的 x sample 出 一個 z
+我們就把 decoder 的部分拿出來
 
-接下來，你要 maximize 這一個 z
+因為，現在我們有一個 decoder
 
-產生這個 x 的機率
+你可以 input 一個 vector
 
-那這個 z 產生這個 x 的 機率是甚麼呢
+所以，你在 input 的 時候，你可以這樣做
 
-這個 z 產生這個 x 的機率
+你可以說，我現在有 10 維的 vector
 
-是把這個 z 丟到另外一個 neural network 裡面去
+我固定其中 8 維
 
-它產生一個 mean 跟 variance
+只選其中的 2 維出來
 
-要怎麼讓這個機率越大越好呢？
+然後，在這兩維的 dimension 上面
 
-要怎麼讓這個 NN output
+我灑不同的點
 
-所代表 distribution 產生 x 的 機率越大越好呢？
+我灑不同的點
 
-假設我們無視 variance 這一件事情的話
+然後，我們把每一點都丟到 decoder 裡面
 
-後來在一般實作裡面
+看它合出來的 image 長什麼樣子
 
-你可能不會把 variance  這一件事情考慮進去
+那如果我們做這一件事情的話
 
-你只考慮 mean 這一項的話
+如果我們灑不同的點的話
 
-那你要做的事情就是
+你就可以看到說
 
-讓這個 mean 呢
+這個 code 的每一個 dimension
 
-讓你的這個 mean 跟你的 x 越接近越好
+分別代表什麼意思
 
-你現在是一個 normal
+如果，我們可以解讀說
 
-你現在是一個 Gaussian distribution
+code 的每一個 dimension 代表什麼意思
 
-那 Gaussian distribution 在 mean 的地方機率是最高的
+以後我們就可以把那個 code
 
-所以，如果你讓這個 NN
+當作像是一個拉桿一樣
 
-output 的這個 mean 正好等於你現在這個 data x 的話
+每一個 dimension 當作一個拉桿一樣
 
-這一項 log P(x|z) 它的值是最大的
+你可以調整它
 
-所以，現在這整個 case 就變成說
+你就可以產生不同的寶可夢
 
-input 一個 x，然後，產生兩個 vector
+理想上是這樣子
 
-然後 sample 一下產生一個 z，再根據這個 z
+那我們用 VAE 產生出來的結果是這個樣子
 
-你要產生另外一個 vector
+你可能覺得沒有很好
 
-這個 vector 要跟原來的 x 越接近越好
+首先，你都看不出來每一隻是什麼
 
-這件事情其實就是
+沒錯， 用 VAE 做出來就是這個樣子
 
-就是 Auto-encoder 在做的事情
+那這兩個 dimension
 
-你要讓你的 input 跟 output 越接近越好
+分別是移動了
 
-它就是 Auto-encoder 在做的事情
+變化了兩個這個 code 的 兩個 dimension 以後的結果
 
-所以這兩項合起來
+但是，你從這個
 
-就是剛才我們前面看到的 VAE 的 loss function
+你從這個變化，你可以看得出來說
 
-如果你聽不懂的話也沒有關係
+每一個 dimension 其實或許它真的是有些含意的
 
-前面有提供了比較  intuitive 的想法
+比如說，如果我們看這一個變化
 
-那其實 VAE 有另外一個是叫做 conditional 的 VAE
+這個變化
 
-conditional VAE 這邊我們就簡單講一下概念就好
+它本來是看起來像是一個站著的東西
 
-conditional VAE 它可以做的事情是說
+然後，它後來就逐漸倒下來，逐漸倒下來
 
-比如說，如果你現在讓 VAE 可以產生手寫的數字
+演化，變成類似魚的東西
 
-讓 VAE 可以產生手寫的數字
+然後，後來就塌下來
 
-它就是看一個，給它一個 digit
+塌下來，變成一個趴在地上的東西
 
-然後，它把這個 digit 的特性抽出來
+如果你從左邊到右邊
 
-它抽出它的特性
+你就會發它站的越來越直
 
-比如說，它的筆劃的粗細等等
+它本來是，感覺是有點前傾的
 
-然後，接下來呢
+越往右它就站得越來越直，它頭上會出現一個帽子
 
-你在丟進 encoder 的時候
+站得越來越直
 
-你一方面給它
+所以，你可以從這樣的 dimension 變化發現說
 
-有關這一個數字的特性的 distribution
+它確實是有學到一些東西
 
-另外一方面告訴 decoder 說
+如果我們可以讓圖產生更清楚的話
 
-它是什麼數字
+我們就可以控制這兩個 dimension
 
-那你就可以 generate 一大排
+就可以產生不同的寶可夢
 
-你就可以根據這一個 digit
+這邊是某兩個 dimension
 
-generate 跟它 style 很相近的 digit
+這邊是另外兩個 dimension 的結果
 
-這個應該是在 MNIST 上面的結果
+這邊，這個的例子可能又更清楚一點
 
-我的 reference 在下面，這是在 MNIST 上面的結果
+從右邊到左邊，本來是一個類倉鼠的樣子
 
-這是在另外一個數字的 corpus 上面的結果
+後來就慢慢倒下來，倒下、倒下，然後變成一團布這樣
 
-你會發現說
+如果你看直的話
 
-conditional VAE 確實可以根據某一個 digit
+看直的話，它本來是一個倉鼠的樣子
 
-畫出其他的這個 style 相近的數字
+倉鼠的樣子，從上面往下
 
-這一邊是一些 reference 給大家參考
+你就會發現說，首先它的腳，越來越長
 
-那 VAE 其實有一個很嚴重的問題
+你就看到寶可夢的演化
 
-就是因為它有這問題，所以
+它本來腳很短，後來越來越長、越來越長
 
-之後又 propose 了 GAN
+後來變成有一隻很長的腳，看起來就變成像是鳥
 
-那 VAE 有什麼樣的問題呢？
+後來就變成有兩隻很長的腳
 
-VAE 其實它從來沒有去真的學怎麼產生一張
+後來又變成說，其實它是有四隻腳
 
-看起來像真的 image，對不對？
+看起來像似哺乳類的動物
 
-因為它所學到的事情是
+這是它的演化
 
-它想要產生一張 image
+如果你看它的尾巴的話
 
-跟我們在 data base 裡面某張 image 越接近越好
+本來尾巴很短
 
-但是，它不知道的事情是
+後來尾巴也越來越長
 
-我們在 evaluate 它產生的 image
+尾巴越來越長
 
-跟 data base 裡面的 image 的相似度的時候
+如果你看它的頭的話
 
-我們是用，比如說，mean square error 等等
+本來耳朵很短
 
-來 evaluate 兩張 image 中間的相似度
+後來耳朵越來越長
 
-今天呢，假設我們這個
+看起來就像是，長出了角一樣
 
-這個 decoder 的 output 跟真的 image 之間
+就可以看到說，隨著 input 的 code 的不同
 
-有一個 pixel 的差距
+你就可以產生不同的寶可夢
 
-它們有某一個 pixel 是不一樣的
+但是，在這麼多圖裡面
 
-但是，這個不一樣的 pixel，它落在不一樣的位置
+你會發現都沒有清楚的，都沒看起來像樣的
 
-其實是會得到非常不一樣的結果
+那我先找到一個像樣的
 
-假設這個不一樣的 pixel
+就是在這一邊，這樣
 
-它是落在這個地方
+我找到一個，這一邊這一隻
 
-它落在這個地方
+我想原來的寶可夢裡面應該是沒有這一隻
 
-它只是讓 7 的筆劃比較長一點
+我看了，我翻了一下圖鑑
 
-跟它落在另外一個地方
+但是沒有很仔細翻，我覺得應該是沒有這一隻
 
-它落在這個地方
+它產生出來是這樣
 
-對人來說 ，你一眼就可以看出說
+看起來，它的頭像是一個海馬
 
-這個是 machine generate，是怪怪的 digit
+然後它的尾巴，就叫做鱷魚
 
-這個搞不好是真的
+我們就胡亂叫它鱷魚海馬
 
-因為你根本看不出來跟原來的 7 有什麼差異
+然後，有人說可以用 VAE  來寫詩
 
-它只是稍微長一點，看起來還是很正常
+怎麼用 VAE 來寫詩呢？
 
-但是，對 VAE 來說，都是一個 pixel 的差異
+這個做法是這樣子的
 
-對它來說，這兩張 image 是一樣的好或一樣的不好
+本來這個 VAE 的 Auto-encoder
 
-所以，VAE 它學的事情
+input 是一個 image，output 也是一個 image
 
-只是怎麼產生一張 image 
-跟 data base 裡面的 image 一模一樣
+現在只是把 input 跟 output 改掉
 
-它從來沒有想過說要
+改成 input 一個 sentence
 
-真的產生一張可以假亂真的 image
+output 也是一個 sentence
 
-所以，如果你用 VAE 來做 training 的時候
+不過，如果你要 input 處理 sentence 的 input
 
-其實你產生出來的 image
+產生 sentence 的 output
 
-VAE 所產生出來的 image
+這邊你需要用 RNN 才能夠做到
 
-往往都是 data base 裡面的 image
+不過，這個我們之後再講
 
-的 linear combination 而已
+那怎麼讓 machine 寫詩呢？
 
-因為它從來沒有學過要產生新的 image
+這一邊的作法是這樣
 
-它唯一做的事情只有模仿而已
+你先胡亂選兩個句子
 
-它唯一做的事情只有
+先胡亂選兩個句子
 
-希望它產生的 image 跟 data base 的某張 image 越像越好
+一個句子是 I went to  the store to  buy some groceries.
 
-它只是模仿而已
+第二個句子是 "don't worry about it," she said.
 
-或者最多就是把原來 data base 裡面的image 做 linear combination
+接下來，你通過這個 encoder
 
-它做一些 combination，它沒辦法產生一些新的 image
+這兩個句子，都找出它的 code
 
-所以，這樣感覺沒有非常的 intelligent
+都找出它的 code
 
-所以，接下來就有人 propose
+所以，這兩個句子就變成
 
-有另外一個方法叫做 Generative Adversarial Network
+在 code space 上面的兩個點
 
-Adversarial 是對抗的意思
+接下來呢，你把這兩個點相連
 
-它縮寫是 GAN
+然後，中間等間隔的取一些點
 
-你會發現它是很新的 paper
+再把中間等間隔取的點呢
 
-它最早出現的時候 是 2014 年的 1 2月
+你就把這個 code 丟到 decode 裡面，再還原出去
 
-所以，大概是兩年前的 paper
+所以，把這一個點稍微偏一點以後
 
-以下呢，我們引用了 Yann LeCun 對 GAN 的 comment
+把 I went to  the store to buy some groceries.
 
-就是有人在 Quora 上面
+稍微偏一點以後
 
-問了說這個
+你得到的句子就是
 
-Unsupervised learning 的 approach 
-哪一個是最有 potential 的
+I store to buy some groceries.
 
-然後，Yann LeCun 他親自來回答，他說呢
+再偏一點以後
 
-Adversarial Training is the coolest thing since sliced bread.
+你就得到 I were to  buy any groceries.
 
-since sliced bread，大家知道是什麼意思嗎？
+就這樣一直下來，一直下來
 
-我 google了一下，這是個片語
+到這一邊呢
 
-如果翻譯成中文的話，是有史以來的意思
+變成 "come with me," she said
 
-since sliced bread 是什麼意思呢？
+然後 "talk to  me," she said.
 
-sliced bread 是切片麵包的意思
+然後變成 "don't worry about it," she said.
 
-那這個片語的典故，好像是說
+你可能會說，這個算是寫詩嗎？
 
-在過去麵包店是不幫你切麵麵包的
+這個是這樣
 
-吐司麵包烤完之後，他是不幫你切的
+如果你仔細看他的 paper 的話
 
-所以你買回去之後，要自己切很麻煩
+他的 paper 裡面沒有提到寫詩這一件事情
 
-後來就人發明說，應該先切了以後再賣
+在這個 blog 裡面說是
 
-然後，大家都很高興這個樣子
+說是這樣子是在寫詩就是了'
 
-所以，since sliced bread
+我不知道這個 blog 是誰寫的
 
-它的英文片語就是有史以來的意思
+大概就是這個樣子
 
-它說這是有史以來最強的、最酷的方法
+那 GAN 的部分
 
-他這邊還講了一些別的，他說
+我們就下一次再講
 
-What's missing at the moment is a good understanding of it.
-
-so we can make it work reliably.
-
-It's very finicky.
-
-Sort of like CovNet were in the 1990s,
-
-when I had the reputation of being the only person who could make them work(which wasn't true).
-
-這其實是 GAN 非常難 train
-
-感覺好像只有 Ian 跟 Goodfellow
-
-才 propose 他們可以做得起來
-
-其他人做起來，你可以 google 一下那個 GAN 的 code
-
-很多都在 MNIST 上面
-
-他們產生的 digit，都不是很好看
-
-我們用 VAE 隨便做都可以打爆這些東西
-
-所以產生的 image 很怪
-
-但是，你如果看 paper 的話
-
-它的 performance 是滿好的
-
-所以，它裡面還有很多不為人知的技巧
-
-像過去大家相信說只有 Yann LeCun 可以 train 起來 CNN
-
-不過其實不是這樣子
-
-那其實我很無聊，我又收集了，找到另外一則這樣
-
-就是有人問說
-
-有沒有什麼最近的 breakthroughs 在 deep learning 裡面
-
-然後，Yann LeCun 又來回答了，他說
-
-The most important one, in my opinion, 
-is adversarial training.
-
-also called GAN.
-
-This is an idea proposed by Ian Goodfellow.
-
-他說這個是 the most interest idea
-
-in the last ten years in ML
-
-所以，你就來看這個十年來最有趣的想法到底是怎麼樣
-
-這個 GAN 的概念
-
-有點像似擬態的演化
-
-比如說，這是一個枯葉蝶
-
-這個是一個枯葉蝶
-
-他長得就跟枯葉一模一樣
-
-枯葉蝶是怎麼變的跟枯葉一模一樣呢？
-
-怎麼變成這麼像的呢？
-
-也許一開始他長的是這個樣子
-
-然後呢，但是他有天敵
-
-類似麻雀的天敵
-
-比如像波波這樣子的天敵
-
-天敵會吃這個蝴蝶
-
-天敵辨識是不是蝴蝶的方式，就是他知道蝴蝶不是棕色
-
-他就吃不是棕色的東西
-
-所以蝴蝶就演化，他就變成是棕色的
-
-但是，他的天敵也會跟著演化
-
-波波就會變成比比鳥這樣
-
-然後這個比比鳥知道說，蝴蝶是沒有葉脈的
-
-所以，他會吃沒有葉脈的東西
-
-他會 ignore 有葉脈的東西
-
-所以，蝴蝶又再演化
-
-就會變成枯葉蝶，他就產生葉脈
-
-但是，他的天敵也會再演化
-
-這個好像是神獸
-
-這個好像不是波波演化來的，不過沒有關係
-
-然後，他的天敵也還會再演化
-
-所以，這兩個東西呢
-
-天敵和枯葉蝶，他們就會共同的演化
-
-所以，枯葉蝶就會長得越來越樣枯葉
-
-直到最後沒有辦法分辨為止
-
-所以這跟 GAN 的概念，是非常類似的
-
-GAN 的概念是這個樣子
-
-首先，有一個第一代的 Generator
-
-第一代的 Generator 它很廢，它可能根本就是 random 的
-
-它會 generate 一大堆奇怪的東西
-
-看起來不像是真正地 image 的東西
-
-假如我們現在叫它 Generate 4 個 digit
-
-那接下來有一個的第一代 Discriminator
-
-他就是那個天敵
-
-Discriminator 做的事情是
-
-他會根據 real 的 image
-
-跟 Generator 所產生的 image
-
-去調整它裡面的參數
-
-去評斷說，一張 image 是真正的 image
-
-還是 Generator 所產生的 image
-
-接下來呢，這個 Generator 根據這個 Discriminator
-
-等一下會講說 Generator
-
-怎麼根據 Discriminator去演化
-
-Generator 根據 Discriminator
-
-他又去調整了他的參數
-
-所以，第二代的 Generator
-
-他產生的參數，他產生的 digit 就可能就更像真的
-
-接下來，Discriminator 會再根據第二代的Generator
-
-產生的 digit 跟真正的 digit
-
-去 update 他的參數
-
-接下來，有了第二代的 Discriminator
-
-就會再產生第三代的 Generator
-
-第三代 Generator 產生的數字又更像真正的這個數字
-
-就是第三代 Generator 他產生的這些數字
-
-可以騙過第二代的 Discriminator
-
-第二代產生的這些數字，可以騙過第一代的 Generator
-
-但是，這個第一代的 Discriminator
-
-他產生的數字，可以騙過第二代的 Discriminator
-
-但是，Discriminator 會再演化
-
-可能又可以再分辨第三代 Generator 產生的數字
-
-跟真正的數字之間的差距
-
-你要注意一個地方就是，這個 Generator 啊
-
-他從來沒有看過真正的 image長什麼樣子
-
-Discriminator 有看過真正的 image 長什麼樣子
-
-它會比較真正的 image 跟 Generator 的 output 的不同
-
-但是，Generator 從來沒有看過真正的 image
-
-他做的事情，只是想去騙過 Discriminator
-
-所以，因為 generator 從來沒有看過真正 image
-
-所以，Generator 他可以產生出來的那一些 image
-
-是 data base 裡面從來都沒有見過的
-
-所以，這比較像是，我們想要 machine 做的事情
-
-我們現在看 Discriminator 是怎麼 train 的
-
-這一邊是比較直覺的
-
-這個 Discriminator 他就是一個 neural network
-
-他的 input 就是一張 image
-
-他的 output  就是一個 number
-
-它的 output 就是一個 scalar
-
-你可能通過 sigmoid function，讓他的值介於 0 到 1 之間
-
-1 就代表說 input 這張 image 是真正的 image
-
-假如你是要做手寫數字辨識的話
-
-那 input image 就是真正的人手寫的數字
-
-0 代表是假的，是 Generator 所產生的
-
-那 Generator 是什麼呢？
-
-Generator 在這一邊，其實
-
-他的那個架構就跟 VAE 的 decoder 是一模一樣的
-
-他也是一個 neural network
-
-他的 input 就是從一個 distribution
-
-他可以是某某 distribution 或是任何其他的 distribution
-
-從某一個 distribution sample 出來的一個 vector
-
-你把這個 sample 出來的 vector
-
-丟到 Generator 裡面
-
-他就會產生一個數字
-
-產生一個 image
-
-你給他不同的 vector
-
-他就產生不同樣子的 image
-
-那先用 Generator 產生一堆假的 image
-
-然後，我們有真正的 image
-
-Discriminator 就是把這一些 Generator
-
-所產生的 image
-
-都 label 為 0，也都 label 為 fake
-
-然後，把這個真正的 image
-
-都 label 為 1
-
-也就是都 label 為 true
-
-接下來，就只是一個 binary classification 的 problem
-
-大家都很熟
-
-你就可以 learn 一個 Discriminator
-
-接下來，怎麼 learn 這個 Generator 呢？
-
-Generator 的 learn 法是這個樣子
-
-現在已經有了第一代的 Discriminator
-
-怎麼根據第一代的 Discriminator
-
-把第一代的 Generator 再 update 呢
-
-首先，如果我們隨便給，輸入一個 vector
-
-他會產生一張隨便的 image
-
-那這一個 image 可能沒有辦法騙過這個 Discriminator
-
-你把 Generator 產生的 image 丟到 Discriminator 裡面
-
-他可能說，這有 87% 像這樣子
-
-然後，接下來要做的事情是甚麼呢？
-
-接下來，我們要做的事情是調這個 Generator 的參數
-
-調這個 Generator 的參數
-
-讓 Discriminator 會認為說 Generator
-
-generate 出來的 image 是真的，也就是說
-
-要讓 Generator generate 出來的 image
-
-丟到 Discriminator 以後，Discriminator 的 output
-
-必須要越接近越好
-
-所以，你希望 Generator generate 是長這樣子的 image
-
-他可以騙過 Discriminator
-
-Discriminator output 是 1.0
-
-覺得他是一個真正的 image
-
-這件事情怎麼做呢
-
-其實，因為你知道這個 Generator 是一個 neural network
-
-那 Discriminator 也是一個 neural network
-
-你把這個 Generator 的 output
-
-丟到這個當作 Discriminator 的 input
-
-然後，再讓他產生一個 scalar
-
-這一件事情，其實就好像是
-
-你有一個很大很大的 neural network
-
-他這邊有很多層
-
-他這一邊也有很多層
-
-然後，你丟一個 random 的 vector
-
-他 output 就是一個 scalar
-
-所以，一個 Generator 加一個 Discriminator，他合起來
-
-就是一個很大的 network
-
-他既然乘起來是一個很大的 network
-
-那你要讓這個 network
-
-再丟進一個 random vector
-
-他 output 1 是很容易的，你就做 Gradient Descent 就好
-
-你就用 Gradient Descent 調參數
-
-希望丟進這一個 vector 的時候
-
-他的 output 是要接近 1 的
-
-但是，你這邊要注意的事情是
-
-你在調這個參數的時候
-
-你在調這個 network 參數的時候
-
-你在做 Backpropagation 的時候
-
-你只能夠調整這個 Generator 的參數
-
-你只能算 generator 的參數對 output 的 gradient
-
-然後去 update Generator 的參數
-
-你必須要 fix 住 Discriminator 的參數
-
-如果你今天不 fix 住 Discriminator 的參數，
-會發生什麼事情呢？
-
-你會發生，對 Discriminator 來說
-
-要讓他 output 1 很簡單阿
-
-就他最後output 的時候，bias 設 1
-
-然後其他都設 2，weight 都設 0，它 output 就 1 了
-
-所以，Discriminator，你要讓這整個 network
-
-input 一個 random 的 vector，output 是1 的時候
-
-你要把 Discriminator 這個參數鎖住
-
-Discriminator 參數必須要是 fix 住的
-
-然後，input 一個 Generator，只調 generator 的參數
-
-這樣 generator 產生出來的 image
-
-才會像是，才是一個可以騙過 Discriminator 的 image
-
-這邊有一個來自 GAN 原始 paper 的 Toy example
-
-我們來說明一下，這個 Toy example 是什麼意思
-
-這個 Toy example 是這樣子
-
-他說，現在我們的這個 z space
-
-也就是這個 decoder 的 input
-
-我們知道 decoder 的 input 就是一個 z
-
-就是一個 hidden 的 vector
-
-hidden 的這個 vector
-
-這個 z 他是一個 one dimensional 的東西
-
-那他丟到 Generator 裡面
-
-他會產生另外一個 one dimension 的東西
-
-這個 z 可以從任何的 distribution 裡面 sample 出來
-
-這邊在這個例子裡面
-
-他顯然是從一個 uniform 的 distribution 裡面
-
-sample 出來的
-
-然後，你把這一個 z 通過 neural network 以後
-
-每一個不同的 z，他會給你不同的 x
-
-這個 x 的分布，就是綠色的這個分布
-
-綠色這個分布，現在要做的事情是
-
-希望這個 Generator 的 output 可以越像 real data 越好
-
-他這一邊的 real data 就是黑色的這個點
-
-假設有一組 real data 就是黑色的這個點
-
-你要找的這個 distribution 是黑色的這個點
-
-那你希望你的 Generator 的 output
-
-也就是這個綠色 distribution
-
-可以跟黑色的這個點，越接近越好
-
-如果按照 GAN 的概念的話
-
-你就是把這個 Generator 的 output x
-
-跟這個 real 的 data
-
-這些黑色的點，丟到 Discriminator 裡面
-
-然後，讓 Discriminator 去判斷說
-
-現在這個 value，其實現在這個 x
-
-real data 都只是一個 scalar 而已
-
-現在這個 scalar，他是來自真正的 data 的機率
-
-跟來自於 Generator 的 output 的機率
-
-如果他是真正的 data 的話就是 1
-
-反之就是 0
-
-Discriminator 的 output，就是綠色的 curve
-
-那假設現在，Generator 他還很弱
-
-所以，他產生出來的 distribution
-
-是這個綠色的 distribution
-
-那這個 Discriminator 他根據 real data
-
-跟這個 Generator distribution 他的樣子呢
-
-你給他這個 x 的值，他的 output
-
-可能就會像是這一條藍色的線
-
-這一條藍色的線告訴我們說
-
-Discriminator 認為說，如果是在這一帶的點
-
-他比較有可能是假的
-
-他的這個值是比較低的
-
-如果是落在這一帶的點
-
-他比較有可能是從 Generator 產生的
-
-落在這一帶的點
-
-他比較有可能是 real data
-
-接下來，Generator 就根據
-
-Discriminator 的結果去調整他的參數
-
-Generator 要做的事情是騙過 Discriminator
-
-既然 Discriminator 認為
-
-這個地方比較有可能是 real data
-
-Generator 就把他的 output 往左邊移
-
-他就把他的 output 往左邊移
-
-那你說有沒有可能會移太多
-
-比如說，通通偏到左邊去，是有可能的
-
-所以 GAN 很難 train 這樣
-
-這個要小心的調參數
-
-小心的調參數，讓他不要移太多
-
-這綠色的 distribution 就可以稍微偏一點
-
-比較接近真正 real 的黑色的點的 distribution
-
-所以，Generator 會騙過他
-
-他就產生新的 distribution
-
-然後，接下來 Discriminator
-
-會再 update 綠色的這一條線
-
-這一個 process 就不斷反覆地去進行
-
-直到最後呢
-
-Generator 產生的 output 跟 real data 一模一樣
-
-那 Discriminator 會沒有任何辦法
-
-分辨真正的 data
-
-你有問題嗎？
-
-其實這個就是現在 train GAN 的時候
-
-所遇到最大的問題
-
-你不知道 Discriminator 是不是對的
-
-因為你說 Discriminator 現在得到一個很好的結果
-
-那可能是 Generator 太廢
-
-有時候 Discriminator 得到一個很差的結果
-
-比如說，他認為說每一個地方
-
-每一個地方他都無法分辨說
-
-是 real value 還是 fake value
-
-這個時候並不代表說 Generator generate 的很像
-
-有可能只是 Discriminator 太弱了
-
-所以，這是一個現在還沒有好的 solution 的難題
-
-所以，真正在 train GAN 的時候，你會怎麼做呢？
-
-你會一直坐在電腦旁邊，看他產生 image 這樣，你懂嗎 ?
-
-因為你從 Discriminator 跟 Generator 的 loss
-
-你看不出來他 generate 的 image 有沒有比較好
-
-所以，變成說你 Generator 每 update 一次參數
-
-Discriminator 每 update 一次參數
-
-你就去看看他
-
-你就拿 generated 的 image 看看有沒有比較好
-
-如果變差以後
-
-方向走錯了，再重新調一下參數這樣子
-
-所以，這個非常非常的困難
-
-非常非常的困難
-
-我們這一邊其實有人在線上放了一個 demo
-
-我們來看一下這個 demo
-
-非常 realistic 的 image
-
-這個是 OpenAI 產生的 image
-
-如果我們問你說
-
-你覺得左邊是 real image
-
-還是右邊是 real image
-
-你覺得左邊是電腦產生的 image 的同學舉手一下
-
-有人，請放下
-
-覺得右邊是電腦產生的 image 的同學舉手一下
-
-好，手放下
-
-其實他還是沒有辦法騙過人
-
-你看這邊還有很多怪怪的的東西就是了
-
-很多東西很像
-
-這個馬還蠻像
-
-這個有飛魚，有大嘴巴的貓
-
-有很多怪怪的東西
-
-所以，他其實沒有辦法騙過人
-
-我覺得如果放單一一張，光看這個馬
-
-他可能可以騙過人
-
-OpenAI 他們有做那個實驗
-
-好像有 21% 的 image
-
-就有 21% machine generate 的 image 會被誤判成 real
-
-所以，他其實是可以騙過部分的人
-
-另外，這一邊又有一個很驚人的結果
-
-在文獻上非常驚人的結果
-
-就是說先拿很多房間的照片
-
-讓 machine 去 train GAN
-
-他可以 generate 房間的照片
-
-那我們說，那個 Generator 就是你 input 一個 vector 給他
-
-他就會 output 一張 image 給你
-
-那你現在可以在那個
-
-input 的 space 上調你的 vector，去產生不同的 output
-
-所以，他說他先 random 找幾個 vector
-
-random 找 5 個 vector
-
-產生 5 張房間的圖
-
-接著，再從這一個點移動你的這個 vector 到這個點這樣
-
-所以，就發現說你的 image 逐漸地變化
-
-逐漸的變化，然後跑到這個點
-
-然後再逐漸的變化，再跑到這個點
-
-你會發現一些有趣的地方，比如說，這邊有一個窗戶
-
-它慢慢的就變成一個類似電視的東西
-
-或是這邊有一個電視
-
-它慢慢的就變成了窗戶這樣子
-
-我覺得最驚人結果
-
-是有人，有日本人他用 GAN
-
-很神奇的，很神奇的東西
-
-就傳說中，你只要能夠
-
-一旦你能夠成功使用他
-
-他就可以召喚不可思議的力量
-
-但是，大部分的時候，你都沒有辦法成功的召喚它
-
-它有點像是神之卡的感覺這樣
-
-你只要能夠操控那個神，就可以獲得不可思議的力量
-
-他大部分的時候你都無法操控他
-
-昨天晚上我想說，我可不可以自己
-
-generate 一些寶可夢
-
-弄到 5 點我搞不起來，所以後來我想我還是去睡好了
-
-就很麻煩
-
-因為，它最大的問題就是你沒有一個很明確的 signal
-
-它可以告訴你說，現在的 Generator
-
-到底做的怎麼樣
-
-沒有一個很明確的 signal 可以告訴你這件事
-
-在一個 stander NN 的 training 裡面
-
-你就看那一個 loss，loss 越來越小
-
-代表說現在 training 越來越好
-
-但是，在 GAN 裡面，你其實要做的事情是
-
-keep 你的 Generator 跟 Discriminator，
-他們是 well match 的
-
-他們必需要不斷屬於一種競爭的狀態
-
-他們必須要不斷處於可以
-
-他們要像塔史亮跟進藤光一樣
-
-不斷處於這種勢均力敵的狀態
-
-他們必須要成為對手
-
-那個第三堂課的時候
-
-會請作業一、二、三做得特別好的同學來分享一下
-
-他是怎麼做的
-
-作業三就有人用 GAN
-
-所以，代表是有人有做起來
-
-那這很麻煩，因為在 GAN 裡面
-
-你要讓 Discriminator 跟 Generator
-
-他們一直維持一種勢均力敵的狀態
-
-所以，你必須要用不可思議的平衡感
-
-來調整這兩個 Discriminator 跟 Generator 的參數
-
-讓他們一直處於勢均力敵的狀態
-
-今天這個其實很像是在做 Alpha Go 一樣
-
-你有兩個 agent
-
-然後，你要讓他們一直是處於一樣強的狀態
-
-當今天你的 Discriminator fail 的時候
-
-因為我們最後 training 的終極的目標
-
-是希望 Generator 產生出來的東西
-
-是 Discriminator 完全無法分別的
-
-就是 Discriminator 在鑑別真的或假的 image 上面
-
-它的正確率是 0
-
-但是，往往當你發現你的 Discriminator 整個 fail 掉的時候
-
-並不代表說 Generator 真的 generate 很好的 image
-
-往 你遇到的狀況是你的 Generator 太弱
-
-那很多時候，我在 train 的時候還會遇到的狀況
-
-就是 Generator 它不管 input 什麼樣的 vector
-
-它 output 都給你一張非常像的東西
-
-那一張非常像的東西
-
-不知道怎麼回事就騙過了 Discriminator
-
-那個就是 Discriminator 的罩門
-
-它無法分辨那一張 image
-
-那它整個就 fail 掉了，但並不代表說你的 machine
-
-真的得到好的結果
-
-我要說的大概就是這樣
-後面是一些 reference 給大家參考
+我們先就休息10 分鐘，等一下來講一下 final
 
 臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心

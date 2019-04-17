@@ -2,3996 +2,2518 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-我把 Dimension Reduction 分成兩種
+我們來講 Semi-supervised learning
 
-一種做的事情，叫做化繁為簡
+有一件事情是這樣子的
 
-它可以分成兩大類，一種是做 Clustering
+本來預計今天要公告作業四
 
-一種是做 Dimension Reduction
+但我想說，我們改到下周再公告好了
 
-所謂的化繁為簡的意思是說
+那你就先專心把作業三
 
-你現在有很多種不同的 input
+做完，然後下周再開始做作業四
 
-比如說，你現在找一個 function
+如果沒有意外的話，下周也會同時公告
 
-然後它可以 input 看起來像樹的東西
+final project
 
-output 都是抽象的樹
+那我們先來講一下 Semi-supervised learning
 
-也就是把本來比較複雜的 input
+就是我們作業三，要請大家稍微做一下的東西
 
-變成比較簡單的 output
+因為如果只做 CIFAR-10 的辨識太簡單
 
-那在做 Unsupervised Learning 的時候
+去網路上 call 個 script，按個 enter，應該就可以得到結果
 
-你通常只會有 function 的其中一邊
+所以，我們增加一些挑戰性
 
-比如說，我們要找一個 function，它可以把
+那甚麼是 Semi-supervised learning
 
-所有的樹都變成抽象的樹
+Supervised learning 大家都知道
 
-但是，你所能擁有的 training data
+在 Supervised learning 裡面
 
-就只有一大堆的 image
+你就是有一大堆的 training data
 
-一大堆的、各種不同的 image
+這些 training data 的組成
 
-你不知道說它的 output，應該要是長什麼樣子
+是一個 function 的 input 跟 function 的 output 的 pair
 
-那另外一個 Unsupervised Learning 會做的事情呢
+假設你有 R 筆 training data
 
-是 Generation，也就是無中生有
+每一筆 training data 裡面
 
-它做的事情是這樣，我們要找一個 function
+都有一個 x^r 代表 function 的 input
 
-這個 function，你隨機給它一個 input
+都有一個 y^r\head 代表 function 的 output
 
-我給它一個 random number，比如說輸入一個數字 1
+這個 x^r 代表是一張
 
-然後，它就會 output 這棵樹
+舉例來說，在 homework 3 裡面
 
-輸入數字 2，就 output 另外一棵樹
+x^r 是一張 image
 
-輸入數字 3，就 output 另外一棵
+y^r\head 是 class 的 label
 
-你輸入一個，給它一個 random number
+那所謂的 Semi-supervised learning 是甚麼呢
 
-它就自動畫一張圖出來
+Semi-supervised learning 是說
 
-不同的 number 給它，它畫出來的圖就不一樣
+在 labeled data 上面，我們有另外一組
 
-在這個 task 裡面，我們要找的這個可以畫圖的 function
+unlabeled 的 data
 
-你只有這一個 function 的 output
+那這一組 unlabeled 的 data，我們這邊
 
-但是你沒有這一個 function 的 input
+寫成 x^u
 
-你就只有一大堆的 image
+那在這些 unlabeled 的 data，它就只有 function 的 input
 
-但是，你不知道輸入怎麼樣的 code
+它沒有 output，在這邊呢
 
-才可以得到這些 image
+有 U 筆 unlabeled 的 data
 
-那在這一份投影片，我們先 focus 在
+通常我們在做 Semi-supervised learning 的時候
 
-Dimension Reduction 這一件事情上
+我們期待常見的 scenario 是
 
-而且我們只 focus 在 linear 的 Dimension Reduction
+unlabeled 的數量遠大於 labeled 的數量
 
-那我們現在說一下什麼是 clustering，什麼是 clustering 呢
+也就這邊的 U
 
-clustering 就是說，這個太直覺了
+是遠大於 R 的
 
-這種地方比較沒有什麼特別好講的
+那其實 Semi-supervised learning 可以分成兩種
 
-有一大堆的 image，假設我們現在要做 image 的 clustering
+一種叫做 Transductive learning
 
-就有一大堆 image
+一種叫做 Inductive learning
 
-然後，你就把它們分成一類、一類、一類的
+那 Transductive learning 跟 Inductive learning
 
-之後，你就可以說
+我認為最簡單的分法就是
 
-這一邊所有的 image 都是屬於 cluster 1
+在做 Transductive learning 的時候
 
-這邊都屬於 cluster 2，這邊都屬於 cluster 3
+你的 unlabeled data 就是你的 testing set
 
-就給它們貼標籤的意思
+這樣大家懂我意思嗎
 
-那這樣你就把本來有些不同的 image
+有人會說，這不是用了 testing set，這不是 cheating 嗎
 
-都用同一個 class 來表示
+其實不是，你用了 testing set 的
 
-就可以做到化繁為簡這一件事情
+label 才是 cheating
 
-那這邊最 critical 的問題就是
+你用了 testing set 的 feature
 
-到底應該要有幾個 cluster，那這個東西沒有什麼好的方法
+不是 cheating，這樣大家懂我意思嗎？
 
-就跟 neural network 要幾層一樣，是 empirical 地去決定
+因為，那筆 testing set 的 feature
 
-你要需要幾個 cluster，這個當然不能太多
+本來就在那邊了，所以
 
-比如說，你多到說
+你是可以用它的
 
-這邊有 9 張 image，你就有 9 個 cluster
+所以，如果你用了 testing set 的 feature 的話
 
-那你乾脆就不要做 clustering
+這個叫做 Transductive learning
 
-這樣 image 就自己一個 cluster
+我已經跟助教確認過了
 
-那這樣有做跟沒有做是一樣的
+其實，只要在 Kaggle 上面載下來的 data 都是可以用的
 
-或者是你說，我們全部的 image
+所以，你其實可以用 testing set 的 image
 
-我們只有一個 cluster
+你只是不能夠去找它的 label 出來而已
 
-全部的 image 都放在同一個 cluster 裡面
+這樣大家了解我的意思嗎
 
-那也是有做跟沒有做一樣
+那 Inductive learning 呢，Inductive learning 是說
 
-但是，要怎麼樣選擇適當的 cluster
+我們不把 testing set 考慮進來
 
-這個你就要 empirical 的來決定它
+假設我們在 training 的時候
 
-那在 clustering 的方法裡面
+我們還不知道 testing set 會長什麼樣子
 
-最常用的叫做 K-means
+所以我沒有辦法事先跟據 testing set 去做任何事
 
-很快地講一下，K-means 是怎麼做的
+那我們必須要先 learn 好一個 model
 
-K-means 就是這樣，我們有一大堆的 data
+在  testing set 進來的時候
 
-它們都是 unlabeled
+再去 classify 它
 
-一大堆的 data，x^1 一直到 x^N
+至於要用 Transductive learning 還是 Inductive learning
 
-那這邊每一個 x，它可能就代表一張 image
+現在 testing set 是不是已經有給你了
 
-那我們要把它做成 K 個 cluster
+有些比賽裡面，testing set 已經有給你了
 
-怎麼做呢，我們要先
+你就確實可能可以用它了
 
-找這些 cluster 的 center
+不過還是跟主辦單位確認一下比較好
 
-假如這一邊每一個
+但是。在很多時候你是
 
-object 都是用一個 vector 來表示的話
+你手上沒有那個 testing set 的
 
-這一邊這些 center，也是一樣長度的 vector
+你要先 learn 好 model 以後
 
-那我們每一個 cluster 都要先找一個 center
+尤其是在真正你要用
 
-有 K 個 cluster，我們就需要 c^1 到 c^K 個 center
+machine learning 的 application 的時候
 
-那這些 center
+你並沒有 testing set 在你手上阿
 
-這個初始的 center 怎麼來的呢
+你要先 learn 好 model 以後，再等 testing set 進來
 
-你可以從你的 training data 裡面
+這個時候你就只能做 Inductive learning
 
-隨機的找 K 個 object 出來
+有人會說 Transductive learning 
+不算是 Semi-supervised learning
 
-就是你的 K個 center
+不過，我覺得這個也算是一種 Semi-supervised learning
 
-接下來，你要對所有在 training data 裡面的 x
+只是跟 Inductive learning 很不一樣就是了
 
-都做以下的事情，都做什麼事情呢
+為什麼做 Semi-supervised learning 呢
 
-你決定說現在的每一個 object
+因為有人常會說我們沒有 data
 
-屬於 1 到 K 的哪一個 cluster
+其實，我們不會沒有 data
 
-那假設現在你的 object, x^n
+我們從來都不缺 data，我們只是
 
-跟第 i 個 cluster 的 center 最接近的話
+缺有 labeled 的 data
 
-那 x^n 就屬於 c^i
+比如說，你要收集 image
 
-那我們用一個 binary 的 value，b (上標n, 下標 i)
+其實是很容易的
 
-來代表說，第 n 個 object 有沒有屬於第 i 個 class
+我就放一個機器人每天在路上走來走去
 
-如果第 n 個 object 屬於第 i 個 class 的話
+一直拍照，它就收集到一大堆的image
 
-那這一個 binary 的 value 就是 1
+只是這些 image 是沒有 label的
 
-反之就是 0
+只有非常少量的 image
 
-接下來，你要 update 你的 cluster
+你才有可能僱人去 label
 
-怎麼 update 你的 cluster 呢
+所以，labeled data 很少，unlabeled data 會很多
 
-這個方法也是很直覺
+所以，Semi-supervised learning 如果你可以利用這些
 
-你就把所有屬於
+unlabeled data 來做某些事的話
 
-假設你要 update 第 i 個 cluster 的 center
+會是很有價值的
 
-你就把所有屬於第 i 個 cluster 的 object
+但事實上，對人類來說
 
-通通拿出來，做平均
+我們人類可能也是一直在做 Semi-supervised learning
 
-你就得到第 i 個 cluster 的 center
+我們會從，比如說，小孩子會從父母那邊
 
-然後，你要反覆的做
+得到一點點的 supervised
 
-那這邊之所以你在做 initialization 的時候
+小孩在路上看到一條狗
 
-你會想要直接從你的
+他問他爸那是什麼，然後
 
-這個 database 裡面去挑 K 個 example
+他爸說是狗，他就認得說這個東西是狗
 
-挑 K 個 object 出來做 center 呢
+之後，他會再看到其他的東西
 
-有一個很重要的原因是，假設你是純粹隨機的
+有狗啊、有貓啊，但是沒有人會告訴他其他的動物是什麼
 
-你不是從 data points 裡面去挑
+他在他往後的人生裡面，看過很多其他奇奇怪怪的動物
 
-你很有可能在第一次 assign 這個 object 的時候
+那沒有人會去 label 那些動物
 
-就沒有任何 example 跟某一個 cluster 很像
+他必須要自己把它學出來
 
-又有可能是，有某一個 cluster，它沒有任何 example
+所以，對人類來說
 
-你現在 update 的時候
+我們也是在做 Semi-supervised learning
 
-程式就會 segmentation fault
+那為甚麼 Semi-supervised learning 有可能
 
-所以，你最好就是從你的 training data 裡面
+會帶來幫助呢
 
-選 K 筆 example 出來當 initialization
+假設我們現在要做一個分類的 task
 
-clustering 有另外一個方法叫做
+我們要建一個貓跟狗的 classifier
 
-Hierarchical Agglomerative Clustering (HAC)
+我們同時，有一大堆有關貓跟狗的圖片
 
-那這個方法
+那這些圖片呢
 
-是先建一個 tree，假設你現在有 5 個 example
+是沒有 label 的，並不知道哪些是貓，哪些是狗
 
-你想要把它做 cluster
+今天，假設我們只考慮這個
 
-那你先做成一個 tree structure
+貓跟狗有 label 的 data 的話
 
-怎麼建這個 tree structure 呢
+假設你今天要畫一個 boundary
 
-你把這 5 個 example
+把貓跟狗的 training data 分開的話
 
-兩兩、兩兩去算他的相似度
+你可能會想說，就畫在這邊
 
-然後挑最相似的那一個 pair 出來
+但是，假如那些 unlabeled data 的分布
 
-假設現在最相似的 pair，是第一個和第二個 example
+是像灰色的點，這個樣子的話
 
-你就把第一個 example 和第二個 example merge 起來
+這可能就會影響你的決定
 
-比如說，把它們平均起來
+unlabeled data，雖然它只告訴我們 function 的 input
 
-得到一個新的 vector
+但，unlabeled data 它的分布
 
-這個 vector 同時代表第一個和第二個 example
+可以告訴我們某一些事
 
-接下來，你再算說
+比如說，在這個 example 裡面，你可能很直覺的
 
-現在變成有四個 example 了
+就會覺得說 boundary 應該切成這樣
 
-現在只剩下 4 筆 data 了
+但是，Semi-supervised learning
 
-把這 4 筆 data，再兩兩去算它的相似度
+使用 unlabeled 的方式，往往伴隨著一些假設
 
-然後發現說，第三筆和第四筆
+所以，Semi-supervised learning 有沒有用就取決於
 
-最後這兩筆是最像的
+你這個假設符不符合實際
 
-那你再把它們 merge 起來，把它們平均起來
+你這個假設精不精確，因為
 
-得到另外一筆 data
+你可能覺得說這個是貓吧
 
-現在只剩三筆 data，再去兩兩算它的 singularity
+誰知道呢，搞不好這個是狗
 
-然後，你發現說
+它們看起來很像，是因為背景都是綠的
 
-黃色這一個和中間這一個最像
+所以 Semi-supervised learning 有沒有用
 
-你就再把它們平均起來
+不見得永遠都是有用
 
-你會發現，最後只剩紅色跟綠色，你只好把它平均起來
+那 depend on 你現在的假設是不是合理的
 
-那你就得到這個 tree 的 root
+我們這邊要講 4 件事，第一個我們會講說
 
-你就根據這 5 筆 data，它們之間的相似度
+在 Generative model 的時候
 
-建立出一個 tree structure
+我們要怎麼用 Semi-supervised learning
 
-接下來，你要決定一個
+然後，我們會講兩個還蠻通用的假設
 
-你沒有做 clustering，你只是建了一個 tree structure
+一個是 Low-density 的 Separation Assumption
 
-這個 tree structure 可以告訴我們說
+一個是 Smoothness Assumption
 
-哪些 example 是比較像的
+最後，我們會說 Semi-supervised learning 還有一招就是
 
-比較早分支代表比較不像
+找一個比較好的 Representation
 
-比如說 ，這三個跟這兩個
+這個我們會等到講 Supervised learning 的時候再講
 
-一開始在 root 的地方就分成兩類
+我們來講一下在 Generative model 裡面
 
-所以，它們這三個跟這兩個就比較不像
+你怎麼做 Semi-supervised learning
 
-那接下來你要做 clustering，怎麼做呢
+我們都已經看過 
+Supervised learning 的 Generative model
 
-你要決定在這個樹上
+在 Supervised learning 裡面呢
 
-在這個 tree structure 上面切一刀
+你有一堆 training 的 example
 
-比如說，你決定切在這一邊
+你知道它們分別屬於 class 1
 
-如果你切在這個地方的時候
+還是屬於 class 2
 
-你就把你的五筆 data
+那你會去估測 class 1 和 class 2 的 prior probability
 
-變成三個 cluster
+你會去估測 P(C1)、P(C2)
 
-根據這一刀
+然後，你會去估測 P(x|C1)、P(x|C2)
 
-這兩個 example 是一個 cluster
+比如說，我假設你假設每一個 class
 
-它自己一個 cluster，這兩個 example 是一個 cluster
+它的分佈都是一個 Gaussian distribution 的話
 
-如果你這一刀切在這個地方
+那你會估測說，這個 class 1
 
-那就變成這 3 筆是一個 cluster
+是從這個 mean 是 μ^1
 
-這三筆是一個 cluster，這兩筆是一個 cluster
+covariance 是 Σ 的 Gaussian 估測出來的
 
-如果，你這一刀切在這邊，那你就變成
+那 class 2 是從 mean 是 μ^2
 
-分成總共四個 cluster
+covariance matrix 也是 Σ 的 Gaussian 所估測出來的
 
-這個是 HAC 的做法
+之前講過說，如果你 share Gaussian
 
-那 HAC 跟 K-means，我覺得最大的差別就是
+你的 performance 可能會是比較好的
 
-你如何決定你 cluster 的數目
+那現在有了這些 prior probability
 
-在 K-means 裡面，你要
+有了這些 mean，有了這些 covariance matrix
 
-決定你那個 K 的 value 是多少
+你就可以估測 given 一個新的 data
 
-有時候你覺得說，到底有多少個 cluster 我不容易想
+它是屬於 C1 的 posterior probability
 
-那你可以換成 HAC
+然後，你就可以
 
-好處就是，你現在把
+看一筆 data 就做一些 classification
 
-你現在不直接決定幾個 cluster，而是
+那你會決定一個 boundary 的位置在哪裡
 
-決定你要在樹上切
+但是，如果今天給了我們一些 unlabeled data
 
-切在這個樹的 structure 的哪裡
+它就會影響你的決定
 
-那有人會覺得說
+舉例來說，如果我們看這一筆 data
 
-有時候你會覺得這樣子是比較容易的話
+假設這些綠色的其實是 unlabeled data 的話
 
-那學 HAC 對你來說，就有一些 benefit
+那如果你的 mean 跟 variance
 
-但是，光只做 cluster
+是 μ^1, μ^2 跟 Σ，顯然就是不合理
 
-是非常卡的
+今天這個 Σ，顯然可能
 
-在做 cluster 的時候
+應該要比較接近圓圈
 
-我們就是以偏概全，因為每一個 object
+或許你在 sample 的時候有一些問題
 
-都必須要屬於某一個 cluster
+所以，你 sample 到比較奇怪的 distribution
 
-這就好像是說，我們知道說
+或許它應該比較接近圓形
 
-念能力有分成六大類
+而這個 class 2 的 μ 呢，或許不應該在這邊
 
-然後，每一個人
+它或許應該在其他的地方，或許應該在更下面，等等
 
-都會被 assign 成這六個念能力的其中一類
+如果你看這個 prior 的話
 
-他怎麼決定他是哪一類呢？
+那 prior 可能也會受到影響，比如說，我們本來覺得說
 
-你就做水鑑識這樣子
+positive，這兩個的 labeled data 是一樣多的
 
-你拿一杯水，然後看看它會有什麼反應
+但是，看了這些 unlabeled data 以後
 
-然後，就把他塞成某一類
+你或許會覺得 class 2 的 data 其實是比較多的
 
-比如說，水滿出來了
+它的 prior probability 應該是比較大的
 
-就是強化，所以小傑就是強化系
+總之，看了這些 unlabeled data 以後
 
-那我們知道說，這樣子把每一個人
+會影響你對 prior probability
 
-都 assign 成念能力裡面的某一個系
+對 mean，還有對 covariance 的估測
 
-是不夠的
+影響了這些估測
 
-是太過粗糙武斷
+就影響了你 posterior probability 的式子
 
-比如說，像比司吉就有說
+然後，就影響了你的 decision boundary
 
-小傑其實是接近放出系的強化系念能力者
+這個是，在直覺上是這麼做的
 
-所以小傑，如果你只是說他是強化系
+但是，實際上在 formulation 上怎麼做呢
 
-其實是 loss 掉很多 information
+我們先講操作的方式
 
-你應該這樣來表示小傑
+然後再稍微講它的原理
 
-你應該說，他強化系是 0.7
+這邊會講稍微比較快帶過去，因為
 
-他放出系是0.2，那其實強化系跟變化系是比較接近的
+我猜在這個作業，你大概用不上
 
-所以有強化系，你也會有部分的變化系的能力
+因為你也不是用 Generative model 做
 
-所以，變化系是 0.05，像小傑可以用剪刀
+那 step 1，step 1 是怎麼樣呢
 
-那個是變化系的能力，然後其他系是 0
+我們先計算每一筆 unlabeled data 的
 
-所以，你應該要用
+posterior probability
 
-如果你只是把你手上所有的 object
+對每一筆 unlabeled data,  x^u
 
-分別 assign 到它屬於哪一個 cluster
+我們都去計算，我們要先初始化一組參數
 
-這樣是以偏概全，這樣太粗了
+先初始化兩個，假設我們做 binary classification 的話
 
-你應該要用一個 vector
+先初始化 class 1 和 class 2 的 prior 的機率
 
-來表示你的 object
+先初始化 μ^1、μ^2 跟  Σ
 
-那這個 vector裡面的每一個 dimension
+那你說初始化這個值怎麼來
 
-就代表了某一種特質
+你可以 random 來，你可以用已經有 labeled 的 data
 
-某一種 attribute
+先估測一個值
 
-那這件事情
+總之，你就得到一組初始化的參數
 
-就叫做 Distributed 的 representation
+我們把這些 prior probability、class dependent 的
 
-如果你原來的 object 是一個
+μ^1、μ^2、Σ 統稱為參數 θ
 
-非常 high dimension 的東西，比如說 image
+那根據我們現在有的 θ
 
-那你現在把它用它的
+你可以估算每一筆 unlabeled data 屬於 class 1 的機率
 
-attribute，把它用它的特質來描述
+當然這個機率算出來怎樣，是跟你的 model 的值有關的
 
-它就會從比較高維的空間變成比較低維的空間
+算出這個機率以後，你就可以去
 
-這一件事情就叫做 Dimension Reduction
+update 你的 model
 
-那它們其實是一樣的事情
+這個是 update 的式子非常的直覺
 
-只是有不同的稱呼而已
+怎麼個直覺法呢
 
-那我們從另外一個角度來看一下
-為什麼 Dimension Reduction
+現在 C1 的 prior probability 怎麼算呢？
 
-是可能是有用的
+原來如果沒有 unlabeled data 的時候
 
-舉例來說，假設你的 data 的分布
+你的計算方法可能是
 
-是長這個樣子
+這個 N 是所有的 example
 
-在 3D 的空間裡面
+N1 是被標註為 C1 的 example
 
-你現在的 data 的分布是長這個螺旋的樣子
+如果你要算 C1 的 prior probability，這些事情太直覺了
 
-但是，用3D的空間
+如果不考慮 unlabeled data 的話，感覺就是 N1/N
 
-來描述這些 data
+但是，我們現在需要考慮 unlabeled data
 
-其實是很浪費的
+我們需要考慮 unlabeled data
 
-你從直覺上就會知道說
+根據 unlabeled data 告訴我們的資訊
 
-其實你可以把這個
+C1 出現的次數是多少呢
 
-這個類似地毯捲起來的東西
+C1 出現的次數就是
 
-把它攤開、把它攤平
+所有 unlabeled data
 
-就變成這樣
+它是 C1 的 posterior probability 的和
 
-所以，你其實只需要在 2D 的空間
+所以，unlabeled data 並不是
 
-就可以描述這個 3D 的 information
+hard design，它一定要屬於 C1 或 C2
 
-你根本不需要把這個問題放到 3D 來解
+根據它的 posterior probability 決定
 
-這樣是把問題複雜化
+它有百分之多少是屬於 C1，它有百分之多少是屬於 C2
 
-你其實在 2D 就可以做這個 task
+那你就得到 C1 的 prior probability
 
-或者是，我們舉一個比較具體的例子
+根據 unsupervised data 影響你對 C1 的估測
 
-比如說，我們考慮 MNIST
+那 μ^1 怎麼算呢
 
-在 MNIST 裡面，每一個 input 的 digit
+如果不考慮 unlabeled data 的時候，所謂的 μ^1
 
-它是一個 image，它都用 28*28 的 dimension
+就是把所有屬於 C1 的 labeled data
 
-來描述它
+都平均起來，就結束了，這個很直覺
 
-但是，實際上
+如果今天要加上 unlabeled data 怎麼做呢
 
-多數 28*28 的 dimension 的 vector
+其實就只是把
 
-你把它轉成一個 image
+unlabeled data 的那每一筆 data, x^u
 
-看起來都不像是一個數字
+根據它的 posterior probability
 
-你 random sample 一個 28*28 的 vector
+做 weighted sum
 
-轉成 image 看起來可能是這樣
+如果這個 x^u，它比較偏向 class1、C1 的話
 
-它其實根本就不像數字
+它對 class 1 的影響就大一點，反之，就小一點
 
-所以在這個 28維 * 28維的空間裡面
+你就把所有 unlabeled data 根據它是
 
-是 digit 的 vector，其實是很少的
+這個 C1 的 posterior probability 做 weighted sum
 
-所以，其實你要描述一個 digit
+然後，再除掉所有 weight 的 和
 
-或許根本不需要用到 28*28 維
+做一個 normalization，就結束了
 
-你要描述一個 digit
+這件事情你幾乎不用解釋 ，因為太直覺了
 
-你要的 dimension 可能是遠比
+直覺就是這麼做的
 
-28維 * 28維少
+跟這個 C2 的 prior probability 阿
 
-所以，如果我們舉一個很極端的例子
+μ^1、μ^2、Σ
 
-比如這邊有一堆 3，然後這一堆 3
+也都用同樣的方式算出來
 
-如果你是從 pixel 來看待它的話
+接下來，你有了新的 model
 
-你要用 28維 * 28維
+你就會 Back to step 1
 
-來描述每一張 image
+有了新的 model 以後
 
-然而，實際上這一些 3，只需要用一個維度
+你的這個機率就不一樣
 
-就可以來表示
+你這個機率就不一樣，在 step 2
 
-為甚麼呢？因為這些 3 就只是說
+你的 model 算出來就不一樣
 
-把原來的 3 放正
+接下來，你又可以去 update 你的機率
 
-是中間這張 image
+所以，就反覆地繼續下去
 
-右轉 10 度轉就變成它
+在理論上這個方法會收斂
 
-右轉20度就變它，左轉10度變它，左轉20度就變它
+可以保證它會收斂
 
-所以，你唯一需要記錄的事情只有
+但是，它的初始值
 
-今天這張 image，它是左轉多少度、右轉多少度
+它就跟 Gradient Descent 一樣
 
-你就可以知道說，它在 28 維的空間裡面
+初始值會影響你最後收斂的結果
 
-應該長什麼樣子
+事實上，這個 step 1
 
-你只需要抓住這一個重點
+如果你聽過 EM algorithm 的話
 
-你只要抓住這個角度的變化
+這個 step 1 就是 E step
 
-你就可以知道 28 維空間中的變化
+這個 step 2 就是 M step
 
-所以，只需要用一維就可以描述這些 image
+我們來解釋一下
 
-所以，這就像我剛才舉的例子
+為什麼這個 algorithm 是這樣子做的
 
-這個是樊一翁，這個就是他的頭這樣子
+雖然這件事情實在是很直覺
 
-那怎麼做 Dimension Reduction 呢
+但是它背後的理論，它為什麼要這樣做呢
 
-在做 Dimension Reduction 的時候
+這個想法是這樣子的
 
-我們要做的事情就是
+原來假設我們只有 labeled data 的時候
 
-找一個 function
-
-這個 function 的 input 是一個 vector, x
-
-它的 output 是另外一個 vector, z
-
-但是，因為是 Dimension Reduction，所以
-
-你 output 的這個 vector, z
-
-它的 dimension 要比 input 的 x 還要小
-
-這樣你才是做 Dimension Reduction
-
-在做 Dimension Reduction 裡面
-
-最簡單的方法是 Feature Selection
-
-這個方法就沒有什麼好講的，這個方法是這樣
-
-現在如果你把你的 data 的分布拿出來看一下
-
-本來在二維的平面上
-
-但是，其實你發現都集中在 x2 的 dimension 而已
-
-所以，x1 這個 dimension 沒什麼用，把它拿掉
-
-就只有 x2 這個 dimension
-
-你就等於是做到 Dimension Reduction 這件事
-
-但是這個方法不見得總是有用，因為有很多時候是
-
-你的 case 是，你任何一個 dimension 都
-
-其實都不能拿掉
-
-那另外一個常見的方法叫做
-
-Principle Component Analysis
-
-叫做 PCA
-
-這個 PCA 怎麼做呢？這個 PCA 做的事情是這樣
-
-它說這個 function 是一個很簡單的 linear function
-
-這個 input, x 跟這個 output, z 之間的關係
-
-就是一個 linear 的 transform
-
-也就是你把這個 x 乘上一個 matrix, W
-
-你就得到它的 output, z
-
-那現在要做的事情就是
-
-根據一大堆的 x，我們現在不知道 z 長什麼樣子
-
-只有一大堆的 x
-
-根據一大堆的 x，我們要把這個 W 找出來
-
-那如果你要知道比較細節的東西的話
-
-你可以看一下 Bishop 的第十二章
-
-接下來，我們介紹一下 PCA
-
-我剛才講過 PCA 要做的事情
-
-就是找這一個 W
-
-那這個 W 怎麼找呢？
-
-假設我們現在考慮一個
-
-比較簡單的 case
-
-我們考慮一個 one dimensional 的 case
-
-什麼意思呢
-
-我們現在假設，我們只要把我們的 data project 到
-
-一維的空間上面
-
-也就是我們的 z 呢
-
-它只是一個一維的 vector，所謂一維的 vector
-
-就是一個 scalar，我們的 z 是一個 scalar
-
-或者是說，我們可以這樣寫
-
-就是，如果我們這邊 z 只是一個 scalar 的話
-
-那我們的 W 其實就是一個
-
-一個 row 對不對，就是一個 row 而已
-
-那我們就用 w^1 來表示
-
-w 的第一個 row
-
-我們把 x 跟 w 的第一個 row, w^1
-
-做 inner product，我們就得到一個 scalar, z1
-
-接下來，我們要問的問題是
-
-我們要找的這個 w^1
-
-應該要長什麼樣子
-
-首先，我們先假設 w^1 的長度是 1
-
-w^1 的 2-norm 是 1
-
-這個假設是有必要的，等一下你會看得更清楚為什麼
-
-一定要有這一個假設
-
-如果 w^1 的 2-norm 是 1 的話
-
-那 w^1 跟 x 做 inner product
-
-得到的 z1 意味著什麼
-
-它意謂著說，現在呢
-
-w 跟 x 是高維空間中的一個點
-
-w^1 是高維空間中的一個 vector
-
-那所謂的 z1 就是 x
-
-在 w^1 上面的投影
-
-它這個投影的值
-
-就是 w^1 跟 x 的 inner product
-
-這個就沒有什麼問題了
-
-這個就是大一線代裡面教過的東西
-
-所以，我們現在要做的事情就是
-
-把一堆 x
-
-透過 w^1 把它投影變成 z1
-
-我們就得到一堆 z1，每一個 x 都變成一個 z1
-
-現在的問題就是，w^1 應該長什麼樣子呢
-
-要選哪一個 w^1，舉例來說
-
-假設這個是 x 的分布
-
-這個 x 的分布是什麼呢
-
-它是橫座標，在每一個點代表一隻寶可夢
-
-它的橫座標是攻擊力
-
-它的縱座標是防禦力
-
-那今天如果我要選
-
-我們要把這個二維的，這邊這個 x 都是二維的
-
-我把這個二維投影到一維
-
-我應該要選什麼樣的 w^1？
-
-我可以選這樣的 w^1
-
-我可以選 w^1 指向這個方向
-
-我也可以選 w^1 指向這個方向
-
-我選不同的方向
-
-我最後得到的結果，得到的 projection 的結果
-
-它會是不一樣的
-
-那我們會想要
-
-你總是要給我一個目標，我才知道要選什麼樣的 w^1
-
-現在的目標是這樣
-
-我們希望選一個 w^1
-
-它經過 projection 以後，得到的這些 z1 的分布
-
-是越大越好
-
-也就是說，我們不希望通過這個 projection 以後
-
-所有的點通通擠在一起
-
-就變成把本來 data point 和 data point 之間的奇異度
-
-拿掉了，我們是希望說
-
-經過這個 projection 以後，不同的 data point
-
-它們之間的區別
-
-我們仍然是可以看得出來
-
-所以，我們希望找一個 projection 的方向，它可以讓
-
-projection 後的 variance 越大越好
-
-如果我們看這一個例子的話
-
-你就會覺得說，如果是選這個方向的話
-
-經過 projection 以後，你的點可能是分布在
-
-這個地方，大概分布在這個 range
-
-那如果是 projection 在這個方向的話
-
-那你點的分布可能是這個 range
-
-所以，如果 projection 在這個方向上的話
-
-你會有比較大的 variance
-
-但是在這個方向上的話，你會有一個比較小的 variance
-
-所以你要選 w^1 的時候，你可能
-
-選 w^1 的方向是指向這個方向
-
-其實這個 w^1 代表什麼意思呢
-
-如果從這個圖，你可以看到說
-
-這個 w^1 其實是代表了寶可夢的強度
-
-寶可夢可能會有一個隱藏的 vector 代表它的強度
-
-這個隱藏的 vector，同時影響了它的
-
-防禦力跟攻擊力
-
-所以，防禦力跟攻擊力是會同時上升的
-
-如果我們要用 equation 來表示它的話
-
-你就會說我們現在要去 maximize 的對象是
-
-z1 的 variance
-
-z1 的 variance 就是 summation over 所有的 z1
-
-(z1 - z1\bar) 的平方，z1\bar 就是做 z1 的平均
-
-那這樣子
-
-我們等一下再講怎麼做
-
-假設你知道怎麼做，你解一解
-
-你找到一個 w^1，你就可以讓 z1 最大
-
-那你就找到這個 w^1，就結束了
-
-再來，你可能不只要投影到一維
-
-你想要投影到更多維，比如說，你想要投影到一個
-
-二維的平面
-
-那如果你想要投影到二維的平面的時候
-
-這個時候你就把 x 跟另外一個 w^2
-
-做 inner product，得到 z2
-
-這個 z1 跟 z2 串起來就得到這邊的 z
-
-這個 w^1 跟 w^2 的 transpose 排起來就是
-
-W 的第一個 row 跟第二個 row
-
-好，那這一個 z2
-
-我們要怎麼找這一個 w^2 呢
-
-跟剛才找 z1 一樣
-
-我們希望，首先 w^2 它的 2-norm 是 1
-
-然後，接下來這個 z2 它的分佈也是越大越好
-
-也是越大越好
-
-但是，如果你只是要讓
-
-讓 z2 的 variance 越大越好，讓這個式子越大越好
-
-你找出來就不是 w^1，w^1 剛才已經找過了
-
-對不對，所以你就等於什麼事都沒有做
-
-所以，你要再加一個 constraint
-
-這個 constraint 是我們剛才已經先找過 w^1 了
-
-這個 w^2 要跟 w^1是垂直的
-
-或者是 w^1 跟 w^2 是 orthogonal
-
-w^1 跟 w^2，它們做 inner product 等於 0
-
-藉由這個方法，你就可以
-
-先找 w^1，再找 w^2，再找 w^3
-
-就看你要 project 到幾維
-
-你要 project 到幾維是你要自己決定的
-
-這個就跟我們要幾個 cluster
-
-要幾個 hidden layer 也是自己決定的
-
-你要 project 到 K 維
-
-那你就找 w^1, w^2 到 w^K
-
-你就把你所有找出來的 w^1, w^2 到 w^K
-
-排起來當作 W row
-
-放在這一邊，就結束了
-
-那這邊有一件事情就是，這個找出來的 W
-
-它會是一個 orthogonal的 matrix
-
-為什麼呢？
-
-如果你看它的 row 的話
-
-它的 w^1 跟 w^2 是 orthogonal的
-
-然後 w^1 的 2-norm 跟 w^2 的 2-norm 都是 1
-
-所以，它的 row 是
-
-norm 是 1，而且互相之間都是 orthogonal
-
-所以，它是一個 orthogonal的 matrix
-
-接下來的問題就是
-
-怎麼找 w^1 跟 w^2 呢？
-
-怎麼解這個問題呢？
-
-怎麼解這個問題呢？
-
-這邊其實有一個，這邊的這個解法其實是蠻容易的
-
-這個怎麼解呢？
-
-你其實要用 Lagrange multiplier
-
-這邊有一個 warning od map，如果你沒有聽懂的話就算了
-
-這個可以都直接 call 套件
-
-這個其實 call 套件就有了
-
-而且就算是你不會下面這套東西的話
-
-你其實可以用 Gradient Descent 的方法
-
-這我們之後會講，你可以把一個
-
-你可以把 PCA 這件事情，描述成一個 neural network
-
-然後，就用 Gradient Descent 的方法來解它
-
-所以不一定要用 Lagrange multiplier 來做這個 PCA
-
-這個 PCA 可以把它看成是一個 neural network 一樣
-
-但我們現在很快講一下 Lagrange multiplier 這個方法
-
-這個很經典的方法，它是怎麼做的呢？它是這樣子
-
-我們說 z1 等於 w^1 跟 x 的 inner product
-
-那 z1 的平均值是 summation over 所有的 z1
-
-也就是 summation over 所有 w^1 跟 x 的 inner product
-
-這邊是 summation over 所有 data point
-
-跟 w^1 無關，所以可以把 w^1 提出來
-
-變成先 summation over 所有的 x
-
-再跟 w^1 做 inner product
-
-得到 w^1 跟 x 的平均的 inner product
-
-接下來，我們說我們要 maximize 的對象
-
-是 z1 的 variance
-
-那 z1 的 variance 我們可以寫成
-
-(z1 - 它的平均值)的平方，再 summation over 所有的 z1
-
-我們先把這一項整理一下
-
-這項整理一下變成什麼樣子呢
-
-z1 是 w^1 跟 x 的 inner product
-
-z1\bar 是 w^1 跟 x\bar 的 inner product
-
-然後，再取平方
-
-那都有 w^1，所以把 w^1 提出來
-
-變成 summation over [w^1 * (x - x\bar)]^2
-
-那這個平方
-
-你可以把它做一下轉化
-
-怎麼轉化呢？
-
-w^1 是一個 vector，(x - x\bar) 是另外一個 vector
-
-兩個 vector，比如說 w^1 就是 a，(x - x\bar) 就是 b
-
-a 跟 b 的 inner product 的平方
-
-可以寫成 a 的 transpose 乘 b 的平方
-
-可以寫成 a 的 transpose 乘 b，
-再乘上 a 的 transpose 乘 b
-
-然後這一項，其實可以寫成
-
-a 的 transpose 乘 b，然後乘上
-
-(a 的 transpose 乘 b) 再 transpose
-
-為甚麼這邊可以直接加 transpose 呢
-
-因為 (a^T)*b 是一個 scalar，所以再 transpose
-
-還是它自己
-
-那 transpose 以後
-
-[(a^T)*b]^T 就是把它們順序對調，再加上 transpose
-
-所以變成 (a^T)*b*(b^T)*a
-
-然後把 a 代回 w^1
-
-b 代回 (x - x\bar)，你就得到這樣的式子
-
-(w^1)^T * (x - x\bar) * (x - x\bar)^T * w^1
-
-接下來呢
-
-你這一邊是 summation over 所有的 data
-
-summation over 所有的 data，所以跟 w 無關
-
-跟 w 無關，所以把 w^1 的 transpose 拿出去
-
-把 w^1 拿出去
-
-注意一下，這邊 summation 是 summation over
-
-(x - x\bar)*(x - x\bar)^T 這一項
-
-w^1 被拿出去了
-
-那 (x - x\bar) 的 transpose
-
-(x - x\bar) * (x - x\bar)^T 
-summation over 所有 data point 是甚麼呢
-
-它是 x 的 covariance
-
-對不對，它是 x 的 covariance matrix，所以這一項
-
-其實就是 (w^1)^T * Cov(x) * w^1
-
-我們用 S 來描述 x 的 covariance matrix
-
-所以，現在我們要解的問題是這樣
-
-找出一個 w^1
-
-它可以 maximize w^1 的 transpose
-
-乘上一個 matrix, x
-
-再乘上 w^1
-
-但這個 optimization 的對象是有 constraint 的
-
-如果沒有 constraint 的話
-
-這個問題它會有無聊的 solution
-
-你把 w^1 的每一個值都變無窮大，就結束了
-
-所以，你要有 constraint
-
-它的 constraint 是說
-
-w^1 的 2-norm 要等於 1
-
-那有了這些以後
-
-我們就要解這一個 optimization 的 problem
-
-這邊這個 S，S 是 covariance matrix，
-x 的 covariance matrix
-
-它是 symmetric 的
-
-而且因為它是 covariance matrix 的關係
-
-它又是半正定
-
-它是 positive-semidefinite
-
-也就是說它所有的 eigenvalue
-
-都是 non-negative 的
-
-如果你對這件事情有困惑的話
-
-你就回去翻一下線代課本，你其實可以在
-
-我的個人的網頁上找到線代的教學
-
-就在 machine learning 的網頁下面
-
-我們就先講結論，假設你不想聽中間的過程的話
-
-結論就是，這一個 programming 的 problem
-
-這個 problem 它的 solution 就是
-
-w^1 是 covariance matrix 的 eigenvector
-
-它不只是一個  eigenvector
-
-它是對應到最大的  eigenvalue
-
-λ1 的那一個  eigenvector
-
-這個就是結論
-
-那中間的過程是怎麼樣呢？
-
-中間的過程是，首先我們要用 Lagrange multiplier
-
-不過，你對這個東西有碰過的話
-
-這不是我們這一堂課應該講的
-
-你就看一下 Bishop 的 Appendix
-
-在做 Lagrange multiplier 的時候，這邊有個式子
-
-這個式子長這樣子
-
-它是先把這一項拿到這邊
-
-再減掉 α 乘上這個 constraint
-
-這個 constraint
-
-然後接下來，你把這個 g
-
-對所有的 w 做偏微分
-
-那 w 是一個 vector
-
-它裡面有很多的 element
-
-所以你把這個 function
-
-對 w 的第一個 element 做偏微分
-
-對第二個 element 做偏微分
-
-然後，令這些式子通通等於 0
-
-整理一下以後，你會得到一個式子
-
-這個式子，是這樣告訴我們的
-
-這個式子告訴我們說
-
-這邊的這個 solution
-
-它會滿足下面這個式子
-
-S*(w^1) - α*(w^1) 等於 0，再整理一下
-
-變成這樣
-
-那這個 w^1 呢
-
-如果你寫成這樣，就是 S*(w^1) = α*(w^1) 的話
-
-那 w^1 就是一個 eigenvector
-
-w^1 就是 S 的 eigenvector
-
-因為 (w^1)*S 等於自己乘上某一個 scalar
-
-所以，w^1 是 S 的 eigenvector
-
-但是現在，S 的 eigenvector 有一大把
-
-有很多，而且你可以找到一大把 eigenvector
-
-它的 norm 都是 1
-
-所以，接下來你要做的事情是
-
-看哪一個 eigenvector
-
-代到這個式子裡面，可以 maximize
-
-(w^1)^T * S * (w^1)
-
-誰可以 maximize 它呢？
-
-我們把這個整理一下
-
-把 (w^1)^T * S * (w^1) 整理一下，它變成
-
-這個 S*(w^1) 就是 α*(w^1)
-
-這一項就變成 α * (w^1)^T * (w^1)
-
-然後，(w^1)^T * (w^1)，這個是 1
-
-所以，這一邊就得到個 α
-
-然後，接下來就是找
-
-誰可以讓這個 α 最大呢？
-
-既然這個值等於 α 的話，誰可以讓 α 最大呢？
-
-w^1 是對應到最大的
-那個 eigenvalue 的 eigenvector 的時候
-
-它可以讓 α 最大，這個 α 就是最大的 eigenvalues, λ1
-
-如果你沒有聽懂的話，你只要記得這個結論就好
-
-第二個，如果要找 w^2 的話
-
-我們要解什麼樣的式子呢？我們如果要找 w^2 的話
-
-我們要解的是
-
-這樣子的一個 equation
-
-我們要解說，我們要 maximize
-
-我們要 maximize 根據 w^2 投影以後的 variance
-
-這個寫成這樣，(w^2)^T * S * (w^2)
-
-同時，w^2 要滿足 norm 等於 1
-
-同時，w^2 跟 w^1 的 inner product
-
-w^1 跟 w^2，它們要是 orthogonal 的
-
-那這個結論是什麼呢？
-
-解完這個問題，你會得到什麼呢？
-
-你會得到說，w^2 也是 covariance matrix 的一個
-
-eigenvector，然後，它對應到
-
-第二大的 eigenvalue, λ2
-
-現在，我們就要用 Lagrange Multiplier 來解它
-
-這個解法就是，你先寫一個 function, g
-
-這個 function, g 裡面包含了你要 maximize 的對象
-
-還有你的兩個 constraint
-
-然後，分別要乘上 α 跟 β
-
-接下來，你對你所有的參數做偏微分
-
-你對 w^2 裡面的每一個參數都做偏微分
-
-你對 w^2 的第一個 element，w^2 的第二個 element
-
-都做偏微分，做完以後
-
-你得到這個值
-
-S*(w^2) - α*(^2) - β*(^1) = 0
-
-接下來，左邊同乘 w^1 的 transpose
-
-乘 w^1 的 transpose
-
-乘 w^1 的 transpose 會發生什麼事呢？
-
-乘 w^1 的 transpose 以後，(w^1)^T * (w^1) 等於 1
-
-這邊 (w^1)^T * (w^2) 等於 0
-
-然後，這邊 (w^1)^T * S * (w^2) 等於甚麼呢？
-
-因為這一項，它是一個 scalar
-
-這是一個 vector，這是一個 matrix
-
-這是一個 vector，所以，乘完以後是一個 scalar
-
-scalar 在做 transpose 以後還是它自己
-
-所以，你可以直接把它 transpose
-
-結果是一樣的
-
-做完 transpose 以後
-
-你得到 (w^2)^T * (S^T) * (w^1)
-
-因為 S 是 symmetric 的
-
-所以，它做 transpose 以後還是它自己
-
-所以，這一項 S^T 變成它自己，所以變這樣
-
-接下來，我們已經知道
-
-w^1是 S 的 eigenvector
-
-而且它對應到最大的 eigenvalue, λ^1
-
-所以，S*(w^1) = (λ^1)*(w^1)
-
-所以，S*(w^1) = (λ^1)*(w^1)
-
-然後，(w^1)*(w^2)^T 又等於 0
-
-所以，這一項第一項是 0
-
-所以，從這邊我們得到什麼結論呢？
-
-我們得到的結論是
-
-β = 0，得到的結論是 β = 0
-
-如果 β 等於 0 的話，這一項就會被拿掉
-
-所以剩下的就是 S*(w^2) - α*(w^2) = 0
-
-然後，它會告訴我們說
-
-S*(w^2) 等於 α*(w^2)
-
-所以，你知道 w^2 是一個 eigenvector
-
-但是，它是哪一個 eigenvector 呢
-
-如果你選它是
-
-我們知道說如果
-
-我們都知道說這一項等於 eigenvalue 的值
-
-等於 eigenvalue 的值
-
-但是你不能夠選 eigenvalue 最大的那一個 eigenvector
-
-因為它會跟，它跟 w^1
-
-不是 orthogonal，但是你可以選第二大
-
-憑甚麼選第二大的就跟第一大的是 orthogonal 的呢？
-
-你就去查一下你的線代課本
-
-因為 S 是 symmetric 的
-
-所以，你可以這麼做
-
-那我們今天就把 map 的部分講完
-
-最後，這個地方要說，在 End of Warning之前
-
-就只剩下一頁投影片
-
-這頁投影片要說甚麼呢？這頁投影片是這樣說的
-
-說 z = W*x
-
-這邊有一個神奇的地方，就是
-
-z 的 covariance 會是一個 diagonal matrix
-
-也就是說，如果我們今天做 PCA
-
-你原來的 data distribution
-
-可能是這個樣子
-
-做完 PCA 以後，你會做 decorrelation
-
-你會讓你的不同的 dimension 間的 covariance 是 0
-
-也就是說，如果你算
-
-z 這個 vector 的 covariance matrix 的話
-
-會發現它是 diagonal
-
-這樣做有什麼好處呢
-
-這樣做，有時候會有幫助的
-
-假設你現在的 PCA 所得到的新的 feature
-
-你這個 z，是一種新的 feature
-
-這個新的 feature 是要給其他的 model 用的
-
-而你的 model 假設，比如說是
-
-一個 generative model
-
-那你用 Gaussian 來描述某一個 class 的 distribution
-
-而你在做這個 Gaussian 的假設的時候
-
-你假設說 input data，它的 covariance 就是 diagonal
-
-你假設不同的 dimension 之間
-
-沒有 correlation
-
-這樣可以減少你的參數量
-
-你做 PCA 的時候，接下來的 model 就可以
-
-你把你原來的 input data 做 PCA 以後
-
-再丟給其他的 model
-
-其他的 model 就可以假設現在的 input data
-
-它 dimension 間沒有 correlation
-
-所以，它就可以用比較簡單的 model
-
-來處理你的 input data
-
-這樣可以避免 overfitting 的情形
-
-這件事情，怎麼說明呢？
-
-這個也是很 trivial 的
-
-z 的 covariance 就是
-
-(z-z的平均) * (z-z的平均)^T
-
-那這一項，你仔細想想看
-
-把它展開，它是 W*S*(W^T)
-
-S 是 x 的 covariance
-
-然後，你就把它展開
-
-這個 W 的
-
-這邊有沒有寫錯，沒有寫錯
-
-這個 W 的 transpose，它的第一個 column 就是 w^1
-
-一直到第 K 個 column 是 w^K
-
-把 x 乘進去
-
-變成這個樣子
-
-把 x 乘進去以後呢
-
-S*(w^1)是什麼呢？
-
-w^1 是 S 的 eigenvector
-
-所以，(w^1)*S 等於 λ1*(w^1)
-
-(w^K)*S 等於 λK*(w^K)
-
-這個 w 是 eigenvector，然後 λ 是 eigenvalue
-
-然後，我們再把 W 乘進去
-
-那 W*(w^1) 會是什麼呢？
-
-想想看 (w^1) 其實是 W 的第一個 row
-
-而 W 是一個 orthogonal 的 matrix
-
-所以，W*(w^1) 會等於 e1，e1 就是
-
-一個 vector，它的第一維是 1，其他都是 0
-
-W*(w^K) 會等於 eK，eK 就是第 K 維是 1，其他都是 0
-
-這一個東西就是一個 diagonal 的 matrix，然後
-
-warning 的部分就講完了
-
-這個部分，或許你覺得沒有太容易理解
-
-那我們下次從另外一個角度來看 PCA
-
-你可能就會更清楚說 PCA 是在做什麼
-
-今天就先講到這邊，謝謝
-
-各位同學大家好，我們來上課吧
-
-我們上次講到 PCA
-
-然後，PCA 有一個很冗長的證明
-
-然後我們說，PCA 
-
-每次找出來的 w
-
-第一次找出來的 w^1 是 covariance matrix
-
-對應到最大的 eigenvalue 的 eigenvector
-
-然後，第二個找出來的 w^2 呢
-
-就是對應到第二大的 eigenvalue 的 eigenvector
-
-以此類推，等等
-
-然後，有一個很長的證明告訴你說
-
-這麼做的話
-
-我們每一次投影的時候都可以讓 variance 最大
-
-假如現在這些東西，你聽不懂的話
-
-就算了
-
-我們來看看另外一個，可能是比較直觀的說明
-
-另外一個比較直觀的 PCA 的想法是這樣子
-
-假設我們現在考慮的是手寫數字
-
-那我們知道說，這些數字其實是由一些
-
-basic 的 component 所組成的
-
-這些 basic 的 component 可能就代表筆劃
-
-舉例來說，人所寫的數字
-
-可能是有這些 basic 的 component 所組成的
-
-有斜的直線、橫的直線、比較長的直線
-
-還有小圈、大圈等等，所組成的
-
-這些 basic 的 component 把它加起來以後
-
-就可以得到一個數字
-
-那這些 basic 的 component
-
-我們這邊寫作 u^1, u^2, u^3 等等
-
-那這些 basic 的 component，其實就是
-
-一個一個的 vector，假設我們現在考慮的是 MNIST 的話
-
-MNIST 的一張 image 是 28*28 pixel
-
-也就是 28*28 維的一個 vector
-
-那這些 component，其實也就是 28*28 維的 vector
-
-把這些 vector 加起來以後
-
-你所得到的那個 vector
-
-把這些 vector 所代表的 component 加起來以後
-
-你所得到的 vector
-
-就代表了一個 digit
-
-或者如果 j我們把它寫成 formulation 的話
-
-寫起來像是這個樣子
-
-x 代表了某一張 image 裡面的 pixel
-
-某一個 image 可以用一個 vector 來表示它
-
-那這個 vector，這邊寫作 x
-
-那這個 x 會等於 u^1 這個 component
-
-乘上 c^1 加上 u^2 這個 component 乘上 c2
-
-一直加到 u^K 這個 component 乘上 cK
-
-假設我們現在總共有 K 個 component 的話
-
-然後再加上 x\bar
-
-x\bar 是所有的 image 的平均，是 x\bar
-
-所以，每一張 image
-
-就是有一堆 component 的 linear combination
-
-然後，再加上它的平均所組成的
-
-舉例來說，我們說 7
-
-是這一個 component、這一個 component 
-和這一個 component 加起來以後的結果
-
-所以，這個
-
-對 7 來說，假設 7 就是 x 的話
-
-c1 就是 1，c2 就是 0
-
-c3就是 1，以此類推
-
-那你可以用 c1, c2 到 cK
-
-來表示一張 image
-
-假設你這個 component 的數目是
-
-遠比 pixel 的數目少的話
-
-你就可以用這些
-
-這個 component 的 weight 來描述一張 image
-
-如果你 component 的數目比 pixel 的數目少的話
-
-那這個描述，是會比較有效的
-
-舉例來說，7 是一倍的 u^1，
-
-一倍的 u^3，一倍的 u^5 所組合而成
-
-所以，7 你就可以說它是一個 vector
-
-它第一維、第三維、第五維是 1
-
-那我們現在知道說
-
-我們現在知道說 x
-
-等於一堆 component 的 linear combination
-
-再加上平均，我們現在把平均移到左邊
-
-所以，x 減掉所有的 image 的平均
-
-等於一堆 component 的 linear combination
-
-那我們說，這一些 linear combination 的結果
-
-我們寫作 x\head
-
-現在假設我們不知道這些 component 是什麼
-
-我們不知道 u^1 到 u^K 的這一些
-
-這 K 個 vector，它們長什麼樣子
-
-那我們要怎麼找這 K 個 vector 出來呢？
+我們只有 labeled data 的時候
 
 我們要做的事情
 
-就是我們去找這 K 個 vector
+是要去 maximize 一個 likelihood 對不對
 
-使得 x\head 跟 (x-x\bar)
+或者是 maximize Log 的 likelihood
 
-越接近越好
+這個意思是一樣的
 
-我們要找 K 個 vector
+那每一筆 training data
 
-讓 (x-x\bar) 跟 x\head 越接近越好
+它的 likelihood，我們是可以算出來的
 
-那它們中間的差呢
+如果你給一個 θ
 
-沒有辦法用這個 component 來描述的部分
+每一筆 training data、每一筆 labeled data 的 likelihood
 
-叫做 Reconstruction error
+我們是可以算出來的
 
-那接下來，我們要做的事情就是
+每一筆 data 的 likelihood
 
-找 K 個 component，其實就是 K 個 vector
+就是 P(y^r\head)
 
-它可以 minimize 這個 Reconstruction error
+那個 label、那個 class 出現的 prior
 
-這個 Reconstruction error
+跟根據那個 class，generate 那筆 data 的機率
 
-如果你要把 formulation 寫出來的話呢
+所以，給一個 θ，你可以把那個 likelihood 算出來
 
-就是我有一個 Reconstruction error 寫成 L
+把所有的 labeled data
 
-我們要找 K 個 vector 去 minimize 它
+的這個 log likelihood 加起來
 
-要 minimize 的對象就是 (x-x\bar)
+就是你的 total log likelihood
 
-減掉下面這一項的 x\head
+然後，你要去找一個 θ 去 maximize 它
 
-減掉 x\head 的 2-norm
+那個 solution，是很直覺的
 
-x\head 是一堆 component 的 linear combination
+它有 Closed-form solution
 
-那我們先來回憶一下 PCA
+代個式子，你就可以把它解出來
 
-在 PCA 裡面，我們講說
+現在如果有 unlabeled data 的時候
 
-我們要找一個 matrix, W
+式子有什麼不一樣呢
 
-我們原來的 vector, x 乘上 W 以後
+我有一個地方寫錯了，就是這邊
 
-就得到 Dimension Reduction 以後的結果，z
+應該要有 y^r\head，就是這一項
 
-那我們可以把 W 的每一個 row 都寫出來
+是要考慮 labeled data，所以這一項
 
-w1, w2 一直到 wK
+跟前面這個部分是一樣的
 
-那我們說 w1, w2 一直到 wK
+但是，unlabeled data 怎麼辦呢
 
-都是 covariance matrix 的 eigenvector
+unlabeled data 我們並不知道
 
-事實上，如果你要解這個式子
+它是來自於哪一個 class 阿
 
-你要解這個式子，找出 u^1, u^2 到 u^K
+我們怎麼估測它的機率呢
 
-這個 w^1 到 w^K，就是由 PCA 找出來的這個解
+那我們說一筆 unlabeled data, x^u
 
-其實，就是可以讓上面這一個式子
+它出現的機率
 
-最小化，就可以讓這個 Reconstruction error 最小
+因為我不知道它是從 C1 還是從 C2 來的
 
-的 u^1 到 u^K
+所以，它就是 C1、C2 都有可能
 
-這個在 Bishop 裡面是有 prove 的
+所以，一筆 unlabeled data 出現的機率
 
-那我這邊講的跟 Bishop 有點不太一樣而已
+就是它在 C1 的 prior probability
 
-用一個比較簡單的方式來說明給大家聽
+跟 C1 這個 class 產生這筆 unlabeled data 的機率
 
-我們現在在 database 裡面有一大堆的 x
+加上 C2 的 prior probability
 
-一大堆的 x
+乘上C2 這個 class 產生這筆 unlabeled data 的機率
 
-現在假設有一個 x^1
+把他們通通合起來
 
-這個 x^1 減掉平均，x\bar
+就是這筆 unlabeled data 出現的機率
 
-等於 u^1 乘上 component 的 weight, c(上標 1, 下標 1)
+你問 x^u，它可以從 C1 來，它可以從 C2 來
 
-這邊 c(上標 1, 下標 1)的意思是說
+我不知道它從哪裡來
 
-c(下標 1) 代表說它是 u^1 的 weight
+所以，你就說它兩個都有可能
 
-上標 1 代表說它是 x^1 的 u1 這個 component 的 weight
+接下來，你要做的事情
 
-我想這個大家應該知道我的意思
+就是要去 maximize 這個式子
 
-所以，(x^1 - x\bar) 就等於 c1*(u^1) + c2*(u^2)
+不幸的是，這個式子它不是 convex
 
-那 (x^1-x\bar)，它是一個 vector
+所以，你解它的時候呢
 
-那我們把這個 vector 拿出來
+你變成要用 EM algorithm 解
 
-這個 u^1, u^2 到 u^K
+其實，你就是要用，要 iterative 的去 solve 它
 
-它們是一排 vector，就把它們排起來
+所以，我們剛才做的那個步驟
 
-其實，它排起來就是一個 matrix
+我在前一頁投影片裡面的那個 algorithm
 
-這個 column 的數目
+它做的事情就是，在每一次循環的時候
 
-是 K 個 column
+你做完 step1，你做完 step 2
 
-那前面 c1, c2 呢？
+你就可以讓這個 Log likelihood
 
-它們就是我們把這個
+增加一點，然後跑到最後呢
 
-c1, c2，這邊有個錯誤的動畫
+它會收斂在一個 local minimum 的地方
 
-我們把這個 c1, c2 排成一排
+那這個是 Generative 的 model
 
-排成一排這在這邊
+那我們等一下會講
 
-那你現在把這個 c1 乘上它
+我們接下來要講一個，比較 general 的方式
 
-把這個 c2 乘上它
+這邊基於的假設
 
-就會得到這個 vector
+是 Low-density 的 Separation
 
-也就是說，你把這一個 vector
+也就是說，這個世界是非黑即白的
 
-你把這些 component 的 weight 排成一排
+什麼是非黑即白呢
 
-這個是一個 vector，這個 vector 乘以這個 matrix
+非黑即白，意思就是說
 
-就會得到這個 vector
+假設我們現在，有一大堆的 data
 
-那我們這個 data set 裡面不是只有一筆 data
+有 labeled data、有 unlabeled data
 
-我們還有很多，比如說，這邊有一個 x^2
+在兩個 class 之間呢
 
-那 (x^2-x\bar)
+它們會有一個非常明顯的鴻溝
 
-它就是這個第二個黃色的 vector
+就是說，如果現在給你這些 labeled data
 
-u^1, u^2 就在這邊
+給你這些 labeled data
 
-第二個 component 的 c1, c2
+你可以說，我的 boundary 要切在這邊也可以
 
-第二個 component 的 c1, c2 跟第一個 component 的 c1, c2
+我的 boundary 要切在這邊也可以
 
-它們是不一樣的，它們的 notation 這邊是不一樣的
+你就可以把這兩個 class 分開
 
-我們把這個值擺在這一邊
+它們在 training data 上的正確率都是100%
 
-那你把這個 vector 乘上這個 matrix
+但是，如果你考慮 unlabeled data 的話
 
-就會得到這個 vector
+或許這一個 boundary 是比較好的
 
-以此類推
+這個 boundary 是比較不好的
 
-你把這個 vector
+為什麼呢？因為今天基於的假設就是
 
-x3 的 component 的 weight 乘上
+這是一個非黑即白的世界
 
-component，就會得到這個 vector
+在這兩個 class 之間呢
 
-那如果我們把所有的 data
+會有一個很明顯的楚河漢界，會有一個鴻溝
 
-都用這個式子來表示，都把它畫在下面的話
+會有一個地方
 
-那這一邊我們就得到一個 matrix
+它之所以叫 Low-density Separation
 
-在這個 matrix 的橫軸
+意思就是說，在這兩個 class 的交界處
 
-column 的數目就是你的 data 的數目
+它的 density 是低的
 
-你有一萬筆 data，這個橫軸就是一萬
+這兩個 class 的交界處
 
-那我們在要做的事情就是
+data 量是很少，不會出現 data 的
 
-用這一個 matrix 去乘上這一個 matrix
+所以，這個 boundary 可能就是比較合理的
 
-這兩個都是 matrix，把這兩個 matrix
+那 Low-density Separation 最具代表性、最簡單的方法
 
-乘上這個 matrix，那希望它
+就是 Self-training，但是 Self-training 太直覺了
 
-越接近這個 matrix 越好
+我覺得這個沒什麼好講的
 
-所以你要 minimize 這兩個相乘以後得到的 matrix
+我相信大家都是秒 implement 這樣
 
-跟左邊這個 matrix 之間的差距
+我們就很快地講過去，Self-training 就是說
 
-你要 minimize 這個 Reconstruction error
+我們有一些 labeled data
 
-那怎麼解這個問題呢？
+有一些 unlabeled data
 
-假如你有修過大一線代的話
+接下來，先從 labeled data 去
 
-你就知道這個問題是怎麼解的
+train 一個 model，這個 model 叫做 f*
 
-以下是我教線代的時候的投影片
+那這邊其實，你的這個 training 的方法
 
-放在這邊給大家參考
+Self-training 其實是一個很 general 的方法
 
-這個在線代裡面是怎麼說的呢？
+你用什麼方法得到你的 f*
 
-每一個 matrix, X
+你用 neural network 是
 
-這邊這一個 matrix, X，你可以用 SVD
+用 Deep 的方法、是用 Shallow 的方法
 
-把它拆成一個
+還是用其他 machine learning 的方法
 
-matrix, U 乘上一個 matrix, Σ 乘上一個 matrix, V
+都可以，反正你就是 train 出一個 model, f*
 
-這個 U 是 m*k 維
+根據這個 f*，你去 label 你的 unlabeled data
 
-這個 Σ 是 k*k 維，這個 V 是 k*n 維
+你就把 x^u 丟進 f*
 
-這個 k，它就是 component 的數目
+看它吐出來的 y^u 是什麼
 
-所以，我們把這個 X 分解成 U, Σ 跟 V
+那就是你的 labeled data
 
-這一個 U 就是這一個
+這個東西，叫做 Pseudo-label
 
-那這個 Σ*V 就是這一個
+接下來呢
 
-那我們知道說，如果我們今天的
+你要從你的 unlabeled data set 裡面拿出一些 data
 
-我們用 SVD 的方法
+把它加到 labeled data set 裡面
 
-把 X 拆成這三個 matrix 相乘
+至於哪些 data 會被加進去
 
-那右邊這三個 matrix 相乘的結果
+這就是 open question，你要自己
 
-跟左邊這一個 matrix 它們之間
+design 一些 heuristic 的 rule，自己想個辦法來解決
 
-的這個 Frobenius 的 norm 呢
+你甚至可以給每一筆 unlabeled data provide weight
 
-是會被 minimize 的，也就是說
+那有一些比較 confidence
 
-我們用 SVD 提供給我們的一個 matrix 的拆解方法
+有一些 Pseudo-label 比較 confident
 
-你拆出來的這 3 個 matrix 相乘，它跟
+有一些 Pseudo-label 比較不 confident
 
-左邊這一個 matrix，是最接近的
+那有了更多的 labeled data 以後
 
-那解出來結果是怎麼樣
+現在 labeled data 從 unlabeled data 那邊
 
-如果你還記得的話，解出來的結果是這樣子
+得到額外的 data
 
-U 這個 matrix，它的 k 個 column
+你就可以回頭再去 train 你的 model, f*
 
-其實就是一組 orthonormal 的 vector
+這件事情，非常的直覺
 
-這一組 orthonormal 的 vector
+那 Self-training 這麼簡單
 
-它們是 x 乘上 x 的 transpose
+你可能覺得自己非常的懂
 
-它們是 X*(X^T) 的 eigenvector
+那我來問大家一個問題
 
-它們這邊總共有 k 個 vector
+以下這個 process
 
-這邊總共有 k 個 orthonormal 的 vector
+如果我們用在 Regression 上面
 
-這 k 個 orthonormal 的 vector 它們就對應到
+會怎樣呢？
 
-X*(X^T) 最大的 k 個  eigenvalue 的 eigenvector
+當然你永遠可以把 Regression 用在這邊，沒有什麼問題
 
-這個大家聽得懂嗎？
+程式也不會 segmentation fault
 
-講到這邊大家有問題嗎？
+那問題就是
 
-那你會發現說
+這一招在 Regression 上面
 
-這個 X*(X^T) 是什麼呢？
+你覺得有可能會有用嗎
 
-這個 X*(X^T) 是什麼
+我們給大家5秒鐘想一下
 
-這個 X*(X^T) 不就是 covariance matrix 嗎？
+你覺得這一招在 Regression 上
 
-那我們說之前 PCA 找出來的那一些
+有可能會有用的，舉手一下
 
-w 就是 covariance matrix 的 eigenvector
+你覺得這一招在 Regression 上
 
-而我們在這邊要說，我們做 SVD
+一定沒有用的，舉手一下
 
-你解出來的 U 的每一個 column
+那都沒有人舉手
 
-就是 covariance matrix 的 eigenvector
+你仔細想想看
 
-所以 U 這個解，其實就是
+你覺得這一招在 Regression 上會有用嗎？
 
-就是 PCA 得出來的解
+Regression 大家知道，就是 output 一個數字
 
-所以，我們知道說 PCA 現在在做的事情
+就是 output 一個 real number，那你有一個
 
-你找出來的，你從根據 PCA，你找出來的那些 w
+x^u，然後，你 output 一個 real number
 
-你找出來的 Dimension Reduction 的 transform
+你把這筆 data 加到你的 data 裡面再 train
 
-其實，就是在 minimize 這個 Reconstruction error
+你會影響 f* 嗎？
 
-那 Dimension Reduction 的結果
+其實不會影響 f*，對不對
 
-你得到其實就是這些 vector
+所以，Regression 其實不能用這一招的
 
-你得到的就是這些 vector
+這樣大家有問題嗎？
 
-PCA 裡面你得到的那些 W
+那其實是這樣子的
 
-其實就是 component
+你可能會覺得剛才這個 Self-training
 
-如果大家知道這些的話
+它很像是，我們剛才在 Generative model 裡面
 
-我們等一下會看說 PCA 跟 neural network 有什麼樣的關係
+用的那個方法
 
-那我們現在已經知道說
+它們唯一的差別是在
 
-從用 PCA 找出來的 w^1 到 w^K
+做 Self-training 的時候
 
-就是 K 個 component，u^1, u^2 到 u^K
+你用的是Hard label
 
-那我們說我們有一個
+在做 Generative model 的時候，你用的是Soft label
 
-根據 component linear combination 的結果叫做 x\head
+在做 Self-training 的時候，我們會強制 assign
 
-它是 (w^K)*ck 做 linear combination 的結果
+一筆 training data，它一定是屬於某一個 class
 
-那我們會希望說，這個 x\head
+但是，在 Generative model 的時候
 
-跟 (x - x\bar)
+我們是說，根據它的 posterior probability
 
-(x - x\bar)，它的平均的是越小越好
+你可能有部分屬於 class 1，有部分屬於 class 2
 
-你要 minimize 這個 Reconstruction error
+所以，Self-training 是 Hard label
 
-那我們現在已經根據 SVD
+Generative model 的時候，我們用的是Soft label
 
-找出來的 W，W 已經找出來了
+那到底哪一個比較好呢
 
-W 已經找出來了，那 ck 的值到底應該是多少呢？
+如果我們今天考慮的是
 
-這個 ck 是每一個 example
+neural network 的話
 
-如果是 image recognition 的話，就每一個 image
+你可以比較看看，到底哪一個方法比較好
 
-都有一組自己的 ck
+假設我們用的是 neural network
 
-所以，你要找這個 ck 就每一個 image 各自找就好
+那你從你的 labeled data，得到一組 network 的參數、θ*
 
-每一個 image 各自找就好了
+那現在有一筆 unlabeled data，x^u
 
-那這個問題，其實就是問說
+然後呢，你說
 
-我現在有 K 維的 vector
+根據我們現在手上的參數，θ*
 
-它們做 span 以後，得到一個 space
+我把它分成兩類
 
-如果我現在
+它有 0.7 的機率屬於 class a
 
-要用 c1 到 cK 對它做 linear combination
+有 0.3 的機率屬於 class b
 
-怎麼樣才能夠最接 (x-x\bar)
+屬於 class 2
 
-怎麼樣才能夠最接 (x-x\bar) 呢
+如果是 Hard label 的話，你就把它直接 label 成 class 1
 
-因為現在這 K 個 vector 它們是 orthonormal 的
+然後你就說，因為它變成 class 1 了
 
-所以你要得到這個 ck，其實是很簡單的，你只要把
+所以，x^u 的新的 target
 
-(x-x\bar) 跟 w^k 做 inner product
+就是你拿 x^u 在 train neural network 的時候
 
-你要找一組 ck 可以
+它的 target 就是第一維是 1
 
-那這個性質是來自於說
+第二維是 0
 
-minimize 左邊這個跟右邊這個的 error
+或是，你就把這個東西
 
-你只需要把
+跟你 neural network 的 output 去算 cross entropy
 
-這個 (x-x\bar) 跟 w^k 做 inner product 就好了
+如果是做 soft 的話
 
-那這個性質是來自於說
+那你就是說 70% 屬於 class 1
 
-這 K 個 vector 是 orthonormal 的
+30% 屬於 class 2
 
-這個如果你有困惑的話
+然後你就說，新的 target 就是
 
-就回去 check 一下線性代數的課本
+0.7 跟 0.3
 
-那我們現在已經知道了這些事情
+你覺得，如果我們今天用的是 neural network 的話
 
-我們已經知道說
+上面跟下面哪一個方法，有可能是有用的呢
 
-c^k 就是長成這個樣子
+你覺得下面這個方法
 
-那這件事情呢
+有可能有用的同學舉手一下
 
-這個做 linear combination 的事情
+手放下
 
-其實你可以想成用 neural network 來表示它
+如果你覺得，下面這個方法完全不可能有用的舉手
 
-什麼意思呢？
+手放下
 
-假設我們的 (x-x\bar) 就是一個 vector
+比較多人覺得它完全不會有用
 
-這邊寫作一個三維的 vector
+為什麼它完全不會有用呢
 
-那我們假設，現在 K 只有兩個 component
+你仔細想想看
 
-K 等於 2
+你現在 model 的 output 在這些 unlabeled data 上
 
-那我們先算出 c^1 跟 c^2
+用這個值，參數 output 是 0.7, 0.3
 
-怎麼算 c^1 呢？
+你說你把它的 target 又設成 0.7, 0.3
 
-c^1 就是 (x-x\bar) 跟 w^1 的 inner product
+那不就是同一組參數可以做到一樣的事情嗎
 
-所謂的 inner product 就是 element-wise 的相乘
+所以如果你是做 neural network 的時候
 
-也就是把 (x-x\bar) 的每一個 component
+你用一個 Soft label
 
-乘上 w^1 的每一個 component
+結果是沒有用的
 
-接下來，你就得到 c^1
+所以，這邊你一定要用 Hard label
 
-這件事情就好像是說
+那我們用 Hard label 是什麼意思呢
 
-這個是 neural network 的 input
+我們用  Hard label 的時候
 
-這是一個 neuron，這是 neuron 的 weight
+我們用的就是 Low-density Separation 的概念
 
-這個 neuron 它是 linear 的 neuron
+也就是說，今天我們看 x^u
 
-它沒有 activation function，它是 linear 的
+它屬於 class 1 的機率只是比較高而已
 
-那這個 neuron，你把這個東西 input
+我們沒有很確定，它一定是屬於 class 1
 
-乘上這個 weight，你就得到 c^1
+但是這是一個非黑即白的世界
 
-那 c^2 也是一樣
+所以，如果你看起來有點像 class 1
 
-c^2，我們這邊
+那你就一定是 class 1
 
-這邊是這樣子，那我們接下來要把 c^1
+所以，本來根據我的 model 是說
 
-我這邊犯了一個錯
+機率是 0.7 是 class 1
 
-這個應該是下標
+0.3 是 class 2
 
-這個應該是下標
+那用 Hard label
 
-如果統一起來的話，這個 K 應該是下標
+用 Low-density Separation Assumption
 
-那我們把這個 c1 乘上 w^1
+就改成說，它這邊是 class 1 的機率是 1
 
-所謂的 c1*(w^1)是什麼意思呢？
+你就把它往 class 1 那邊推過去
 
-你就把 c1*(w^1)
+它就完全不可能是屬於 class 2
 
-把 c1 乘上 w^1 的第一維，得到一個 value
+那下面這個方法不會 work
 
-乘上 w^1 的第二維，得到一個 value；
-乘上 w^1 的第三維，得到一個 value
+我之前還有看過有 paper propose 就是
 
-這一項，就是 c1*(w^1)
+propose 在做 neural network 的時候
 
-接下來，我們再算一下 c^2
+用一個甚麼 soft 的方法
 
-c^2 一樣就是這個 input 一樣乘上
+那果然 performance 不 work
 
-跟這個 w^2 做 inner product
+不用做，我就知道結果會怎樣
 
-得到 c^2，然後再把這個 c^2
+那剛才這一招
 
-w^2 的三個 element
+有一個進階版
 
-再跟原來 w^1 的三個 element 加起來
+叫做 Entropy-based Regularization
 
-得到最後的 output，這一項就是 x\head
+你可能會覺得說
 
-這一項就是 x\head
+直接看它有點像 class 1 就變 1
 
-接下來，我們 training 的 criteria
+直接看它有點像 class 2 就變 2
 
-就是 minimize
+有點太武斷了
 
-我們要讓這個 x\head  跟 (x-x\bar) 越接近越好
+那你可以用 Entropy-based 的這個方法
 
-你所以，我們就是希望這個 neural network 的 output
+Entropy-based 這個方法是說
 
-跟 (x-x\bar) 越接近越好
+如果你用 neural network 的時候，你的 output
 
-這是我們的 input, (x-x\bar)
+是一個 distribution
 
-它乘上一組 weight
+那我們不要限制說這個 output 一定要是
 
-再 hidden layer 的 output 是 c^1, c^2
+class 1，一定要是 class 2
 
-再乘上另外一組 weight，得到 x\head
+但是，我們做的假設是這樣
 
-那我們希望 (x-x\bar) 越接近越好
+這個 output 的 distribution
 
-那你就會發現說
+它一定要很集中
 
-其實 PCA 可以表示成一個 neural network
+因為這是一個非黑即白的世界
 
-它可以表示成一個 neural network，然後
+所以，output 的 distribution 一定要很集中
 
-這個 neural network 它只有一個 hidden layer
+也就是說你 output，假設我們現在做 5 個 class 的分類
 
-然後，這個 hidden layer 是 linear 的 activation function
+那如果你的 output 都是
 
-然後，我們現在 train 這個 neural network 的 criterion
+在 class 1 的機率很大，在其他 class 的機率很小
 
-是要讓 input 一個東西，得到 output
+這個是好的
 
-結果這個 output 要跟 input 越接近越好
+因為是 unlabeled data，所以我不知道它的 label 是什麼
 
-這個 output 要跟 input 越接近越好
+但是，如果你的 model
 
-這個 output 要跟 input 越接近越好
+可以讓這筆 data，在 class 1 的機率很大
 
-這個東西就叫做 Autoencoder
+在其他的機率很小，那是好的
 
-那這邊我們就有一個問題
+如果它在 class 5 的機率很大
 
-我們這邊就有一個問題
+其他的機率都很小
 
-假設我們現在這個 weight
+這個也是好的
 
-不是用 PCA 的方法
+因為我也不知道它是 class 1 還是 class 5
 
-也就不是用找 eigenvector 的方法
+所以，這樣是好的
 
-去找出這些 w^1, w^2 ......w^K
+甚麼狀況不好呢
 
-而是，兜一個 neural network
+如果今天分布是很平均的話
 
-直接用我們要 minimize 這個 error 的 criterion
+這樣是不好的，因為這是一個非黑即白的世界
 
-然後用 Gradient Descent 去 train 一發的話
+這樣子不符合 Low-density Separation 的假設
 
-那你覺得你得到的結果
+但是，現在的問題就是我們要怎麼
 
-會跟用 PCA 解出來的結果一樣嗎？
+用數值的方法來evaluate
 
-給大家一秒鐘的時間想一想
+這個 distribution 到底是好的還是不好
 
-你覺得會一樣的同學舉手
+這個 distribution是集中的還是不集中的呢
 
-有些同學同學會覺得一樣，好
+這邊要用的東西 ，叫做Entropy
 
-手放下來 ，你覺得會不一樣的同學舉手
+你就去算一個 distribution 的 Entropy
 
-也有一些同學覺得會不一樣的
+這個 distribution 的 Entropy 呢
 
-覺得不一樣的稍微多一點
+告訴你說，這個 distribution 它到底是集中還是不集中
 
-其實，是會不一樣的
+我們用一個值來表示，這個 distribution 是集中還是分散
 
-你仔細想看看 PCA 解出來這些 W
+這個怎麼算呢
 
-它們是 orthonormal 的，它們是 orthogonal 的
+其實就算你沒有修過 information theory 之類的
 
-它們是垂直的
+我相信你也是聽得懂的
 
-你今天如果你用 neural network
+就記一下它的式子
 
-你就兜一個 neural network，硬 learn 一發
+它的式子是這樣
 
-你得到的結果，你沒有辦法保證，會是垂直的阿
+某一個 distribution，它的 entropy 呢
 
-你會得到一個 solution
+就是負的
 
-但是你沒有辦法保證說
+它對每一個 class 的機率
 
-這組 weight，這個 w^1 跟 w^2 是垂直的
+有 5 個 class，就 summation 1到 5
 
-你得到的是另外一組解
+它對每一個 class 的機率
 
-這樣大家了解我的意思嗎 ?
+乘上 log(那一個 class 的機率)
 
-我們在前面 SVD 的證明裡面
+如果我們今天把
 
-已經說 PCA 導出來的這組解  w^1 到 w^K
+這一個、第一個 distribution 的機率
 
-它可以讓我們的 Reconstruction error 被 minimize
+代到這裡面去，它只有一個是 1
 
-那你用這個 neural network 的方法
+其他都是 0
 
-去用 Gradient Descent 硬解一發
+那你得到的 entropy 是多少呢
 
-你其實也不可能找出來
+你得到的 entropy
 
-你不可能讓你的 Reconstruction error 比
+算出來會是 0
 
-比 PCA 找出來的 Reconstruction error 還要小
+因為 1*ln1 是 0
 
-所以，如果是在 linear 的情況下
+0*ln0 也是 0，所以
 
-或許你就會想要用
+這個就是 0，這沒有甚麼特別好講的
 
-直接用 PCA 來找這個 w，是比較快的
+這個也是 0
 
-你用 neural network，或許是比較麻煩的
+那下面這個呢
 
-但是，用 neural network 的好處就是
+這邊每一個機率
 
-它可以是 deep 的
+也就是這一邊每一個 (y 上標 u, 下標 m) 都是 1/5
 
-這邊為什麼，只可以有一個 hidden layer 呢
+所以，你就把這些值代進去
 
-它的一個 hidden layer，就要改成很多的 hidden layer
+你就把這些 1/5 的值都代進去
 
-所以這個，就是我們等一下會講的
+你算出來就是 1- ln(1/5)
 
-下一堂課會講的 Deep Autoencoder
+也就是 ln5，所以
 
-那 PCA 其實有一些很明顯的弱點
+它的 entropy 比較大，它是散佈比較開的
 
-一個就是，因為它是 unsupervised
+所以，它 entropy 比較大
 
-它是 unsupervised
+它是散佈比較窄的
 
-所以今天假如給它一大堆點，沒有 label
+所以，它的 entropy 比較小
 
-那對 PCA 來說，假設你把它 project 到一維上
+所以，我們需要做的事情是
 
-PCA 會找一個可以讓 data variance 最大的
+我們希望這個 model 的 output
 
-那一個 dimension
+當然在 labeled data 上，它的分類要正確
 
-比如說，在這個case 裡面
+但是在 unlabeled data 上，
 
-或許，它就把它 project 到這一維上
+它的 output、entropy 要越小越好
 
-把每一個綠色點，都 project 到這一維上
+所以，根據這個假設
 
-但是，有一個可能是，或許其實
+你就可以去重新設計你的 loss function
 
-這兩組 data point，它們分別代表了
+我們原來的 loss function 是說
 
-兩個 class，代表了兩個 class
+我希望，找一組參數
 
-如果你用 PCA 這個方法來做 Dimension Reduction 的話
+讓我現在在 labeled data 上的 model 的 output
 
-你就會使得這兩個藍色跟橙色的 class
+跟正確的 model 的 output
 
-被 merge 在一起
+它的距離越近越好
 
-它們在 PCA 找出來的 single dimension 上
+你用 cross entropy 來 evaluate 它們之間的距離
 
-完全被混在一起，就無法分別
+這個是 labeled data 的部分
 
-這個時候怎麼辦呢
+在 unlabeled data 的部分呢
 
-你可能會需要引入 labeled data
+你會加上每一筆 unlabeled data
 
-那 LDA，是考慮這個 labeled data 的一個降維的方法
+它的 output distribution 的 entropy
 
-不過它是 supervised，所以這邊就不是我們要講的對象
+那你會希望這些 unlabeled data 的 entropy
 
-這個 LDA 是 linear discriminant analysis 的縮寫
+越小越好，那在這兩項中間呢
 
-另外一個 PCA 的弱點，就是它是 linear 的
+你其實可以乘一個 weight 來考慮說
 
-我們剛才在一開始舉例子的時候，我們會說
+你要偏向 unlabeled data 多一點
 
-這一邊有一個 S 形的這個 manifold
+還是少一點
 
-這邊有一堆的點，它的分佈像是一個 S 形
+那在 training 的時候怎麼辦呢？
 
-那我們期待做 dimension reduction 以後
+在 training 的時候就是
 
-可以把這個 S 形的曲面
+一句話就 train 下去這樣，懂嗎？
 
-把它拉直，但是這一件事情
+這個可以算微分
 
-對 PCA 來說是做不到的
+可以算微分就
 
-你要它做這一件事情，其實是強人所難
+就沒有甚麼問題，就用 Gradient Descent
 
-因為你要把這一個 S 形的曲面拉直
+來 minimize 這個式子而已
 
-是一個 non-linear 的 transformation
+那這一件事情
 
-PCA 做不到這件事情
+它的角色就很像我們之前講的 Regularization
 
-如果你做 PCA 的話
+所以它稱之為 Entropy-based 的 Regularization
 
-你得到的結果
+之前我們說 Regularization 的時候
 
-就是把這個 S 形的曲面做 PCA
+我們說，我們在原來的 loss function 後面
 
-你得到的結果就是這樣
+加一個 parameter 的 1-norm 或 2-norm
 
-你就是把它從藍色這一邊把它打扁這樣
+讓它比較不會 overfitting
 
-你會發現說藍色跟紅色的點
+那現在加上一個
 
-那就被壓在一起，然後綠色的點在這邊
+根據 unlabeled data 得到的 entropy
 
-黃色的點在這一邊
+來讓它比較不會 overfitting
 
-你會把它打扁而不是把它拉開
+那還有別的 Semi-supervised learning 的方式
 
-因為把它拉開這件事情
+有一個很著名的叫做
 
-是 PCA 辦不到的
+Semi-supervised SVM，不過我們還沒有講 SVM
 
-那我們等一下會講 non-linear 的 transformation
+所以，這邊就是當作一個 outlook
 
-再來，我們就把 PCA 用在一些實際的問題上
+這個 Semi-supervised SVM 它的精神是這樣
 
-比如說，我們用它來分析寶可夢的 data
+我們知道 SVM 做的事情就是
 
-我們這一門課的例子都是寶可夢的例子
+給你兩個 class 的 data，然後找一個 boundary
 
-寶可夢，我們都知道說
+那這個 boundary，一方面它要有最大的 margin
 
-它總共有 800 種寶可夢
+所謂最大的 margin 就是讓這兩個 class 分的越開越好
 
-那其實有人說是 721 種，因為在 800 種裡面
+同時，它也要有最小的
 
-有一些是重複的
+分類的錯誤
 
-我也不知道怎麼解釋
+現在，假設有一些 unlabeled data
 
-反正就是假設有 800 種好了
+這個 Semi-supervised SVM 會怎麼處理這個問題呢
 
-那每一種寶可夢，你可以用 6 個 feature
+它會窮舉所有可能的 label
 
-來表示它，分別是
+這邊有 4 筆 unlabeled data
 
-生命值、攻擊力、防禦力
+每一筆它都可以是屬於 class 1，也可以是屬於 class 2
 
-特殊攻擊力、特殊防禦力還有它的速度等等
+我們就窮舉它所有可能的 label
 
-所以，它們就是
+它可以是長這樣的
 
-每一個寶可夢就是一個六維度的 data point
+就是說這三筆是屬於藍色 class
 
-就是一個六維的 vector
+這一筆是屬於橙色 class，它可以是長這樣
 
-那我們現在，要用 PCA 來分析它
+它可以是長這樣
 
-那在用 PCA 的時候，常常會有人問的問題就是
+這兩個是藍色 class，這兩個是橙色 class
 
-我需要有多少個 component
+它可以長這樣，這個是橙的，這個是藍的
 
-我到底要把它 project 到一維
+這個是藍的，這個是橙的，有各種可能，有很多的可能
 
-還是二維、還是三維
+有很多可能
 
-這個資訊量才足夠呢，這個 depend on 你想要做甚麼
+然後，對每一個可能的結果，你都去算一個
 
-假設你想要做 Visualization
+你都去做一個 SVM
 
-因為現在每一個寶可夢都是 6 維
+如果是在這個可能，這個情況下
 
-你沒有辦法了解這個寶可夢
+你的 SVM 的 boundary 切在這邊
 
-它們之間的特性有什麼樣的關係
+然後，這個可能你的 SVM 的 boundary 切在這邊
 
-因為 6 維你沒有辦法看
+這個可能你的 SVM 的 boundary 不得不切在這邊
 
-所以，你可能就會想把它 project 到二維
+因為找不到一個方法可以把兩個 class 分開
 
-就比較容易分析
+然後，你再去看說，哪一個
 
-那其實要用多少的 principle component，就好像是
+unlabeled data 的可能性
 
-neural network 要有幾個 layer，每個 layer 要有多少個
+在窮舉所有的可能的 label 裡面，哪一個可能性
 
-hidden variable，要有幾個 neuron 一樣
+可以讓你的 margin 最大，同時又 minimize error
 
-所以，這個是你要自己決定的
+今天在這個 example 裡面呢
 
-那一個常見的方法是這樣
+可能是這一個方法
 
-一個常見的方法是說
+可以讓你的 margin 最大
 
-我們去計算每一個 principle component 的 λ
+它的 margin 是小的
 
-我們知道每一個 principle component 就是一個
+它的 margin 不只小，而且還有分類錯誤
 
-eigenvector，然後這個 eigenvector 又對應到一個
+它的 margin 大而且都分類對，所以
 
-eigenvalue，就是這邊的 λ
+你可能最後就選擇這一個 boundary
 
-那這個 eigenvalue 代表什麼意思呢？
+那這個 SVM，我把它的 reference 放在下面
 
-這個 eigenvalue 代表說
+你可能會有一個問題說
 
-我們用這個 principle component
+窮舉所有 unlabeled data 的 label
 
-去做 dimension reduction 的時候
+這聽起來不 make sense 阿，我有一萬筆 unlabeled data
 
-在 principle component 的 dimension 上
+2 的一萬次方，可能沒辦法做啊
 
-它的 variance 有多大，那個 variance 就是 λ
+所以，這個 paper 裡面
 
-今天這個寶可夢的 data 總共有 6 維
+它就提出了一個很 approximate 的方法
 
-所以它 covariance matrix 是六維
+基本精神是
 
-所以，你可以找出 6 個 eigenvector
+我們今天，先很快帶過
 
-你可以找出 6 個 eigenvalue
+它的基本精神是你一開始先得到一些 label
 
-我們現在來計算一下
+然後，你每次改一筆 unlabeled data 的 label
 
-每一個 eigenvalue 的 ratio
+看看可不可以讓你的 objective function 變大
 
-每一個 eigenvalue 的 ratio
+變大的話就改這樣子
 
-我們就把每一個 eigenvalue  除掉 6 個 eigenvalue 的總和
+接下來我們要講的方法呢
 
-你得到的結果，會是這個樣子
+叫做 Smoothness Assumption
 
-第一個 eigenvalue
+它的精神就是：近朱者赤；近墨者黑
 
-它佔全部的 eigenvalue 的 0.45
+或者是，像勸學篇說的那個
 
-第二個是 0.18，第三個是 0.13
+蓬生麻中，不扶而直；白沙在涅，與之俱黑
 
-以此類推
+它的假設是這樣子
 
-現在看到這個結果
+如果 x 是像的，那它們的 label y 也就像
 
-我們可以從這個結果看出來說
+這個假設聽起來沒有甚麼，而且
 
-這一邊是 0.45, 0.18, 0.13, 0.12，再來是 0.07, 0.04
+光講這個假設
 
-所以，第 5 個 principle component
+其實是不精確的，因為
 
-和第 6 個 principle component，它們的作用
+你知道一個正常的 model，你給它一個像的 input
 
-其實是比較小的
+如果它不是很 deep 的話，output 就會很像阿
 
-你用這兩個 dimension
+所以，這個這樣講其實是不夠精確的
 
-來做 projection 的時候
+真正精確的假設，應該是下面這個講法
 
-你 project 出來的 variance 是很小的
+x 的分布是不平均的
 
-代表說，現在寶可夢的這這些特性
+它在某些地方是很集中
 
-在第五個和第六個 principle component 上
+某些地方又很分散
 
-是沒有太多的 information
+如果今天 x1 和 x2
 
-它 variance 很小，所以它沒有太多的information
+它們在一個 high density 的 region
 
-所以，如果我們今天要分析寶可夢的 data 的話
+很 close 的話
 
-感覺只需要前面 4 個 principle component 就好了
+x^1 的 label、y^1\head
 
-所以，我們就實際來分析一下
+跟 x^2 的 label、y^2\head，它們才會很像
 
-實際來分析一下
+這句話有點讓人不知道在說甚麼
 
-如果你做 PCA 以後
+甚麼叫做在 high density 的 region 下呢
 
-我們得到的四個 principle component
+這句話的意思就是說
 
-就是這個樣子
+它們可以用 high density 的 path 做 connection
 
-然後，每一個 principle component 就是一個 vector
+這樣講你還是不知道我在說什麼，所以我直接
 
-現在每一個寶可夢，它是有用六維的 vector 來描述它
+舉一個例子，假設這個是
 
-所以呢，每一個 principle component
+我們 data 的分布，假設這個是 data 的分布
 
-就是一個六維的 vector
+它分布就像是一個血輪眼的樣子
 
-這 4 個 principle component 就是 4 個六維的 vector
+假設我們現在有 3 筆 data
 
-那我們來看一下每一個 principle component
+有 3 筆 data
 
-它在做的事情是什麼
+x^1、x^2 跟 x^3
 
-如果我們看第一個 principle component
+如果我們只是考慮這個比較粗的假設
 
-第一個 principle component，它的每一個 dimension
+像的 x，它的 output 像
 
-每一個 dimension 都是正的
+那它的 label 像，所以
 
-每一個 dimension 都是正的
+感覺好像應該是，x^2 跟 x^3 的 label 應該比較像
 
-那這個東西是什麼意思，這個東西其實就
+x^1 跟 x^2 的 label 比較不像
 
-代表寶可夢的強度
+但是，其實 Smoothness Assumption 的假設不是這樣
 
-知道嗎？就是如果你要產生一隻寶可夢的時候
+它更精確的假設是說
 
-每一個寶可夢都是
+你的像要透過一個
 
-由這 4 個 vector 做 linear combination
+high density 的 region 像
 
-每一個寶可夢都可以想成是
+懂嗎？就是說
 
-它的數值可以想成是，這 4 個 vector
+x^1 跟 x^2，它們中間有一個
 
-做 linear combination 的結果
+high density 的 region
 
-combine 的 weight，每一隻寶可夢是不一樣的
+它們中間有很多很多很多的 data
 
-所以，如果你在選第一個
+所以，它們兩個相連的地方是
 
-principle component 的時候，你給它的 weight 比較大
+通過一個 high density 的 path 相連的
 
-那這個寶可夢它的六維都是強的
+從 x^1 走到 x^2 中間都是點，都是人煙
 
-那如果選擇的值小，它的六維都是弱的
+然後 x^2 跟 x^3 中間沒有點，所以可以走過去
 
-所以，在 第一個 principle component
+這樣懂我意思嗎？就是
 
-就代表了這一隻寶可夢強度
+假設藍色點是聚落的分布的話
 
-那第二個 principle component 是什麼呢？
+這中間是平原，所以人很多
 
-第二個 principle component 它在
+所以，從 x^1 走到 x^2 比較容易
 
-它在防禦力的地方是正值
+x^2 跟 x^3 中間是個山
 
-它在速度的地方是負值
+所以這邊沒有住人，所以你走不過去
 
-也就是說，如果你選
+所以
 
-這個防禦力跟速度
+根據這個真正的 Smoothness Assumption 的假設
 
-是成反比的
+它要告訴我們的意思是說
 
-是成反比的
+x^1 跟 x^2 是會有
 
-你今天選，你今天給這個
+比較可能有一樣的 label
 
-第二個 component 一個 weight 的時候
+x^2 跟 x^3 比較可能有不一樣的 label
 
-你會增加那隻寶可夢的防禦力
+因為，它們中間沒有 high density 的 path
 
-但是，會減低它的速度
+那為甚麼會有 Smoothness Assumption 這樣的假設？
 
-所以，寶可夢防禦力提升的時候
+因為在真實的情況下，這個假設很有可能是成立的
 
-它的速度會下降
+比如說，我們考慮這個例子
 
-如果我們把
+我們考慮手寫數字辨識的例子
 
-第一個和第二個 principle component 畫出來的話
+我們現在看到這邊有兩個 2，這邊有一個 3
 
-你發現是這個樣子
+對人來說，你當然知道這兩個都是 2
 
-這個圖上，有 800 個點，每一個點
+但是，如果你是單純算他們 pixel 的相似度的話
 
-就對應到一隻寶可夢
+搞不好，這兩個其實是比較不像的
 
-那你把它畫到二維的平面上
+這兩個搞不好還比較像，因為它這邊有一個圈圈
 
-那這樣我們很難知道每一隻寶可夢是甚麼
+它沒有圈圈，它這邊有一個勾勾
 
-所以，我就做了一件瘋狂的事
+它有一個這樣的勾勾
 
-如果我們看第三、第四個 component 的話
+我看它們兩個搞不好還比較像
 
-會發現說第三個 component
+對不對，你這邊再稍微彎曲一點
 
-它是 special defense
+就變成 3 了，所以它們搞不好還比較像
 
-是正的
+但是，如果你把你的 data 通通倒出來的話
 
-special defense 是正的
+你會發現，這個 2
 
-然後，攻擊力跟 HP 是負的
+和這個 2 中間，它們有很多連續的型態
 
-也就是說，這是用
+就是這個 2 稍微變一下變它
 
-特殊防禦力來換取
+再變一下變它、變一下變它這樣
 
-用攻擊力跟 HP 來換取特殊防禦力的寶可夢
+它和它中間有很多連續的變化
 
-最後一個呢？最後一個是
+所以，可以從這種生物演化成這種生物
 
-它的 HP 是正的
+但是沒有辦法演化成這種生物
 
-然後，攻擊力和防禦率是負的
+中間沒有過渡的型態
 
-也就是說，它是用攻擊力和防禦來換取生命力的寶可夢
+所以說，它們中間有很多
 
-那這些分別是什麼呢
+不直接相連的相似
 
-如果我們把第三個和第四個 principle component
+它們中間有很多 stepping stone，可以讓它這樣跳過去
 
-畫在圖上的話
+所以，如果根據 Smoothness Assumption 的話
 
-其實它們也是橢圓的形狀
+你就可以得到說，這個東西
 
-其實也是橢圓的形狀
+和這個東西是比較像的
 
-不過基本上考慮的是統計的結果，所以會有一些 outlier
+這個東西和這個東西，它們中間沒有
 
-不過，統計的結果最後算出來
+過渡的型態，所以它們其實是比較不像的
 
-它是 decorrelation 的
+它們其實不應該是屬於同一個 class
 
-其實，特殊的防禦力用
+它們其實是屬於同一個 class
 
-攻擊力和生命值換特殊防禦力
+如果你看人臉辨識的話呢
 
-其實也是普普
+其實也是一樣，一個人的
 
-它不只是一個防禦力特別高的寶可夢
+一個人，如果從他的左臉照一張相
 
-它也是一個特殊防禦力特別高的寶可夢
+跟右臉照一張相，那差很多
 
-第二名是冰柱機器人這樣子
+你拿這一張相片，跟另外一個人的
 
-然後，如果我們看生命力的話
+這邊是甚麼，正側面，這也是正側面
 
-第四個 component 就是生命力特別強的
+你拿另外一張一樣是眼睛朝左的相片來比較的話
 
-那這個其實跟我們預期是一樣的，就是
+我看還比這個像
 
-這個是吉利蛋跟幸福蛋，對不對
+還比較像這個眼睛朝左的相片
 
-所以，今天我們至少回答到一個問題
+跟這個眼睛朝右的相片相比的話
 
-你知道最強的寶可夢其實是超夢，還有
+但是，假設你收集到夠多的 unlabeled data 的話
 
-那三隻神獸是特別強的
+你會找到說，這一張臉和這一張臉中間呢
 
-那如果我們可以拿它來做其他 class
+有很多過渡的型態
 
-比如說，我們拿它來做
+所以，這一張臉跟這一張臉可能是同一個人的臉
 
-影像的手寫數字的辨識的話
+或者是，在這個
 
-那會怎麼樣呢？我們可以把每一張
+這招在文件分類上面呢
 
-數字都拆成
+可能是會非常有用的
 
-component 的 weight 乘上 component
+為甚麼呢？假設你現在
 
-加上 component 的 weight 乘上另一個 component
+要分天文學跟旅遊的文章
 
-其實，每一個 component 都是一張 image，對不對
+那天文學的文章有一個它固定的 word distribution
 
-每一個 component 都是一個 28*28 維的 vector
+比如說，它會出現這個
 
-所以，你可以把它畫在圖上，把它變成一張 image
+asteroid, bright，那如果旅遊的文章，它會出現
 
-我們如果畫前 30 個 component 的話
+yellow stone 等等
 
-我們畫 PCA 得到前 30 個 component 的話
+如果今天，你的 unlabeled data
 
-你得到的結果，其實是這個樣子的
+如果今天你的 unlabeled data 跟你的 labeled data
 
-白色的地方代表是有筆劃，所以這個是 1
+是有 overlapped 的
 
-這個看起來有點像 9
+那你就很容易可以處理這個問題
 
-這個看起來是 0，中間接一條線
+但是，在真實的情況下
 
-這個看起來不知道，像是加了勾勾
+你的 unlabeled data 跟 labeled data，它們中間可能
 
-後面這很複雜，看起來像是馬雅文字一樣複雜
+沒有任何 overlapped 的 word
 
-你用這些 component
+為甚麼呢？因為世界上的 word 很多
 
-做 linear combination
+一篇文章裡面，你往往
 
-你就可以得到所有的 digit，就可以得到 0~9
+你的詞彙不會太多
 
-所以，這些 component 就叫做 Eigen-digit
+但是，世界上可能 word 很多
 
-之所以叫 Eigen-digit 就是說
+所以，每一篇文章它裡面的詞彙，其實是非常 sparse 的
 
-Eigen 就是說，這些 component 其實都是
+它只提到非常少量的 word
 
-covariance matrix 的 eigenvector
+所以，你拿兩篇文章出來，它們中間
 
-所以，叫它 Eigen-digit
+有重複的 word 的比例，是沒有那麼多的
 
-所以，Eigen-digit 做 linear combination
+所以，很有可能你的 data
 
-就可以得到各種不同的 digit
+你的 unlabeled data 跟你的 labeled data 中間
 
-如果做人臉辨識的話
+是沒有任何 overlap 的
 
-處理人臉的話，得到的結果大概是這樣
+但是，如果你 collect 到夠多的 unlabeled data 的話
 
-這邊有一大堆的人臉
+如果你 collect 到夠多的 unlabeled data 的話
 
-然後，你就找它的 principle component
+你就可以說，這個是 d1 跟 d5 像
 
-你就找它的 principle component，你就找前 30 個
+d5 又跟 d6 像，這個像就可以一路 propagate 過去
 
-principle component
+知道說 d1 跟 d3 一類，那 d2 跟 d9 像
 
-你就會發現說找出來是這樣，每一個都是哀怨的臉
+d9 跟 d8 像，那你就會得到 d2 跟 d4 像
 
-這叫 Eigen-face
+這個像也可以一路 propagate 過去
 
-你看每一個都是一個臉，每一張都是一個臉
+那如何實踐這個 Smoothness Assumption  呢
 
-那你把這些臉做 linear combination 以後
+最簡單的方法這個
 
-就可以得到所有的臉
+呃，電腦卡住了，沒有卡住
 
-但是，這邊你有沒有覺得有些地方
+又回來了
 
-跟你預期的不太一樣呢？
+是 Cluster and then Label
 
-我第一次看到的時候，覺得這跟預期的結果不太一樣
+這個方法太簡單了，沒什麼可以講的
 
-是不是程式有 bug 阿
+我們現在 data distribution 長這個樣子
 
-因為，我們說P CA 找出來的是
+橙色是 class 1 ，綠色是 class 2
 
-是 component，對不對
+藍色是 unlabeled data
 
-我們把很多 component linear combine 以後
+接下來，你就做一下 clustering
 
-它會變成一個 face 或一個 digit
+你把這些所有的 data 拿來做 clustering
 
-但我們現在找出來的不是 component 阿
+你可能就分成 3 個 class
 
-我們找出來的每一個圖，幾乎都是完整的臉
+3 個 class，3 個 cluster
 
-幾乎都是完整的臉
+然後，你就看出 cluster 1 裡面呢
 
-我們剛才前一個數字
+橙色 class 1 的 label data 最多
 
-你找出來每一個 Eigen-digit 看起來都是馬雅文字
+所以，cluster 1 裡面所有的 data 都算 class 1
 
-它們不是 component，不是
+那 cluster 2 跟 cluster 3 都算 class 2
 
-一筆劃這種東西，不是圈圈、一豎這種東西
+就結束了
 
-那為甚麼會這樣呢？
+那你把這些 data 拿去 learn 就結束了
 
-如果你仔細想想看 PCA 的特性
+那這個方法不一定有用，尤其是
 
-你就會發現說，會得到這個結果是可能的
+在你的作業三裡面，你可以 implement 這個方法
 
-因為在 PCA 裡面，你的這個 weight
+因為我們只說，助教只說要實踐兩種方法
 
-你的這個 linear combination 的 weight
+沒有說做完以後一定要進步嘛，所以
 
-它可以是任何值
+真的是這樣的阿，如果你今天在
 
-它可以是正的，也可以是負的
+就是說助教只提供兩個方法
 
-所以，當我們用這些 principal component
+一個是 self-learning
 
-組成一張 image 的時候
+我們自己試過啦，是一定會進步的
 
-你可以把這些 component 相加
+如果你今天要做 Cluster and then Label
 
-也可以把這些 component 相減
+你這個 cluster 要很強
 
-所以，這會導致說你找出來的 component
+因為只有這一招 work 的假設就是
 
-不見得是一個圖的 basic 的東西
+你可以把同一個 class 的東西 cluster 在一起
 
-舉例來說，假設我想要畫一個 9
+可是在 image 裡面
 
-那我可以先畫一個 8
+你要把同一個 class 的東西 cluster 在一起
 
-然後，再把下面的圈圈減掉
+其實是沒那麼容易的
 
-再把一槓加上去
+我們之前有講過說
 
-這樣大家了解我意思嗎？因為現在我們
+我們在前面的投影片講為甚麼要用 deep learning 的時候
 
-不一定是把這些 component 加起來
+不同 class，可能會長得很像
 
-我們可以把這些 component 相減
+同一個 class，可能會長得很不像
 
-所以就變成說，你可以先畫一個很複雜的圖
+你單純只用 pixel 來做 clustering
 
-然後，再把多餘的東西減掉
+你結果八成是會壞掉
 
-這就是為甚麼我們剛才會看到一堆馬雅文字的關係
+你沒有辦法把同一個 class 的 data cluster 在一起
 
-這些 component 其實不見得是類似筆劃這種東西
+那 unlabeled data 沒有什麼幫助
 
-如果你想要得到類似筆劃的東西的話
+做出來就是會壞掉
 
-怎麼辦呢？你要用另外一個技術叫做
+所以，如果你要讓 Cluster and then Label 這個方法
 
-Non-negative matrix 的 factorization (NMF)
+有用，你的 cluster 要很強
 
-那在 NMF 裡面
+你要有很好的方法，來描述你的一張 image
 
-我們剛才講說，PCA 它可以看成是對 matrix, X
+在我們自己試的時候，我們會用 Deep Autoencoder
 
-做 SVD，SVD 就是一種
+我們還沒有講 Deep Autoencoder，所以
 
-matrix factorization 的技術，就是一種矩陣分解的技術
+如果你覺得沒有辦法這實作，這個也是正常的
 
-那它分解出來的兩個 matrix 的值
+我們是用 Deep Autoencoder call feature
 
-可以是正的，可以是負的
+然後再 call clustering，這樣才會 work
 
-現在如果你用 NMF 的話
+如果你不這樣做的話，我覺得應該是不會 work 的
 
-我們沒有打算要講它的細節
+但是，你還是可以直接用 pixel 做 cluster
 
-我等一下列 reference 給大家參考就好
+剛才講這個比較直覺的做法
 
-簡單來說的話，精神就是
+另外一個方法是引入 Graph structure
 
-如果我們現在用 NMF 的話
+我們用 Graph structure 呢
 
-我們會強迫所有的 component 都是正的
+來表達 connected by a high density path 這件事情
 
-首先，我會強迫所有 component 的 weight
+就是說，我們現在呢
 
-都是正的
+把所有的 data points，都建成一個 graph
 
-是正的好處就是
+每一個 data point, x，就是這個圖上的一個點
 
-現在一張 image 必須由 component 疊加得到
+你要想辦法算它們之間的 singularity
 
-而你不能說，我先畫一個圖
+你要想辦法它們之間的 edge 建出來
 
-很複雜的東西，再把複雜的東西去掉一些部分
+有了這個 graph 以後
 
-得到一個 digit
+你就可以說所謂的 high density path 的意思就是說
 
-現在因為每一個 weight 都一定要是正的，所以
+如果今天有兩個點
 
-你只能相加，再來就是
+它們在這個 graph 上面是相連的
 
-所有的 component
+是走得到的
 
-它的每一個 dimension，也都必須要是正的
+它們就是同一個 class，如果沒有相連
 
-如果你用 NMF 的話，會讓你的每一個 dimension
+就算是實際上的距離呢
 
-都是正的
+也不算太遠，那你也走不到
 
-如果你用 PCA 的話
+那怎麼建一個 graph
 
-你得到的 dimension 不見得每一維都是正的
+有些時候
 
-你找出來的 principal component 裡面
+這個 graph 的 representation 是很自然就可以得到
 
-它會有一些負值
+舉例來說，假設你現在要做的是
 
-那你知道，你今天如果要畫一張 image 的話
+這個網頁的分類
 
-其實，負值你是有點不知道該怎麼處理的
+而你有記錄網頁有網頁之間的 hyperlink
 
-如果我今天把負值都當作是
+hyperlink 自然地就告訴你說，這些網頁先是如何連結的
 
-就沒有筆劃，就是 0 的話
+或者是，你現在要做的是論文的分類
 
-你可能整張圖都看起來黑漆漆
+而論文和論文之間有引用的關係
 
-你大部分的圖都黑漆漆，就很怪
+這個引用的關係式也是另外一種 graph 的 edge
 
-我前面那幾張圖的作法是
+它也可以很自然地把這種圖畫出來給你
 
-如果有負值又有正值，會把它 normalize
+當然有時候，你需要自己想辦法建這個 graph
 
-把它做一個平移，讓負的也都變成正的
+怎麼自己想辦法建這個 graph？
 
-你看起來的圖才會比較好看
+其實這邊
 
-那這個就比較麻煩，如果你用 NMF 就沒有這個問題了
+你的 graph 的好壞對你的結果
 
-你找出來的 component 都是正的
+影響是非常的 critical 的
 
-所以，那些 component 就自然地會形成一張 image
+不過這個地方就非常的 heuristic
 
-下面這是 reference 給大家參考
+就是憑著經驗和直覺
 
-所以，如果在同樣的 test 上
+你就覺得你怎麼做比較好
 
-比如在手寫數字的 test 上，一樣 apply NMF 的時候
+就選擇你覺得爽的方法做就是了
 
-這個時候，你找出來的那些 principal component
+那這邊通常的做法是這個樣子
 
-它就會長這樣
+你要先定義兩個 object 之間
 
-它就會清楚很多，你就會發現說，這顯然
+你怎麼算它們的相似度
 
-都是筆劃，這個是縱的，這個是 0 的兩邊
+影像的話，你可以 base on pixel 算相似度
 
-這個是斜的，這個是一小點
+performance 不太好
 
-一直線、一撇這樣子
+因為 base on autoencoder 抽出來的 feature 算相似度
 
-一橫線、一撇這樣子
+可能 performance 就會比較好
 
-你會發現，你找出來的每一個東西
+算完相似度以後
 
-就都變成是筆劃了，這跟我們
+你就可以建 graph 了
 
-本來想要找的東西，是比較像的
+那 graph 有很多種，比如說你可以建
 
-如果你看臉的話
+K nearest Neighbor 的 graph
 
-你會發現說，它長的是這個樣子，它比較像是
+所謂 K nearest Neighbor 的 graph，意思是說
 
-臉的一些部分
+我現在有一大堆的 data
 
-比如說，這個是人中的地方
+那 data 和 data 之間，我都可以算出它的相似度
 
-這個是眉毛，這個是下巴，這個是嘴唇
+我就說
 
-這個也是嘴唇等等
+我 K nearest Neighbor 設 k = 3
 
-如果，你今天是用 NMF
+那每一個 point 都跟它最近的、相似度最像的
 
-對這個人臉圖片做 NMF 的話
+三個點做相連
 
-你得到的結果會比較像是
+或者，你可以做
 
-你期待要找的像是 component 一樣的東西
+e-Neighborhood，所謂 e-Neighborhood 是甚麼意思呢
 
-那接下來，剩下來的時間
+是說，每一個點
 
-我們講一下 Matrix Factorization
+只有跟它相似度超過某一個 threshold
 
-Matrix Factorization 是這樣子，有時候
+跟它相似大於 1 的那些點
 
-你會有兩種東西
+才不會被黏起來
 
-你會有兩種 object
+這都是很直覺的
 
-它們之間是受到某種共通的 latent factor 去操控的
+那所謂的相連也不是只有
 
-什麼意思呢，假設我們現在做一下調查
+所謂的 edge 也不是只有相連和不相連
 
-調查每一個人手上有，每一個人有買公仔的數目
+這樣 binary 的選擇而已
 
-然後，A B C D E 代表 5 個人
+你可以給 edge 一些 weight
 
-我們調查一下，每個人手上有的公仔的數目
+你可以讓你的 edge 跟你的
 
-比如說，調查 A 有 5 個涼宮春日的公仔
+要被連接起來的兩個 data point 之間
 
-B 有 4個，C 有 1 個， D有 1 個
+相似度是成正比的
 
-然後這個是御坂美琴，A有 3 個，B有 3 個，C有 1 個
+怎麼定義這個相似度呢
 
-這個是小野寺小咲 (人名)
+我會建議比較好的選擇
 
-我要想看看人名到底是什麼
+其實是用 RBM function 來訂這個相似度
 
-小野寺，對不對
+然後，我就發現說我這邊寫錯了
 
-D有4個，E有5個
+這邊這個應該是 x 才對啊
 
-然後這個，這個是小唯，是平澤唯
+這個其實應該是 x
 
-然後，C有5個，D有4個，E有4個，
+怎麼算這個 function
 
-你會發現說
+你可以先算說
 
-在這個 matrix 上面
+x^i 跟 x^j 如果你都把它們用 vector 來表示的話
 
-每一個 table 裡面的 block
+算它們的 Euclidean distance
 
-並不是隨機出現
+前面乘一個參數
 
-你會發現，如果有買涼宮春日公仔的人
+然後，前面乘一個負號，再取 exponential
 
-就比較有可能會有御坂美琴的公仔
+那其實取 exponential 這件事情呢
 
-有這個姐寺公仔的人，就比較有可能有小唯的公仔
+是我覺得還滿必要的，在經驗上
 
-那是因為說
+用這樣的 function，可以給你比較好的 performance
 
-這每一個人跟每一個人
+為甚麼用這樣子的 function
 
-跟角色背後是有一些共同的特性
+會給你比較好的 performance 呢？
 
-有一些個共同的 factor 來操控
+因為你想想看這個 function，它下降的速度是非常快的
 
-這些事情發生
+因為它有取 exponential
 
-otaku 這個是御宅族的意思這樣
+所以，只有當 x^i 跟 x^j 非常靠近的時候
 
-每一個御宅族和每一個角色後面，是有一些
+它的 singularity 才會大
 
-共同的 factor在操控它們的
+只要距離稍微遠一點
 
-什麼意思呢？
+singularity 就會下降很快，變得很小
 
-其實這個動漫宅，或許可以分成兩種
+也就是說，如果你用這種 RBM function 的話
 
-有一種是萌傲嬌的
+你才能夠製造，比如說，像這個圖上
 
-有一種是萌天然呆的
+這邊有兩個橙色的點，是距離很近的
 
-每一個人，其實就是在萌傲嬌和萌天然呆
+這個綠色的點，其實它跟橙色的點的距離
 
-這個平面上的一個點
+也蠻近，只是稍微遠一點
 
-所以，如果比較偏，A 是比較萌傲嬌的
+但是，你用這種 exponential 的話
 
-那每一個角色，他也是
+每一個點都只跟非常近的點連
 
-他可能是有傲嬌屬性，或者是有天然呆的屬性
+跟它稍微遠一點，它就不連了
 
-所以每一個角色，也都是平面上的一個點
+你要有這樣子的機制
 
-每一個角色，你也都可以用一個 vector 來描述它
+才可以避免你連到這種
 
-如果某一個人萌的屬性
+跨海溝的這種 link 這樣
 
-跟某一個角色，他本身所具有的屬性是 match 的話
+所以如果你有 exponential，通常效果是會比較好的
 
-所謂的屬性 match 是說
+所以，graph-based 的方法，它的精神
 
-他們背後的這個 vector
+是這樣子的
 
-他們背後的這個 vector 很像
+如果我們現在，在這個 graph 上面
 
-他們背後的這個 vector
+我有一些 labeled data
 
-比如說，在做 inner product 的時候，值很大
+比如說，在這個 graph 上面
 
-那這個人
+我們已經知道說，這筆 data 是屬於 class 1
 
-就會買很多涼宮春日的公仔
+這筆 data 是屬於 class 1
 
-所以，這個他們有沒有 match 呢
+那跟它們有相連的
 
-這個 degree，他們這個匹配的程度
+那些 data point，它是屬於 class 1 的機率也就會上升
 
-就取決於他們背後的這個的 latent factor 是不是匹配的
+比如說，這筆 data 它屬於 class 1 的機率也會上升
 
-所以，只可能 ABC 他們背後的這個
+這筆 data 它屬於 class 1 的機率也會上升
 
-他們萌的角色，大概是這個樣子
+所以，每一筆 data 它會去影響它的鄰居
 
-A 是萌傲嬌的， B也是萌傲嬌的
+光是會影響它的鄰居是不夠的
 
-但沒有 A 那麼強 ，C 是萌天然呆的
+如果你只考慮光會影響它的鄰居的話，其實可能
 
-然後每一個動漫人物角色的後面
+幫助不會太大
 
-也都有傲嬌和天然呆，這兩種屬性
+為甚麼呢？因為如果說它們相連
 
-每一角色都有他不同的屬性
+本來就很像
 
-然後，如果他們的屬性
+你 train 一個 model
 
-它們背後的屬性 match 的話
+input 很像的東西，output 本來就很像的東西
 
-那這一個人，就會買這個公仔
+所以，幫助不會太大
 
-這個世界操控的邏輯是這個樣子
+那 Graph-based 的 approach 真正會有幫助它的
 
-但是這些 factor
+這個醍醐味就是
 
-就一個人到底是萌傲嬌還是萌天然呆，這一件事情
+它的這個 class 是會傳遞的
 
-是沒有辦法直接被觀察的
+也就是說，本來 class 1
 
-因為，其實沒有人在意一個
+只有這個點有跟 class 1 相連
 
-阿宅他心裡想什麼
+所以，它會變得比較像 class 1
 
-所以這些事情，是沒有人知道的
+但是，這件事情會像傳染病一樣傳遞過去
 
-你也沒有辦法直接知道說
+所以，這個點雖然它沒有
 
-每一個動漫人物他背後的屬性是甚麼
+這個 data point，它雖然沒有真的跟任何
 
-這也是沒有辦法直接觀察到的
+真的是 class 1 的點相連
 
-所以我們有的東西是什麼呢？
+但是，因為這件事情
 
-我們有的是，這個動漫人物跟阿宅中間的關係
+像 class 1 這件事情是會感染的
 
-他們中間的關係，也就是
+所以，這件事情也會透過這個 graph 的 link 傳遞過來
 
-也就是他手上有的公仔的數目，他們之間的關係
+所以，舉例來說，我們如果看這個例子
 
-那我們要憑著這個關係
+你把你所有的 data point 都建成一個 graph
 
-去推論出每一個人，跟每一個動漫人物
+當然這個是比較理想的例子
 
-他們背後的 latent factor
+然後，你有一個藍色的點
 
-他們每一個人背後都有一個二維的 vector
+是你 label 一筆 data 是屬於 class 1
 
-分別代表他，就每一個這個阿宅背後都有一個 vector
+你 label 一筆 data 是屬於 class 2
 
-代表了他萌傲嬌或是萌天然呆的程度
+經過  Graph-based approach
 
-他都是用一個 vector來表示
+如果你的 graph 是建得這麼漂亮的話
 
-每一個人物，他背後也都有一個 vector
+這邊就會通通是藍色
 
-代表他傲嬌的屬性和天然呆的屬性
+這邊就會通通是紅色
 
-而我們知道的每一個阿宅，他手上有的這個公仔的數目
+雖然說，這一點其實跟它的尾巴其實沒有接在一起
 
-你就可以把他們合起來看作是一個 matrix, X
+但是紅色這個 class 這件事情會一路 propagate 過去
 
-我們可以把合起來看做是一個 matrix, X
+會一路 propagate 過去
 
-那這一個 matrix, X，它的 row 的數目就是
+那如果你要讓 graph-based 這種
 
-Otaku 的數目
+這種 Semi-supervised 的方法有用
 
-它的這個 column 的數目
+你的一個 critical 的方法是你的 data 要夠多
 
-就是動漫角色的數目
+如果你 data 不夠多
 
-那我們現在要做的事情，就是做一個假設
+這個地方你沒收集到 data，這個點斷掉了
 
-這一個假設是這個樣子
+那你這 information就傳不過去
 
-每一個，這個 matrix 裡面的 element
+那剛才是
 
-它都來自於兩個 vector 的 inner product
+定性的說一下說，怎麼把
 
-都來自於兩個 vector 的內積
+怎麼使用這個 graph，接下來是要說怎麼
 
-這一個 5，為什麼 A 會有 5 個涼宮春日的公仔呢
+定量的使用這個 graph
 
-是因為 r^A 跟 r^1 的 inner product 很大
+這個定量的使用方式
 
-它們的 inner product 是 5
+是我們在這個 graph 的 structure 上面
 
-所以他就會買，他們就會有 5 個涼宮春日的公仔
+定一個東西，叫做
 
-如果 r^B 跟 ^r1，它的 inner product 是 4 的話
+label 的 smoothness
 
-那 B 就會有 4個涼宮春日的公仔
+我們會定義說，今天這個 label
 
-以此類推
+有多符合我們剛才說的 Smoothness Assumption 的假設
 
-這個世間運作的邏輯就是這個樣子
+怎麼定這個東西呢？
 
-那這件事情，如果你用數學式來表示它的話
+如果我們看這兩個例子
 
-你可以寫成這樣子
+在這兩個例子裡面都有
 
-我們把 r^A 到 r^E 排成一排
+4 個 data point
 
-我們把 r^A 到 r^E 排成一排
+那 data point 和 data point 之間連接的數字
 
-把 r^1 到 r^4
+代表了這個 edge 的 weight
 
-也當作是另外一個 matrix 的 row 把它排起來
+我們說，假設在左邊這個例子
 
-那這個 K 是 latent factor 的數目
+左邊和右邊這兩個 graph 是一樣的，但是
 
-這個東西，我們是沒有辦法知道的
+我們現在給每一個 data 不同的 label
 
-我們把人分成只有萌傲嬌和萌天然呆，這樣是一個
+假設在這個 class 裡面
 
-不精確的分析方式
+你給它的 label 是 1、1、1、0
 
-如果我們有更多的 data 的話
+再這個 example 裡面
 
-我們應該可以更準確知道應該要有多少 factor
+給它的例子是 0、1、1、0
 
-但是，實際上要有多少 factor 這件事情
+那誰比較 smooth 呢
 
-你必須要試出來，就像 principal component 的數目
+給大家一秒鐘的時間考慮一下
 
-或者是這個 neural network 的陳述一樣
+你覺得左邊比較 smooth 的同學舉手
 
-這個是你要事先決定好的
+手放下
 
-我們現在就假設說
+你覺得右邊比較 smooth 的同學舉手
 
-latent factor 的數目
+沒有人，所以你覺得
 
-latent factor的數目就是K
+多數人都覺得左邊比較 smooth
 
-所以， 這個 r^A 到 r^E
+所以，大家的看法是非常一致的
 
-你把它當作是 matrix row
+左邊、這個三角形的地方都是 1
 
-這邊就有 N*K，這是一個 N*K 的 matrix
+這邊是 0
 
-你把 r^1 到 r^4 當作 column，那就是 K*N 的 matrix
+這邊三角的地方有 0、有 1
 
-你把這個 N*K  matrix、 N*K matrix 乘起來
+這邊是 0，感覺這個比較
 
-你就會得到一個
+不符合 Smoothness Assumption 的假設
 
-我寫錯了，這應該是 M，不好意思，這應該是 M
+這個比較符合
 
-這個應該是 M 個 Otaku，所以是有 M 個人
+但是，我們需要用一個數字來
 
-所以，把這個 (M*K) * (K*N)
+定量的描述它說
 
-得到一個 M*N 的 matrix
+它有多 smooth
 
-那它的每一個 dimension 分別是甚麼呢？
+那常見的作法是這個樣子
 
-我們知道說，最左上角這個 dimension
+常見的作法是，你寫一個式子
 
-最左上角的這個 dimension
+這個式子你可以這樣寫，我們考慮
 
-如果你現在熟的話
+兩兩、有相連的這個
 
-它就是 r^A * r^1，對不對
+point，兩兩拿出來
 
-那這第一個 row，第二個 column 的 element
+summation over 所有的 data pair (i, j)
 
-n(下標 A2)，就是 r^A * r^2
+然後，我們計算 i, j 之間的 weight
 
-n(下標 B1)，就是 r^B * r^1
+跟 i 的 label
 
-n(下標 B2)，就是 r^B * r^2
+減掉 j 的 label 的平方
 
-所以這一個 matrix 是什麼呢？
+這邊是 summation over 所有的 data
 
-這一個 matrix 其實就是這一個 matrix
+不管它現在是有 label，還是沒有 label
 
-其實就是這一個 matrix
+所以你看左邊這個 case
 
-假設我們說，這一個 matrix 就是這一個 matrix 的話
+(1 - 1) 的平方是 0
 
-那我們要做的事情就是找一組
+(1 - 1) 的平方是 0
 
-r^A 到 r^E，找一組 r^A 到 r^E
+(1 - 1) 的平方是 0
 
-找一組 r^1 到 r^4
+只有這邊是 (1 - 0) 的平方是 1
 
-把這兩個 matrix 相乘以後
+所以，你在 summation over 所有的 data pair 的時候
 
-跟這個 matrix, X 越接近越好
+你只需要考慮 x^3 跟 x^4 這邊
 
-minimize 這兩個 matrix 相乘以後
+那 (y^i - y^j) 的平方是 1
 
-跟這個 matrix, X 之間的 Reconstruction error
+那 w (下標i, j) 是 1，再除 0.5，除 0.5 這件事情只是
 
-那這個東西，我們剛才講過
+為了等一下做某一個計算的時候
 
-你就可以用 SVD 來解
+比較方便，它其實沒有甚麼真正的效用
 
-那你可能說 SVD 不是解完以後，有 3 個 matrix 嗎？
+這邊乘一個 0.5
 
-中間還會有 Σ 呢
+最後得到的這個 smoothness
 
-你就看你要把 Σ 併到左邊或是併到右邊都可以
+有多 smooth 呢？
 
-你就把這個 matrix, X 拆成兩個 matrix
+evaluation 就是 0.5
 
-它們可以 minimize Reconstruction error，然後就結束了
+那如果是右邊這一個 case
 
-但有時候你可能會遇到這個問題
+你自己回去算一下，到底有沒有算錯
 
-就是有一些 information，是 missing，是你不知道的
+根據這個定義，它算出來的 smoothness = 3
 
-這個 information，比如說 ABC 他們
+所以，這個值越小
 
-你並不知道 ABC 手上有沒有，有沒有小野寺的公仔
+它越 smooth
 
-有可能就只是在他所在的地區，沒有發行這個公仔而已
+所以，你會希望你得出來的 label
 
-所以，不知道如果發行的話，他到底會不會買
+根據這個 smoothness 的定義
 
-所以這邊，其實是個問號，這個是問號
+它算出來，越小越好
 
-假設這個 table 上有一些問號的話，怎麼辦呢？
+其實，這邊可以很快告訴大家一件事情，這一項
 
-這 table 上有一些問號的話
+可以稍微整理一下
 
-你用剛才那個 SVD 的方法
+寫成一個比較簡潔的式子，怎麼寫呢？
 
-就會有點卡
+我們把 y 串成一個 vector
 
-你可能說我把這個值
+現在，y 是包括 labeled data，也包括 unlabeled data
 
-都當作是零的話
+每一筆  labeled data 跟 unlabeled data
 
-做一發，這樣子也可以啦
+都出一個值給你
 
-不過總覺得有些怪怪的
+所以，你現在有 (R + U) 個 dimension
 
-可以描述得更精確一點
+串成一個 vector，寫成 y，我們粗體字來表示一個 vector
 
-所以，如果今天在 matrix 上面
+如果你這樣寫的話
 
-有一些 missing value 的話，怎麼辦呢？
+這一個式子，可以寫成
 
-有一些 missing value 的話
+y 這個 vector 的 transpose，乘上一個 matrix，叫做 L
 
-我們還是可以做的
+再乘上 y
 
-我們就用 Gradient Descent 的方法來做它
+那這個 L，它是一個
 
-就我們寫一個 loss function
+因為 y 的 dimension 是 (R + U)
 
-這一個 loss function 是這樣子
+所以，這個 L 是一個 (R +U) * (R + U) 的 matrix
 
-我們要讓 r^i
+那這個 L，它是有名字的
 
-r^i 指的是每一個 Otaku 背後的 latent factor
+它叫 Graph Laplacian，你可能有聽過這個名字
 
-r^j 指的是每一個動漫角色背後的 latent factor
+Graph Laplacian 就是指這個 L
 
-你要讓 i 這個人
+這個是它的名字
 
-他的 latent factor 乘上 j 這個角色
+那這個 L 的定義是甚麼呢？
 
-他的 latent factor，這個 inner product
+它寫成兩個 matrix 的相減，就是 D - W
 
-跟他購買的數量，n(下標ij) 越接近越好
+我們現在看 W 是什麼，W 就是
 
-那重點是說
+你把這些 data point 阿
 
-我今天在 summation over 這些 element 的時候
+兩兩之間 weight 的 connection 的關係建成一個 matrix
 
-我們可以避開這一些 missing 的 data
+就是 W，這邊的
 
-我們可以避開這些 missing data
+4 個 row 跟 4 個 column，分別就代表了
 
-我們在 summation over 這些 ij 的時候
+data x^1 到 data x^4
 
-如果今天這個值是沒有的
+也就是說，你看現在 x^1 跟 x^2 之間的
 
-我就不算它
+connection 的 weight 是 2
 
-我們只算這個值是有定義的部分
+這個 (1, 2) 這邊就是 2
 
-那接下來怎麼辦呢？
+那 x^1 跟 x^3 的 connection 是 3
 
-接下來，你都把 loss function 寫出來了
+(1, 3) 這邊就是 3，以此類推
 
-你要找 r^i 跟 r^j
+就建出一個 matrix, W
 
-就用 Gradient Descent，就好了
+D 是甚麼呢？ D 是這樣的
 
-用 Gradient Descent 運算一發
+你把 W 的每一個 row
 
-然後就結束了
+每一個 row 合起來，你把第一個 row：2 + 3 合起來
 
-所以，根據剛才那個例子
+放在 diagonal 的地方，變成 5
 
-我們就可以實際地用 Gradient Descent 來做一下
+2 + 1 變成 3，3 + 1 + 1 變成 5，1 變成 1
 
-那我們假設 latent factor 的數目等於 2
+然後，把這些合起來的值放在 diagonal 的地方就是 D
 
-假設 latent factor 的數目等於 2
+然後，你把 D - W 就得到 Laplacian
 
-那每一個這個 A 到 E 呢
+你再把它放在這邊
 
-它們就都會對應到一個二維的 vector
+這個左邊的式子，就會等於右邊的式子
 
-A 的 vector是這樣， B 是這樣
+你可能沒有辦法一下子看出來說
 
-C 是這樣，以此類推
+為什麼左邊的式子等於右邊的式子
 
-每一個人都會對應到一個 vector
+這個證明其實很無聊
 
-那每一個這個角色呢
+正確講你也不會覺得特別有趣
 
-他也都可以對應到一個 vector
+你就回去，把這個東西展開
 
-我怕大家，如果我只寫這個字的話
+你就知道左邊其實是等於右邊的
 
-會不知道什麼意思
+所以，現在我們知道這件事情了
 
-所以特別把編號列出來
+我們可以用這一個式子
 
-這個是春日，這個是炮姐
+來 evaluate 說，我們現在得到的 label有多 smooth
 
-這個是姐寺，這個是小唯
+那在這個式子裡面
 
-那你就會找出說
+我們會看到有 y，那這個 y 是 label
 
-每一個角色，都得到一個 vector
+這個 label 的值，你的 neural network output 的值是
 
-也都得到一個 latent factor，這代表他的屬性
+取決於你的 network 的 parameter，所以這一項
 
-代表他的屬性
+其實是 network 的 dependent
 
-這個每一個人的 latent factor 就代表他萌哪一種屬性
+所以，你要把 graph 的 information
 
-所以，如果我們把他在兩個維度裡面
+考慮到 neural network 的 training 的時候
 
-比較大的維度挑出來的話
+你要做的事情，其實就是在
 
-你就會發現說，A 跟 B 是萌同一組屬性的
+原來的 loss function 裡面，加一項
 
-C，D，E 是萌同一組屬性的
+你原來的 loss function 是考慮 cross entropy 之類的
 
-1 跟 2 他們有同樣的屬性
+你就加另外一項，你加這一項是 smoothness 的值
 
-然後 3 跟 4 他們有同樣的屬性
+乘上某一個你想要調的參數，λ
 
-你沒有辦法真的知道說，每一個屬性
+那這後面這一項，它其實就象徵了一個
 
-分別代表的是甚麼
+Regularization，它就像是一個 Regularization 的 term
 
-你不知道說，這個維度是代表是傲嬌，還是天然呆
+你不只要調你的參數讓你的那些 labeled data 的
 
-你不知道這個維度是代表傲嬌，還是天然呆
+你的 neural network 在那些 labeled data 的 output
 
-你會需要先找出這些 latent factor 以後
+跟真正的 label，越接近越好
 
-再去分析它的結果
+你同時還要做到說
 
-你就可以知道說
+你 output 的這些 label
 
-因為我們事先已經知道說
+不管是在 labeled data 或 unlabeled data 上面
 
-姐寺跟小唯是有天然呆屬性
+它都符合 Smoothness Assumption 的假設
 
-所以第一個維度代表的就是天然呆屬性
+Smoothness Assumption 的假設是由這個 x
 
-而第二個維度代表的就是傲嬌屬性
+所衡量出來的，所以你同時 minimize 這項
 
-接下來，有這些 data 以後
+也要同時 minimize 這項，你可能會說，這件事怎麼做？
 
-你就可以，預測你的 missing value
+這件事沒有甚麼好講的
 
-你就可以預測問號的值
+你就算一下它的 gradient
 
-怎麼預測問號的值呢
+然後，做 gradient descent 就可以了
 
-我們如果已經知道 r^3
+那其實，你也要算 smoothness 時候，不一定要算在
 
-我們已經知道 r^a
+不一定要算在 output 的地方
 
-那我們知道說，一個人會購買公仔的數量
+不一定要算在 output 的地方，如果你今天是一個
 
-其實是他背後的
+deep neural network 的話
 
-這個動漫角色背後的 latent factor
+你可以把你的 smoothness 放在 network 的任何地方
 
-那個人背後的 latent factor 做 inner product 的結果
+你可以假設你的 output 是 smooth
 
-所以，我們只要把 r^3 跟 r^a
+你也可以同時說
 
-做 inner product，你就可以預測說
+我把某一個 hidden layer 接出來
 
-這個人會買多少的公仔
+再乘上一些別的 transform
 
-所以，做完 inner product 以後的結果
+它也要 smooth
 
-就是這樣子
+你也可以說，每一個 hidden layer 的 output
 
-這告訴我們說
+都要是 smooth 的，都可以
 
-這個 C，如果說
+你可以同時把這些 smooth 
+通通都加到 neural network 上面去
 
-r^C 跟 r^3 他們的 latent factor，其實是 match 的
+最後呢，這個
 
-所以 C 這個人呢
+最後的方法是 Better Representation
 
-如果他可以買的話
+這個方法的精神是：是去蕪存菁、化繁為簡
 
-預期他會買，他會有 2.2 個姐寺的公仔
+這一部分我們會等到 unsupervised learning 的時候再講
 
-所以，你就可以推薦姐寺公仔給他
+那它的精神是這樣子的
 
-你就可以推薦他入坑
+我們觀察到的世界其實是比較複雜的
 
-所以，這個方法
+我們在我們觀察到的世界背後
 
-常用在這種推薦系統裡面
+其實有一些比較簡單的 vector
 
-大家可能都有聽過 Netflix 的比賽
+比較簡單的東西，在操控我們這個複雜的世界
 
-如果你今天把動漫角色換成電影
+所以，你只要能夠看透這個世界的假象
 
-你把這個中間的這個數值換成 rating 的話
+支持它的核心的話，你就可以讓 training 變得比較容易
 
-你就可以預測某一個人
+舉例來說，這個圖是出自神鵰俠侶
 
-會不會喜歡某一部電影，等等
+這個大家知道什麼意思嗎
 
-線上推薦系統，現在很多都會使用這樣的技術
+這個是楊過，他手上拿了一個剪刀
 
-其實，剛才那個 model 可以做更精緻一點
+這個是樊一翁，這個是他的鬍子
 
-我們剛才說，A 背後的 latent factor
+然後，楊過跟樊一翁打的時候
 
-乘上 1 背後的 latent factor
+他說我可以在三招之內，就剪掉你的鬍子
 
-得到的結果，就是 table 上面的數值
+大家都不相信，楊過後來就真的在三招之內
 
-但是事實上，可能還有別的因素
+剪掉他的鬍子，為甚麼呢？因為
 
-會操控他的數值
+楊過觀察到說，鬍子只是一個假相
 
-所以更精確的寫法，或許是我們可以寫成
+雖然，鬍子的變化是比較複雜的
 
-r^A 跟 的 r^1 inner product
+但是，鬍子是受到頭所操控
 
-加上某一個跟 A 有關的 scalar
+頭的變化是有限的，所以他看透這一件事情
 
-再加上某一個跟 1 有關的 scalar
+以後，他就可以把鬍子剪掉
 
-其實才等於 5
+所以說，樊一翁他的鬍子就是 observation
 
-這跟 A 有關的 scalar, b(下標A) 指的是甚麼呢？
+而他的頭，就是你要找的 Better Representation
 
-它代表的是說，A 他有多喜歡買公仔
+那就是我們下一堂課要講的東西
 
-有的人，他就只是
-
-其實他也不特別喜歡某一個角色
-
-他就只是想要買公仔而已
-
-所以這個 b(下標A)，代表他本身有多想要買公仔
-
-本身有多想要買公仔
-
-這個 b1 代表說
-
-這個角色，他本質上會有
-
-多想讓人家購買
-
-這件事情是跟屬性無關的
-
-就是他本來就會想要購買這個角色
-
-比如說，最近涼宮春日慶祝動畫十周年
-
-就出現藍光 DVD，甚麼的
-
-所以大家就可能會比較想要買
-
-涼宮春日的公仔，其實也不會啦
-
-所以就會有這個 b1
-
-所以，你今天就改一下 minimize 的式子
-
-就變成說，把 r^i 跟 r^j 的 inner product
-
-加上 bi 再加上 bj
-
-然後，你會希望這個值
-
-跟 n(下標ij) 越接近越好
-
-你會希望說這兩個 latent factor 的 inner product
-
-加上這個代表 i 本身的 scalar
-
-還有代表 j 本身的 scalar
-
-要跟在 table 上面看到的值，越接近越好
-
-那這個怎麼解呢
-
-這沒有什麼好講的
-
-你就用 Gradient Descent 硬解一發就好了
-
-你也可以加 Regularization
-
-如果你覺得應該要 Regularization 的話
-
-那你也可以在這個 r^i，r^j，bi，bj 上面
-
-加上 Regularization，比如說你會希望說
-
-r^i, r^j 是 sparse 的
-
-每個人要麼就是萌傲嬌，要麼就是萌天然呆
-
-不會有模糊的人
-
-你可能就會想要加上 L1 的 Regularization
-
-如果你想要知道更多的話
-
-以下是 Matrix Factorization 精簡的 paper
-
-講的是在這個 Netflix 上面，是怎麼做的
-
-那 Matrix Factorization 還有很多其他的應用
-
-比如說，它可以用在 Topic analysis 上面
-
-這個，應該是大家
-
-等一下，11 點多的時候，助教會回來講一下作業 4
-
-作業 4 要做的是跟文字有關的
-
-裡面你可能會需要用到 Topic analysis 的技術
-
-如果是把剛才所講的 Matrix Factorization 的方式
-
-用在 Topic analysis 的上面的話
-
-就叫做 Latent semantic analysis (LSA)
-
-它的技術跟我們剛才所講的是一模一樣的
-
-就只是換一個名詞而已
-
-就是把剛才的動漫人物，通通換成文章
-
-把剛才的人都換成詞彙
-
-那 table 裡面的值呢
-
-把人物換成文章
-
-把人都換成詞彙
-
-那 table 裡面的值呢
-
-就是 Term frequency
-
-就是說，投資這個 word
-
-在 Doc 1 出現 5 次
-
-股票這個 word 在 Doc1 出現 4 次
-
-以此類推
-
-有時候，我們不只會用 Term frequency
-
-你會把 Term frequency
-
-再乘上一個 weight，代表說
-
-這個 term 本身有多重要
-
-如果你把一個 term 乘上比較大的 weight 的話
-
-今天你在做 matrix factorization 的時候
-
-那一個 term 它就比較會被考慮到
-
-你就會比較想要讓那一個 term 的 Reconstruction error
-
-你就比較想要讓那個 term 的 Reconstruction error
-
-比較小
-
-通常怎麼 evaluate 一個 term 重不重要呢
-
-有很多方法
-
-比如說，常用的就是 inverse document frequency
-
-這個我想等一下，助教會講
-
-或是說你不知道的話
-
-也可以自己 google 一下
-
-所以，inverse document frequency 簡單來講
-
-就是計算某一個詞彙
-
-在整個 corpus 裡面，有多少比例的 document
-
-有涵蓋這個詞彙
-
-假如，某一個詞彙是每個 document 都有的
-
-比如說，"的 " 每一個 document 都有
-
-它的 inverse document frequency 就很小
-
-代表說這個詞彙的重要性是低的
-
-假如某一個詞彙，是只有某一篇 document 有
-
-那它的 inverse document frequency 就很大
-
-就代表這個詞彙的重要性是高的
-
-那在這一個 task 裡面
-
-如果你今天把這個 matrix 做分解的話
-
-你就會找到每一個 document 背後的 latent factor
-
-你就會找到每一個詞彙背後的 latent factor
-
-這邊這個 latent factor 是什麼呢
-
-今天這個 task 裡面，你的 latent factor 可能指的是
-
-topic
-
-可能指的是這個主題
-
-某一個 document，它背後要談的主題
-
-有多少部分是跟財經有關的
-
-有多少部分是跟政治有關的
-
-那某一個詞彙，它跟
-
-它有多少部分是跟財經有關的
-
-它有多少部分是跟政治有關的
-
-比如說，可能
-
-可能今天在這個例子裡面
-
-投資跟股票是跟財經有關的
-
-那 Doc1 跟 Doc2 又都有
-
-比較多的投資跟股票這兩個詞彙
-
-那 Doc1 跟 Doc 2
-
-它就有比較高可能性
-
-它背後的 latent factor 是偏向於財經的
-
-其實 Topic analysis 的方法多如牛毛
-
-所以，它們基本的精神是差不多的
-
-但是有很多各種各樣的變化
-
-常見的是 Probability latent semantic analysis (PLSA)
-
-另外一個 latent Dirichlet allocation (LDA)
-
-那這一邊就把 reference 列在這邊，給大家參考
-
-前面我們有講過另外一個 LDA
-
-在 machine learning 裡面，有兩個 LDA
-
-然後是完全不一樣的東西
-
-就是這麼回事
-
-這邊就是一些 reference 給大家參考
-
-其實這種 Dimension Reduction 的方式
-
-這邊還沒有列
-
-這邊只列一些跟 PCA 比較像、有比較關係的
-
-這個 Dimension Reduction 的方法，多如牛毛
-
-比如說，像 MDS
-
-MDS，它特別的地方是
-
-它不需要把每一個 data 都表示成 feature vector
-
-它要知道的只有
-
-feature vector 跟 feature vector 之間的 distance
-
-你只要有這個 distance，你就可以做 Dimension Reduction
-
-那一般教科書舉的例子，都會舉說
-
-我現在有一堆程式
-
-你不知道怎麼把程式描述成一個 vector
-
-但你知道程式和程式之間的距離
-
-你就有每一筆 data 之間的距離
-
-就可以把它畫在一個二維平面上
-
-那其實 MDS 跟 PCA ，是有一些關係的
-
-你如果用某些
-
-如果用某一些特定的這個 distance
-
-來衡量兩個 data point 之間的距離的話
-
-你又做 MDS 就等於是做 PCA
-
-所以，其實 PCA 有一個特性
-
-是它保留了
-
-原來在高維空間中的距離
-
-如果兩個點在高維空間中的距離是遠的
-
-在低維的空間中，它的距離也是遠的
-
-在高維空間中是接近的
-
-在低維空間中也是接近的
-
-那 PCA 有機率的版本
-
-叫做 Probabilistic PCA
-
-PCA 有非線性的版本叫做 Kernel PCA
-
-另外一個東西叫  CCA
-
-CCA 是說如果你有兩種不同的 source
-
-這個時候你會想要用 CCA
-
-比如說，如果你做語音辨識
-
-你有兩個 source ，一個是聲音訊號
-
-另外一個是
-
-假設你今天其實是有螢幕的
-
-那你可以看到這個人的唇形
-
-你可以讀他的唇語
-
-那你現在有聲音訊號
-
-有那一個人嘴巴的 image
-
-你把這兩種不同的 source
-
-都做 Dimension Reduction
-
-這個是 CCA
-
-還有另外一種東西叫做 ICA
-
-它們的名字聽起來都很像
-
-ICA 比較常用在 source separation 上面
-
-它要做的事情是
-
-原來在 PCA 裡面
-
-我們找出來的 component 是 orthogonal
-
-那 ICA 裡面，我們不見得要找
-
-ICA 說我們不見得要找 orthogonal 的 component
-
-我們找 independent component 就好
-
-然後，它用一套很複雜的方法來定義什麼叫做
-
-independent component
-
-還有剛才有提到的 LDA
-
-它是 supervise 的方式
-
-那以上給大家參考，我們在這邊休息10分鐘，謝謝
+我們在這邊休息10分鐘
 
 臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心

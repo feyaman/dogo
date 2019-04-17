@@ -1,1927 +1,1691 @@
-臺灣大學人工智慧中心
-科技部人工智慧技術暨全幅健康照護聯合研究中
+台灣大學人工智慧中心
+科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-方法之間呢
-如果你很熟悉 machine learning 原則的話
+Transfer learning 指的意思是甚麼？
 
-不同方法間他們其實是非常像的
+Transfer learning 指的意思是說
 
-其實就算你沒有辦法把所有方法都學過
-其實也是一法通，萬法通
+假設你現在手上有一些跟你現在進行的 task 沒有直接相關的 data
 
-machine learning 的方法是非常多的
+能不能用這些沒有直接相關的 data，來幫助我們做一些甚麼事情
 
-我覺得你並不需要很汲汲營營把所有方法都覺得你應該要學過一遍
+比如說你現在要做的是，貓跟狗的 classifier
 
-掌握幾個大原則其實你就可以了解大部分的方法
+那所謂的沒有直接相關的 data，是甚麼意思呢？
 
-Support Vector Machine 是甚麼呢
+所謂的沒有直接相關，有很多不同的可能
 
-Support Vector Machine 有兩個特色
+一個可能是，input 的 distribution 是類似的
 
-第一個是他用了 Hinge Loss
+比如說，input distribution 一樣是動物的圖片
 
-等一下我們會講 Hinge Loss 是甚麼
+但是 task 裡的 label 是無關的
 
-另外一個是我覺得最厲害的地方，他有個 Kernel Trick
+比如說現在你的另外一些 data 其實是要分大象跟老虎
 
-把 Hinge Loss 加上 Kernel Trick 就是 Support Vector Machine，就是SVM
+input domain 是像的，但是你的 task 是不一樣的
 
-先來講一下 Hinge Loss 是甚麼
+還有另外一個可能是，input domain 不一樣，但 task 是一樣的
 
-回到我們在開學的時候講過的 Binary Classification 的問題
+一樣是做貓跟狗的分類，但是圖片是招財貓和高飛狗的圖片
 
-我們講過在理想上
+跟原來圖片的 distribution 是非常不像的，但要做的task是一樣的
 
-Binary Classification 應該要怎麼做呢
+transfer learning 要問的問題就是，我們能不能夠在有一些不相干的 data 的情況下
 
-理想上我們知道一個 Machine Learning 的 solution 往往就有三個 step
+然後來幫助我們現在要做的 task
 
-在 Binary Classification 裡面
+為甚麼我們要考慮 transfer learning 這樣的 task 呢？
 
-第一個 step 是
+舉例來說，在 speech recognition 裡面
 
-我們定一個 function g(x)
+可能你現在要做的事情，是台語的語音辨識
 
-這個 g(x) 裡面有另外一個 function f(x)
+但是台語的 data 是很少的
 
-當 f(x) > 0 的時候
+但其實，語音的 data 是很容易蒐集的，你隨便去 YouTube 爬一下，就可以爬到一大堆英文、中文、其他語言的 data
 
-他的 output 就是 +1 代表某個 class
+那我們能不能夠用其他語言的 data，來 improve 台語的語音辨識這件事情
 
-當 f(x) < 0 的時候，他的 output 就是 -1
+或者是如果在 image recognition 裡面，或許是現在有興趣的 task 是做 medical 的image
 
-代表另外一個 class
+你想要讓機器自動診斷說，有沒有 tumor 之類的，這是現在很流行做的事情
 
-我們現在的 training data
+可是這種 medical的image 其實是很少的，不可能手上有太多這種 image
 
-我們是 supervised problem
+但是實際上 image 的 data 我們永遠都不缺
 
-所以每一筆 data 都有 label : y hat
+胡亂網路爬就有一大堆 image
 
-我們現在 y hat 就用 +1 跟 -1 來表示
+或 download MNIST，裡面有超過一百萬張 image
 
-分別代表兩個不同的 class
+有這麼多 image，只是不是 medical 的 image
 
-之前在講 Logistic Regression 的時候
+這些其他的 image 對你現在要考慮的 task，有沒有可能有幫助
 
-我知道我們在講 y hat 的時候
+或者是在文件的分析上，你現在要分析的文件
 
-我們是用 1 跟 0 表示
+是某個很 specific 的 domain，比如說你想要分析的是，某種特別的法律的文件
 
-但這邊要用 +1 和 -1 來表示比較順
+那這種法律的文件或許 data 很少，但是假設你可以從網路上 collect 一大堆的 data
 
-你知道說用 +1 和 -1 來表示跟用 0 跟 1 來表示是講同一件事情
+那這些 data，有沒有可能是有幫助的
 
-就只是朝三暮四的差別而已
+那其實 transfer learning 這件事情可能嗎？
 
-但是這邊如果用 +1 和 -1 的話
+用不相干的 data、來自其他 domain 的 data
+來幫助我們現在的 task 是有可能的嗎
 
-等一下寫式子是會比較順，所以這邊用 +1 和 -1
+是有可能的，因為我們在現實生活中，我們都是不斷的在做 transfer learning
 
-只要記得他的差別就好
+比如說，你可能是一個研究生，你可能想要知道研究生應該怎麼樣過日子
 
-Loss Function 呢，理想上
+那怎麼辦呢？你就可以參考"爆漫王"這樣子
 
-一個最理想的 Loss Function 就是寫成像下面這個樣子
+那在"爆漫王"裡面呢，其實漫畫家就是研究生
+責編就等同於指導教授
 
-當今天這個 g(x) 的 output 跟 y hat 不一樣的時候
+漫畫家每周就要畫分鏡去給責編看，跟責編討論
 
-machine 就得到一個 loss
+每周跟指導教授進度報告一樣，畫分鏡就是跑實驗
 
-如果一樣的時候，就沒有 loss
+目標就是要在 jump 上連載，在 jump 連載就是投稿期刊
 
-所以一個很理想的 Loss Function 是
+連 word embedding 都知道這件事情
 
-summation 我們所有的 training data
+雖然我們沒有研究生的守則，但是從"爆漫王"裡面，我們可以知道身為一個研究生
 
-然後對每筆 training data 都帶進 g(x) 裡面
+應該要做什麼樣的事情
 
-看他的 output 多少，+1 也可能 -1
+你可能會覺得說，拿漫畫來跟神聖的研究做類比，有點不倫不類
 
-接下來看他的 output 跟 y hat 是一樣的還是不一樣的
+我跟你說，漫畫家都是用生命來畫漫畫的，其實比我們做研究認真多了
 
-如果是不一樣的你就得到一個 loss 1 反之就是 0
+我不知道大家有沒有看過"爆漫王"，我簡介一下"爆漫王"的劇情，用三十個字
 
-這邊用 delta 加一個括號的意思是
+"爆漫王"就是說有兩個高中生，一個叫真城，一個叫高木
 
-裡面這件事情如果為真的話，delta function 的 output 就是 1
+他們不知道怎麼回事，就很想當漫畫家，後來就當了漫畫家
 
-如果 g 不等於 y，delta 的 output 就是 1
+有一次，因為每週都要連載，實在太累了，真城就累到要住院、開刀
 
-所以我們現在的 loss 就變成 g 在 training set  上總共犯了幾次錯誤
+住院的時候，他手還握著畫筆畫漫畫，大家都阻止他
 
-我們當然希望他犯的錯誤是越小越好
+他女朋友來看他，決定要支持他，他女朋友握著他的手繼續畫下去
 
-但是在今天這個 task 裡面
+這個就好像說，你今天在做研究的時候，你覺得每周都進度報告太累了
 
-你要做 optimization
+譬如說累到生病住院了，其他人都叫你不要再做研究
 
-你要用第三步找一個好的 function 這件事情變得有點困難
+你女朋友來看你，把你的手壓在鍵盤上，繼續寫 code
 
-因為你的 loss 是不可微分的
+比如說裡面有一個天才漫畫家，叫新妻惠一兒
 
-這個東西是沒有辦法微分的
+應該在影射尾田榮一郎，新妻惠一兒想要結束他現在的連載
 
-所以根本沒有辦法用 Gradient Descent 來解他
+跟總編說要結束現在的連載，他跟總編談一個條件
 
-怎麼辦呢
+我從現在開始接下來十周，我都要是 jump 人氣第一名
 
-我們把這個 delta 用另外一個
-approximate 的 loss 來表示
+如果我做到的話你就要讓我結束連載，如果做不到我就繼續畫到死為止
 
-直接 minimize 這個 delta 做不到
+叫你跟指導教授說我做這個題目很膩，我想要畢業
 
-所以我們不直接 minimize 這個 delta
+指導教授說你接下來連發十篇 paper 都拿 best paper award 我就讓你畢業
 
-我們 minimize 另外一個 loss function
+如果做不到就繼續做到死為止，就是這個概念
 
-這邊寫成小寫的 L
+他們是比我們還要認真很多的，所以我覺得研究生都應該看一下"爆漫王"
 
-至於這個 loss function 可以長甚麼樣子
+transfer learning 是這樣子的，transfer learning 有很多很多的方法
 
-你就可以自己隨便定了
+他是很多方法的集合，你以下聽到的 terminology，這個地方有點混亂
 
-這是我們的 g，裡面有個 f(x)
+不同的文獻，他用的詞彙其實是不一樣的
 
-這個圖上的橫軸是 y hat 乘上 f(x)
+有些方法有人說算是 transfer learning
+有些方法有人又說不算是 transfer learning
 
-因為這個 y n hat 可以是 +1，也可能是 -1
+這邊是很混亂的
 
-我們希望 y n hat 是 +1 的時候
+如果你看到我跟別人說的不一樣，並不是我錯，或者是別人錯
 
-f(x) 要越 positive 越好
+這個地方就是很混亂
 
-y n hat 是 +1 的話
-f(x) 要越大越好
+你只要知道那個方法是甚麼就好了
 
-y n hat 如果是 -1 的時候
-f(x) 應該要是越負越好
+我們講法是我們現在有一個我們想要做的 task
 
-整體說來你會希望 y n hat 乘上 f(x)
+有一些跟這個 task 有關的 data，這個叫做 target data
 
-兩者相乘以後他的值越大越好
+我們有一些 data 是跟這個 data 無關的 data，這個 data 叫做 source data
 
-他們要是同號的，他們兩個要乘起來越大越好
+target data 他有可能是有 label，也可能沒有 label
+source data 也有可能是有 label，也有可能沒有 label
 
-所以今天原則就是
+所以現在我們會有四種可能，之後我們會分這四種可能來討論
 
-如果我們把縱軸當作是 loss 的話
+Transfer learning 我們可以分成四個不同的象限來討論他
 
-原則就是越往右，y n hat 乘以 f(x) 越大
+我們的 data 分成兩種，一種是 target data，一種是 source data
 
-loss 就應該要越小
+所謂的 target data 是跟我們現在考慮的 task 是直接相關的
 
-我們剛才講的理想狀況是
+source data 跟我們現在考慮的 task 沒有直接的關係
 
-假設 y n hat 和 f(x) 他們是反向的
+甚麼叫做"沒有直接的關係"，這個定義是比較模糊的
 
-他們相乘以後，得到的值是負數的話
+有很多不同的定義方式
 
-你得到的 loss 就是 1
+雖然 input 都是 image，但 image 的 distribution 是很不一樣的
 
-反之如果他們是同向的
-你的 loss 就是 0
+比如說一個是真正的實物 image，一個是動畫的 image
 
-這是理想的狀況
-但這件事情是沒辦法微分
+他們就差很多，那就可以算是和這個 task 沒有直接相關
 
-那我們現在做一個 approximation
-我們把 delta 用 L 來取代
+我們可以分成我們的 target data 有可能是有 label 的，有可能是沒有 label 的
 
-縱軸就是 L 的值
+source data，也可能同時是有 label 的，也可能是沒有 label 的
 
-你可以選各種、各式各樣不同的 function 來當作 L 這個 function
+總共有四種可能，分別對這四種可能的情況，介紹些方法
 
-舉例來說，我現在 loss 定法是
+我們先來講，假設我們現在我們的 target data 跟 source data 同時都有 label 的情況下
 
-我希望當 y n hat = 1 的時候
+我們可以做甚麼事情
+最常見的也最簡單的作法就是 fine-tune 你的 model
 
-f(x) 跟 1 越接近越好
+甚麼意思呢？ 我們先來看一下我們現在的 task
 
-y n hat = -1 的時候
+在我們 task 裡面，我們的 target 和 source data 通通都有 label
 
-f(x) 跟 -1 越接近越好
+target data 我們就用上標 t 來表示
 
-這個是 square loss
+target data 裡有我們要找的 function 的 input，x 上標 t，跟他的 output，y 上標 t
 
-square loss 其實可以寫成這個樣子
+source data 裡有 function 的 input，x 上標 s，跟 y 上標 s
 
-square loss 這個 loss 可以寫成
-( y n hat * f(x^n) -1 )^2
+通常我們會假設 target data 的量非常少
 
-為甚麼呢
-如果 y n hat 帶 1 的話
+如果 target data 量很多，就當作一般 machine learning 的 problem
 
-這個 function 就變成 (f(x^n) - 1 )^2
+直接拿 target data 來 train 你的 model 就好了
 
-如果 y n hat 帶 -1 的話
+也不需要做 transfer learning
 
-這個 function 就變成 ( -f (x^n) - 1 )^2
+在做 transfer learning 的假設是 target data 的量是非常少的
 
-( -f (x^n) - 1 )^2 可以寫成
+而 source data 是很多的，雖然 source data 跟我們的 task 沒有關係
 
-因為他在平方裡面所以可以把負號拿掉
+但我們想知道說，在 target data 很少的情況下
 
-(f (x^n) + 1) ^ 2
-也就是 f (x^n) 減 -1 的平方
+如果有一大堆不相干的 source data
+到底有沒有可能會有幫助
 
-當你寫這個式子的時候
+如果今天 target data 的量非常少，少到只有幾個 example
 
-就意味著如果 y n hat = 1 的時候
+這個叫做 one-shot learning
 
-f(x^n) 要跟 1 越接近越好
+從名字來看好像只有一個 example，所以叫 one-shot
+但有時候也不見得只有一個 example 才能稱之為 one-shot
 
-y n hat = -1 的時候
-f(x^n) 要跟 -1 越接近越好
+反正意思就是如我 target data 的量非常非常少，你可以說你在做 one-shot learning
 
-square loss 的 function
-你把 function 畫出來
+這樣子的 task 有什麼樣的例子呢
 
-他對 y n hat * f(x) 的變化是寫成這樣子
+語音上最典型的例子呢，就是 speaker 的 adaptation
 
-但是這個東西是不合理的
+甚麼意思呢？我現在的 target data 是某一個人的聲音
 
-我們一開始在講 Binary Classification 的時候
+我們要辨識某一個人的聲音
+這個人的聲音不可能太多的label data
 
-我們就講過你用 square loss 是不合理的
+不可能對這個人的 audio 去做太多的 transcription
+只有他非常少量的 transcription
 
-從這個圖上你又可以更明確地看出他的不合理性
+他可能只有對你的 machine 說三句話
+只有這三句話的 label 而已
 
-我們不希望說 y n hat 跟 f(x) 乘起來很大的時候
+但 source data 你有一大堆的 audio data 來自於不同人的
+這些 audio data 都有 transcription
 
-居然有一個很大的 loss
+通常這種 data 你要 collect 上萬小時都是有可能的
 
-那另外一個是 sigmoid + square loss
+當然不可能直接用 target data、某一個 speaker 他的 data 去 train 語音辨識系統
 
-這邊我們 sigmoid function 就用一個 sigma 來表示
+這樣一定會壞掉，你會希望說，好幾萬個小時的 source data 對這個 task 有甚麼幫助
 
-我們希望 y n hat = 1 的時候
+這邊的處理方式可以非常直覺，怎麼做呢
 
-sigma(f(x^n) 趨近於 1
+你就拿你的 source data 直接去 train 一個 model
 
-等於 -1 的時候
+接下來你去 fine-tune 你的 model ，用這個 target data
 
-sigma(f(x^n) 趨近於 0
+甚麼叫做用 target data 來 fine-tune 你的 model 呢
 
-這個式子可以寫成這個樣子
+這個想法非常直覺，你就把你在 source data 上 train 出來的 model
 
-為甚麼呢
-如果你把 y n hat 帶 1 的話
+當作是 training 的 initial value ，當作是初始值
 
-那沒有問題
-很直覺的就是希望這個 output 跟 1 越接近越好
+然後再用 target data train 下去就結束了
 
-帶 -1 的話呢
+但是這邊可能會遇到的 challenge 是 source data 真的非常少
 
-變成 sigma ( f ( sigma (-f(x)) )) 減 1 的平方
+今天就算在 target data 上 train 出一個好的 model
 
-sigma ( -f (x)) 是甚麼呢
+當你把它當 model 的 initialization
 
-如果你了解 sigmoid function 特性的話
+在 source data 再去做 training 可能 train 下去就壞掉
 
-你把裡面的值取一個負號
+所以在 train 的時候要很小心
+有很多不同的技巧
 
-其實就是 1 減 sigma ( f(x))
+有一個技巧叫 conservative training
 
-我想這個你們想一下的話應該可以體會
-減 1 的平方
+conservative training 是說現在有大量的 source data
 
-這個 1 可以消掉
+在語音辨識裡面，他就是很多不同 speaker 的聲音都有 transcription
 
-所以就變成 sigma (f(x))^2 的平方
+可以去 train 一個拿來做語音辨識的 neural network
 
-總之你寫這個式子的意思
+接下來呢，你有 target data
 
-就是希望 f(x) 通過 sigma function 以後
+target data 是某個 speaker 的聲音跟 transcription
 
-如果他的答案是 1 他就要接近 1
+你可能只有五句、十句這麼多而已
 
-如果答案是 -1 他就要接近 0
+怎麼辦呢？ 如果你直接拿這些 target data 去 train
 
-這個式子寫出來是藍色這條線
+Train 下去就壞掉
+你可以說我在 training 的時候，下一些 constrain
 
-那我們之前有講過說
+讓 training 的時候，train 完了新的 model 跟舊的 model 不要差太多
 
-其實你在做 Logistic Regression 的時候
+我下一個 constrain，下一個 constrain 其實就是加一個 regularization
 
-你不會用 square loss 當作你的 loss
+我們在 training 的時候，你會加L1、L2的 regularization
 
-因為這樣 performance 不好
-之前也有實際操作過
+在 conservative training 裡面，你會加另外一種不同的 regularization
 
-你不會用 square loss 其實你會用 cross entropy
+新的 model 的 output 跟舊的 model 的 output 在看到同一筆 data 的時候
 
-那如果用 cross entropy 的話
+他們的 output 越接近越好
 
-在 Logistic Regression 其實我們真正是用 cross entropy
+或者是下 constrain 是新的 model 跟舊的 model
 
-然後 entropy 的意思我們之前講過
+他們的 L2 norm 差距越小越好
 
-就是你的 sigma(f(x))
+總之就是做一些事情，讓新的 model 跟舊的 model 差距不要太大
 
-代表了一個 distribution
+這樣就可以防止 overfitting
 
-你的 ground truth 是另外一個 distribution
+防止 target data 只有一點點，train 下去就壞掉的情形
 
-這樣的 distribution 之間的 cross entropy
+另外一個方法是 layer的transfer
 
-就是你要去 minimize 的 loss
+現在有用 source data train 好的一個 model
 
-如果你回頭過去把 square loss 的 function 寫出來的話
+你把這 model 裡的某幾個 layer 拿出來
 
-你會發現其實這個 function 可以寫成
+直接 copy 到新的 model 裡面去
 
-log ( 1 + exp( - y n hat * f(x)))
+你把某幾個 layer 直接 copy 到新的 model 裡面去
 
-這邊我們就不做多餘的推倒
-這個比較麻煩
+接下來你用你的 source data ( 應該是target data ) 只去 train 沒有 copy 的 layer
 
-你可能自己回去推一下就知道
+可能只有保留一個 layer 是沒有 copy 的
 
-但這個式子是不是合理的呢
+source data ( 應該是target data ) 就只 train 那個 layer 就好
 
-他其實是合理的
+這樣的好處就是 source data ( 應該是target data ) 只需要考慮非常少的參數
 
-你想想看當你今天的 y n hat 乘上 f(x^n) 趨近無窮大的時候
+就可以避免 overfitting 的情形
 
-當他趨近無窮大的時候
-exponential 負的無窮大是 0
+當然如果 source data ( 應該是target data ) 夠多了
 
-那就變成 log (1+0) 得到結果是 0
+我還是要 fine-tune 整個 model，也是可以的
 
-所以當這一項趨近無窮大的時候
+layer transfer 是一個非常常見的小技巧
 
-這一個 sigmoid + cross entropy 這個 loss function
+現在可能問題是；那些 layer 應該被 transfer，那些 layer 不應該被 transfer 呢
 
-他是綠色這一條，他會趨近於 0
+有趣的是在不同的 task 上面，需要被 transfer 的 layer 往往是不一樣的
 
-如果今天 y n hat * f(x) 負很大的時候
+比如說，在語音辨識上，通常是 copy 最後幾層
 
-exponential 裡面會是正的很大再加上 1 他的值會很大
+然後重新 train input 那一層
 
-再取 log 以後他還是無窮大
+在語音上你可想成每一個人用同樣的發音方式，但因為口腔結構略有差異
 
-log 只能跟 exponential 消掉，如果 exponential 這裡面是無窮大的
+同樣的發音方式，得到的聲音是不一樣的
 
-得到結果還是無窮大
-所以你得到的值還是無窮大
+那 neural network 前幾層是從聲音訊號裡面，得知說話的人的發音方式
 
-所以這一項是這一條線
+再根據發音方式，他就可以得到現在說的是哪一個詞彙，就可以得到辨識的結果
 
-在這邊我特別偷偷把他除了一個 log 2
+從這個角度來看，從發音方式到辨識結果，neural network 的後面幾層
 
-你對 loss function 除一個 constant
+是跟說話的人沒有關係的，所以是可以被 copy 的
 
-不會影響你最後找出來的解，對不對
+不一樣的是，從聲音訊號，到發音方式這一段
 
-這邊偷偷除了一個 log 2，為甚麼呢
+可能是每個人都不一樣的
 
-因為我們要偷偷除 log 2 以後呢
+所以在做語音辨識的時候，常見的作法是把 neural network 的後幾層是 copy 的
 
-可以讓他變成一個剛才 ideal loss 的 upper bound
+只有前面可能第一層用 target data、某一個 speaker 的 data train
 
-我們雖然沒有辦法 minimize ideal 的 loss
+但是在 image 的時候，我發現是不一樣的
 
-黑色這條線
+因為在 image 的時候，通常是 copy 前面幾層，只 train 最後幾層
 
-但是我們可以去 minimize 他的 upper bound
+為甚麼呢？因為在 image 你會發現當你在 source domain 上 learn 了一個 network
 
-就可以順便 minimize 這個 ideal  的 loss function
+你 learn 到的 CNN 通常前幾層他做的
 
-我們可以比較一下這兩條曲線
+就是 detect 最簡單的 pattern
 
-你就可以比較了解為甚麼我們之前會選擇用 cross entropy
+比如說前幾層，做的事情就是 detect 有沒有直線橫線，或者是有沒有簡單的幾何圖形
 
-而不是用 square error 來當作我們的 loss function
+所以在 image 上面，neural network 前幾層 learn 的東西
 
-在我們做 Logistic Regression 的時候
+他是可以被 transfer 到其他的 task 上面
 
-你想想看，我們今天如果把 y n hat * f(x) 從 -2 移到 -1 的時候
+而最後幾層 learn 的東西往往比較 abstract
 
-如果是 sigmoid + square error 他的變化很小
+這個比較 abstract 他就沒有辦法 transfer 到其他的 task 上面去
 
-如果是 sigmoid + cross entropy 他的變化就非常大
+在做影像處理、辨識的時候，反而是 copy 前面幾層
 
-那所以對 sigmoid 這個 function 來說他在這種極端的 case
+然後後面幾層重 train
+到底哪些 layer 要被 transfer
 
-在你的值非常 negative 的時候
+其實是 case by case
+特別是運用之妙，存乎一心
 
-照理說應該要有很大的 gradient
+這邊是 image 在 layer transfer 上的實驗
 
-應該趕快調整你的值
+這是出自 Bengio 在 NIPS,2014 的 paper
 
-但是實際上不是如此
+這個實驗做在 ImageNet 上，這個實驗他把 ImageNet 的 corpus
 
-因為在值很大的時候
+一百二十萬張 image 分成 source 跟 target
 
-當你在這一項 y n hat * f(x) 非常 negative 的時候
+這個分法是按照 class 來分的
+我們知道 ImageNet 的 image
 
-你調整你的值對你最後 total loss 影響不大
+一個 typical 的 setup 是有一千個 class
 
-所以就會變成說
+把其中五百個 class 歸為 source data
 
-對這個 sigmoid + square loss 的 case 來說
+把另外五百個 class 歸為 target data
 
-就算調整了他 negative 的值
+橫軸是我們在做 transfer learning 的時候，copy 了幾個 layer
 
-他也沒有辦法得到太多的回報
+Copy 0 個 layer 就代表完全沒有做 transfer learning
 
-所以他就會不想調整那些非常 negative 的值
+這是一個 baseline ，就直接在 target data 上面 train 下去
 
-那對這個 cross entropy 來說
+縱軸是 top-1 accuracy，所以是越高越好
 
-他的努力是可以得到回報的
+直接 train 下去的結果是白色這個點
 
-所以他就會很樂意把原來很 negative 的值
+沒有做 transfer learning 是白色這個點
 
-把他往正的地方推
+如果今天 copy 前面幾個 layer，只有 train 最後幾個 layer 的時候
 
-所以我們用 cross entropy 的時候
-在實作上
+如果今天 copy 第一個 layer，train 剩下的 layer
 
-你會比 square error 還更容易 training
+Copy 前面兩個、三個 layer，在 source data 上 train 一個 model
 
-所以我們在做 Logistic Regression 的時候都是用 cross entropy
+然後 copy 第一個 layer，或 copy 第二個，copy 第三個，一直到 copy 前面七個 layer
 
-那 hinge loss 他寫成一個很特別的式子
+然後剩下的 layer 再用 target data 去 train，會得到什麼樣的結果
 
-他說我們的 loss function 是 maximum
+今天它的結果是會變差的
 
-其實我們剛才在講 Zero-shot learning 的時候
+但是如果只有 copy 前面幾個 layer 的時候
 
-其實有看到類似的 function
+只有 copy 第一個 layer 的時候，performance 稍微有點進步
 
-我們這邊寫成 max(0,1 - y n hat * f(x))
+不過 copy 前面兩個 layer，performance 幾乎是持平的
 
-如果 y n hat 帶 1
+但是 copy 的 layer 太多，結果是會壞掉
 
-loss function 就是 max 0 跟 1 - f(x)
+這個實驗顯示說在不同的 data 上面，train 出來的 neural network
 
-什麼樣的狀況下會有 zero 的 loss 呢
+前面幾個 layer 是可以共用的
 
-因為這邊是 max 0 跟 1 - f(x)
+後面幾個可能是沒有辦法共用的
 
-所以這個 function 最小值是 0
+上面這條橙色的線是說，如果 copy 完以後，還有 fine-tune 整個 model 的話
 
-甚麼時候會是達到 loss function 是 0 最完美的狀況呢
+把第一個 layer，在 source domain 上 train 一個 model
 
-只要 1 - f(x) < 0 就行
+然後把第一個 layer copy 過去以後，再用 target domain fine-tune 整個 model
 
-1 - f(x) < 0 的時候這個 loss 的值就會是 0
+包括前面 copy 過的 layer 的話
 
-也就是說只要 f(x) > 1 的時候
+那得到 performance 是橙色這條線
 
-這個 loss 就會是 0
+在所有的 case 上面都是有進步的
+其實這個結果滿 surprised
 
-如果 y n hat = -1 的時候
+不要忘了，這可是 ImageNet 的 corpus
 
-這個 loss function 會寫成 0 跟 1 + f(x) 的 max
+一般在做 transfer learning 的時候，都是假設 target domain 的 data 非常少
 
-要讓 loss 等於 0
+這邊 target domain 可是有六十萬張，你可能都沒有處理過這麼多的 image
 
-我們就是要讓 1 + f(x) < 0
+這 target domain 的 data 是非常多的
 
-也就是要讓 f(x) < 1
+但是就算在這個情況下，再多加了另外六十張 image 做 transfer learning
 
-所以用 hinge loss 做 training 的時候
+其實還是有幫助的
 
-你想要讓 machine 做到的事情
-甚麼時候 machine 會覺得他已經
+這兩條藍色的線跟 transfer learning 比較沒有關係
+不過是這篇paper裡面發現一個有趣的現象
 
-他的 loss 是 0
-他已經做到完美的 case 了呢
+假設呢，假設呢
+他想要做一個對照組
 
-他如果對一個 positive 的 example 來說
+在 target domain 上面 learn 一個 model
 
-f(x) > 1 的時候就是完美的 case
+把前幾個 layer copy 起來
 
-對一個 negative example 來說
+再用一次 target domain 的 data train 剩下幾個 layer
 
-他的 f(x) < -1 的時候他就是一個完美的 case
+前面幾個 layer 就 fix 住，只 train 後面幾個 layer
 
-他的值不用太大
+直覺上這樣做應該跟直接 train 整個 model 沒有太大差別
 
-你把 f(x) 變成 2
+但最後發現假設你 fix 前面幾個 layer
 
-loss 也不會比較小
+先 train 好一個 model，fix 前面幾個 layer
 
-你把 f(x) 變成 -2 loss 也不會比較小
+接下來只 train 後面幾個 layer
 
-他只要大過 1 跟小於 -1 就可以了
+接下來重新 train 後面幾個 layer
 
-如果你把 hinge loss 畫出來的話呢他長得像這個樣子
+結果有些時候是會壞掉的
 
-他是紫色的這條線
+他的理由是 training 的時候，前面的 layer 跟後面的 layer
 
-你會發現在紫色的這條線上
+他們其實是要互相搭配
 
-在這一段只要 y n hat * f(x) > 1 的時候
+所以如果只 copy 前面的 layer，然後只 train 後面的 layer
 
-就已經夠好了，你的 loss 就已經是 0
+其實 performance 會是比較差的
 
-再更大都沒有幫助
+後面的 layer 就沒有辦法跟前面的 layer 互相搭配，結果有點差
 
-但如果 y n hat, f(x^n) 是 positive 的 example
+如果可以 fine-tune 整個 model 的話，performance 就跟有沒有 transfer learning 是一樣的
 
-是 positive 還不夠好
+這是另一個有趣的發現，作者自己對這件事情是滿 surprised
 
-如果 y n hat 跟 f(x^n) 是同向
+這是另外一個實驗結果
 
-machine 在做 classification 的時候他已經可以得到正確的答案
+這個實驗結果是
+紅色這條線是前一頁看到的紅色的這條線
 
-根據我們剛才前面定出來的 step 1、定出來的 function
+這邊假設 source 跟 target 是比較沒有關係的
 
-但是對 hinge loss 來說這樣還不夠好
+把 ImageNet 的 corpus 分成 source data 跟 target data 的時候
 
-他會說你只得到正確的答案還不夠
+把自然界的東西，通通當作 source
 
-你要比正確的答案還要好過一段距離
+target 通通是人造的東西，桌子、椅子等等
 
-這個距離就是 margin
+這樣 transfer learning 會有什麼樣的影響
 
-也就是說當 y n hat * f(x) 還沒有大於 1 的時候
+如果 source 跟 target 的 data 是差很多的
 
-其實還是會有 penalty
+在做 transfer learning 的時候，performance 會掉的比較多
 
-促使 machine 讓 y n hat 乘上 f(x) 大於 0
+前面幾個 layer 影響還是比較小的
 
-你可能會問這邊為甚麼是 1 呢
+如果只 copy 前面幾個 layer，仍然跟沒有 copy 是持平的
 
-你可以想想看如果這邊是 1 的話
+這意味著，就算是 source domain 跟 target domain 是非常不一樣的
 
-hinge loss 才會是 ideal loss 的一個 type 的 upper bound
+一邊是自然的東西，一邊是人造的東西
 
-如果你用其他值的話
+在 neural network 第一個 layer，他們仍然做的事情很有可能是一樣的
 
-他就不是一個那麼 tight 的 upper bound
+綠色的這條線，爛掉的這條線是假設前面幾個 layer 的參數是 random 的
 
-所以 hinge loss 跟我們剛看到的 cross entropy 一樣
+會發生甚麼事情呢？得到的結果就是爛掉，這是一個 baseline
 
-他也是 ideal loss function 的 upper bound
+另外一個要講的是 multitask learning
 
-所以我們會期待說我們可以 minimize hinge loss
+multitask learning 跟 fine-tune 略有不同的地方就是
 
-然後就可能可以得到 minimize ideal loss function 的效果
+在 fine-tune 裡面我們 care 的是 target domain 做得好不好
 
-如果我們比較 hinge loss 跟 cross entropy 的話
+在 source domain 上 learn 一個 model
 
-你會發現他們最大的不同來自於他們對待已經做得好的 example 的態度
+在 target domain 上 fine-tune
 
-如果我們把 y n hat * f(x) 從1 挪到 2
+care 的是 target domain 做得好不好，fine-tune 以後 source domain 壞掉就算了
 
-對 cross entropy 來說可以得到 loss 的下降
+在 multitask learning 裡面，其實同時 care target domain 跟 source domain 做得好不好
 
-所以 cross entropy 他會想要好，還可以更好
+care 在這兩個 domain 上，能不能夠同時把它做好
 
-如果你已經可以把 y n hat * f(x) 的值做的夠大
+如果是用 deep learning base 方法的話，特別適合來做這種 multitask 的 learning
 
-cross entropy 他有動機讓他的值更大，因為這樣可以減少 loss
+可以丟一個 neural network
+假設兩個不同的 task，他們用的是同樣的 feature
 
-但是對 hinge loss 來說，如果採用 hinge loss function
+比如說，都做影像辨識，只是影像辨識的 class 不一樣的話
 
-他是一個及格就好的 loss function
+我就 learn 一個 neural network，input 就是兩個不同 task 同樣的 feature
 
-所以只要你的值大過 margin 的時候就結束了
+但是中間會分叉出來，一部分的 network  他的 output 是 task A 的答案
 
-他就不會想要再做得更好
+一部分的 network 他的 output 是 task B 的答案
 
-你可能會問說在實作上到底 hinge loss 跟 cross entropy 他們的 performance 有甚麼差別呢
+這麼做的好處是，task A 跟 task B 他們在前面幾個 layer 會是共用的
 
-在實作上的差別可能沒有你想像的那麼顯著
+在前面幾個 layer，會同時使用 task A 跟 task B 的 data 去同時 train 前面幾個layer
 
-有一些時候我們可以看到 hinge loss 略勝 cross entropy
+前面幾個 layer 是用比較多的 data train 的，所以可能有比較好的 performance
 
-但其實也沒有贏那麼多
+做這件事的前提就是，要確定這兩個 task 有沒有共通性，是不是可以共用前面幾個 layer
 
-非常 hinge loss 的時候有一個好處是他比較不害怕 outlier
+有一些更 crazy 的 task，現在連 input 都是沒有辦法 share 的
 
-learn 出來的結果會是比較 robust 的
+今天兩種不同的 task，不同的 input 都用不同的 neural network
 
-這個等下在講 kernel 的時候會比較明顯的看到這個結果
+把它 transform 到同一個 domain 上面去
+在同一個 domain 上，再 apply 不同的 neural network
 
-如果你看這 hinge loss 跟 cross entropy 的差別的話
+一條路去做 task A，一條路去做 task B
+中間可能有某幾個 layer 是 share 的
 
-這個 cross entropy 就好像是說現在期末考有很多科目要讀
+如果在這樣的 task 下，也可以做 transfer learning
 
-但你就是想要拚死讀一科而已
+就算是 task A、task B 的 input、output 完全不一樣
 
-你想要把某一科考到一百分
+如果覺得中間幾個 layer 他們有共同的地方
 
-其他如果你念不起來的你就會放棄
+還是可以用這樣子的 model 架構來處理
 
-最後可能就被二一了
+Multitask learning 一個很成功的例子是多語言的語音辨識
 
-hinge loss 會顧全所有的科目
+假設現在有一大堆不同語言的 data
 
-所有的科目考到及格就好
+假設有法文、德文、西班牙文、義大利文還有中文
 
-他其實是會 all pass 的
+在 train model 的時候，train 你拿來做語音辨識的 neural network 的時候
 
-所以如果你有 outlier 的時候
+可以 train 一個 model，它同時可以辨識這五種不同的語言
 
-hinge loss 會給你比較好的結果
-cross entropy 會給你比較差的結果
+而這個 model 前面幾個 layer 他們會共用參數
 
-等一下我們在別的角度來看這個問題可能是會更清楚
+後面幾個 layer，每個語言可能有自己的參數
 
-甚麼是 linear SVM
+這麼做是合理的，因為雖然是不同的語言，但都是人類說的
 
-linear SVM 是說我們現在的 function
+前面幾個 layer 就可以 share 同樣的資訊、可以共用同樣的參數
 
-就是 linear 的
+其實在 translation 也可以用同樣的事情
 
-我們現在的 f(x) 就是
+假設要做中翻英、中文翻日文，那可以把這兩個 model 一起 train
 
-x 裡面的每一個 feature，x i 乘上他對應的 weight ，w i
+在一起 train 的時候，在中翻英、中文翻日文
 
-summation 起來再加上 b
+都要先把中文的 data 做process
+那把中文的 data 先做process
 
-我們可以把這件事情看作兩個 vector 的 inner product
+那一部分的 neural network 就可以是兩種不同語言的 data 共同使用
 
-其中一個 vector 是 model 的 parameter w 跟 b concatenate 的一個 vector
+這個 transfer 到底可以 transfer 的多廣？
 
-另外一個 vector 是 feature 的 vector x 跟 1 concatenate 的結果
+比如說德文法文都是同樣語系的語言
+所以他們是可以 transfer 的
 
-如果你把這兩個 vector 做 inner product 的話
+但這些歐洲的語言跟中文或許是不能 transfer 的
 
-那你就會得到左邊這個式子
+目前在語音的發現是，幾乎所有的語言都可以 transfer
 
-所以在等一下的說明裡面
+過去還有人蒐集了十幾種語言，把他們互相之間兩兩做 transfer
 
-我們把 w 跟 b 串起來的那個 vector
+做了一個很大的 N x N 的 table，每一個 case 都有進步
 
-直接就用 w 來表示
+目前發現大部分的 case，不同人類的語言
+就算覺得他們不是非常像，他們也都可以互相 transfer
 
-這個東西是你的 model 的參數
-是要透過 training data 把它找出來的
+這邊舉的例子是從歐洲的語言 transfer 到中文上面
 
-下面 x  跟 1 concatenate 起來的結果
+這邊中文的 data 不是太多，可能是十小時
 
-我們就當作是一個新的 feature
-你就想像成每一個 feature 下面都有 concatenate 1
+橫軸是中文 training 的 data
 
-這樣你就可以把 bias 這一項省略掉
+縱軸是辨識的 character 的 error rate
 
-所以一個 function 你就寫成 w 的 transpose 乘上 x
+一開始 data 很少，假設只有用中文直接 train 一個 model
 
-或 w 跟 x 的 inner product
+現在 data 很少，Error rate 當然就很大，當 data 越來越多
 
-那在 SVM 裡面
+到一百多小時的時候，error rate 就可以壓到 30 以下
 
-你的 f 長這個樣子
+今天如果有一大堆的歐洲語言，把歐洲語言跟中文一起做 multitask training
 
-你就說 f > 0 的時候是屬於某一個 class
+用這些歐洲語言的 data，來幫助中文 model 的前面幾層，讓他 train 得更好
 
-f < 0 的時候是另外一個 class
+會發現就算是中文 data 很少的情況下
 
-如果是 loss function 的話
+有做 transfer learning，可以得到比較好的 performance
 
-在 SVM 裡面它的特色就是他採用了 hinge loss 這個 loss function
+當中文的 data 越多的時候，中文本身的 performance 越好
 
-通常你還會加上 regularization 的 term
+就算是中文有一百小時的 data，借用一些歐洲語言來的 knowledge
 
-這個 loss function 他是一個 convex 的 function
+對這個辨識還是有微幅的幫助的
 
-為甚麼呢?因為我們知道 hinge loss 的 loss function
+這邊的好處是，假設做 multitask learning 的時候
 
-他長得是這個樣子，就像 RELU 那個 activation function 的形狀
+會發現有一百多個小時，跟你只有這邊大概是五十個小時以內
 
-他是一個 convex 的 function
+如果有做 transfer learning 的話，你只需要二分之一以下的 data
 
-而這一項，L2 的 regularization
+就可以跟原來有兩倍的 data 做的一樣好
 
-他也是一個 convex 的 function
+常常有人擔心說， transfer learning 會不會有負面的效應
 
-所以所有的 loss 都是 convex 的 function
+會不會有 negative 的 transfer 的結果
 
-regularization 也是 convex 的 function
+是有可能的，如果兩個 task 不像的話
+Transfer 就是 negative 的
 
-當你把這些 convex 的 function 疊加起來以後會發生甚麼事情呢
+兩個 task 不像，讓 neural network 同時做兩個 task
+反而把結果弄糟了
 
-其實你可以很輕易的證明，把 convex 的 function 疊加起來
+有人總會思考，兩個 task 之間到底能不能夠 transfer
+然後 try and error ，這樣很浪費時間
 
-仍然是 convex function
+所以有人 propose 這個 progressive neural networks
+這個 progressive neural networks 其實是很新的作法
 
-所以今天的 loss function 其實就是一個 convex 的 function
+這個是 16 年的放在 arXiv 上的 paper
+會發現它是有很多問題的
 
-如果是 convex function 的話
+這個方法是這樣子
+現在有個 Task 1，先 train 一個 Task 1 的 neural network
 
-做 gradient descent 就很簡單了
+藍色這個 neural network
+Train 好以後，它的參數就 fix 住了
 
-不管從哪個地方做 initialization
+現在要做 Task 2，一樣有一個 neural network
 
-最後找出來的結果都會是一樣的
+但是 Task 2 它的每一個 hidden layer 都會去接前面 Task 1 某一個 hidden layer 的
+ output
 
-你可能會問說這個東西在某些點不可微
+所以在 training 的時候，它的好處是就算 Task 1 跟 Task 2 非常的不像
 
-他有這種菱菱角角的東西
+首先，Task 2 的 data 不會去動到 Task 1 的 model
 
-Hinge  Loss 他在某些點是不可微的
+所以 Task 1 一定不會比原來更差
 
-你把很多不可微的 convex function 疊起來他就長這樣
+再來 Task 2 他去借用 Task 1 的參數，但是它可以把這些參數直接設成 0
 
-他有很多菱菱角角的地方
+這樣子也不會影響 Task 2 的 performance
+最糟的情況下，就跟自己 train 的 performance 是差不多的
 
-感覺不是每一個位子都是可微
+如果有 Task 3，也就做一樣的事情
 
-但是這個不是甚麼大問題
-這個其實可以做的
+Task 3會同時從 Task 1 和 Task 2 的 hidden layer 得到 information
 
-我們之前在講 Deep Learning 的時候，你有 RELU 的 Activation Function
+你可能會覺得這個 model 怪怪的
 
-你有 Maxout Network
-他們表面上看起來也是不可微的
+如果有五個 Task，那第五個 Task 不是要同時接前面四個 Task 嗎？
 
-但其實你都可以用 Gradient Descent 去做 optimization
+對，他是怪怪的。作者也有說怪怪的，等待大家提出更好的想法
 
-所以今天這個 case 也一樣
+假設 target data 是 unlabeled
 
-我們可以用 Gradient Descent 去做 optimization
+而 Source data 是 labeled 時候
 
-等一下我們會看看怎麼做這一件事情
+這邊的 task 是這樣
 
-其實如果我們比較 Logistic Regression
+在 source data 有 function 的 input，也有 function 的 output
 
-跟 Linear SVM 的差別，他唯一的差別就只是
+但在 target data 只有 function 的 input，沒有 function 的 output
 
-我們怎麼定 Loss Function
+舉例來說，source data 是 MNIST 的 image
 
-你用 Hinge Loss 就是 Linear SVM
+Target data 是另外一個 corpus，MNIST-M 的 image
 
-Cross Entropy 的 Loss 就是 Logistic Regression
+把 MNIST 的 image 加上一些奇怪的顏色跟背景
 
-而這個 function 他沒有一定要是 linear 的
+MNIST 是有label的
 
-他如果是 linear 的話有很多好的特質
-但是如果他不是 linear 的也 ok
+我們知道每一張 image 對應到哪個 digit
 
-你也可以用 Gradient Descent 來 train
+但 MNIST-M 沒有 label
 
-所以 SVM 是可以有 deep 的版本的
+在這種情況下，通常把 source data 視作 training data
 
-這邊列一個 reference 給大家參考
+把 target data 視作 testing data
 
-當你今天在做 Deep Learning 的時候
+這邊的問題是 training data 跟 testing data 是非常的 mismatch
 
-你不是用 Cross Entropy 當作你 minimization  的對象
-當作你的 Loss Function
+在這種 source data，MNIST 上 train 出來的一個 model
 
-而是想要用 Hinge Loss 的話
+直接 apply 到另外一個 corpus 上面，他也 work 的
 
-你其實就是有一個 deep 版本的 SVM
+雖然另外一個 corpus 要做的事情，也是辨識數字零到九
 
-所以其實沒有必要說
+但他們 input 的 image 是非常不一樣的
 
-哦～我做的是 Deep Learning、我做的是 SVM
+要怎麼把 source data 上 learn 出來的 model 也可以 apply target data 上面呢？
 
-他們其實可以是一樣的東西
+如果直接 learn 一個 model
 
-這背後的精神其實都是可以相通的
+Input 是一張 image
 
-再來的問題就是怎麼用 Gradient Descent 來 learn SVM 呢
+不管 mismatch training 跟 testing 也沒有關係
 
-我知道你傳統上聽到的方法都不是用 Gradient Descent 來 learn SVM
+直接 learn 一個 model 下去看看會怎樣
 
-但 SVM 確實是可以用 Gradient Descent 來做 training 的
+會發現結果是會爛掉的
 
-有一個用 Gradient Descent 來 train SVM 的方法叫做 Picasso
+如果把一個 neural network 當作是一個 feature 的 extractor
 
-我這邊忘了附 reference 我之後再附上去
+Neural network 的前面幾層可以看作是在抽 feature
+後面幾層可以看作是在做 classification
 
-總之 SVM 是可以用 Gradient Descent train
+如果把 neural network 的前面幾層看作是在抽 feature 的話
+把 feature 拿來看會發現甚麼事呢
 
-怎麼 train 呢
-我們現在的 Loss Function 長這個樣子
+會發現不同 domain 的 data，他的 feature 完全不一樣
 
-他是一個 Hinge Loss
+如果把 MNIST 的 feature 丟進去的話，是藍色的這些點
 
-Gradient Descent 很簡單你只要能夠對他做微分就好了
+藍色的這些點很明顯分成十群
 
-我們只要能夠對 model 裡面的某一個 weight w i
+零到九，十個數字
 
-對這個 summation 裡面的 loss 可以做偏微分
+但如果把另外一個 corpus 的 image 丟進去的話
 
-我們就可以做 Gradient Descent
+會發現抽出來的 feature 就是紅色這群
 
-這個偏微分的值是甚麼呢
+這邊有把 t-SNE 降維以後的結果
 
-w i 只跟 f(x) 有關
+反正做出來就是紅色這一群
 
-所以我們可以把這一項拆成 partial f 分之 partial log Loss Function
+會發現作 feature extraction 的時候
 
-我們先用 f 對 Loss Function 做偏微分
+原來 source domain 的 image 跟 target domain 的 image
 
-再乘上用 w 對 f 做偏微分
+他們根本就不在同一個位置裡面
 
-用 w 對 f 做偏微分的結果是很簡單的
+抽出來的 feature 完全不一樣
 
-因為我們知道 f(x^n) 就是一個 linear 的 function
+後面的 classifier 雖然可以把藍色的部分做好
 
-他是兩個 vector 的 Inner Product
+但紅色的部分就無能為力
 
-如果你用 w i 對 f 做偏微分的話
+這邊希望做到前面 feature extractor
+可以把 domain 的特性去除掉
 
-你得到的其實就是 xn 的第 i 個 dimension 的 value
+這招叫 domain-adversarial training
+等一下會講為甚麼出現 adversarial 這個字
 
-前面這個用 f 對 Loss Function 做偏微分他的解是怎樣呢
+之前已經看過 adversarial 這個字
+在前面講 GAN 的時候
 
-這個 f 就是這個 Hinge Loss 的 Loss Function
+GAN 就是 generative adversarial 的 model
+這邊又出現 adversarial
 
-這個 Hinge Loss 的 Loss Function 他長得是 RELU 這個樣子
+這邊 adversarial 跟 GAN 的原理是非常像的
+希望 feature extractor 可以把 domain 的特性消掉
 
-他有兩個 operation 的 region
+也就是 feature extractor 的 output
 
-它可以 operate 在 0 是 max 的 case
+不應該是紅色跟藍色的點分成兩群
 
-它可以 operate 在 1 - y * f(x) 是 max 的 case
+不同的 domain 不應該是分成兩群
 
-如果它 operate 在 0 是 max 的 case 就是這個 region
+而是不同的 domain 都應該被混合在一起
 
-它 operate 在 1 - y * f(x) 是 max 的 case 它就是這個 region
+希望 feature extractor 的 output 是可以把不同 domain 的 image 混在一起
 
-甚麼時候會 operate 在哪一個 case 呢
+也就是把不同 domain 的特性消掉
 
-這個是 depend 你現在的 model w 是多少
+怎麼 learn 這樣的 feature extractor 呢
 
-也就是說假如你現在的 1 - y hat * f(x) > 0
+在後面接一個 domain 的 classifier
 
-這個 f(x) 的值取決於你現在的 model w 的值是多少
+把 feature extractor 的 output 丟給 domain classifier
 
-假設這個東西大於零
+Domain classifier 也是一個 classification 的 task
 
-那就是 y hat * f(x) < 1 這樣
+他要做的是根據 feature extractor 給他的 feature
 
-當 y hat * f(x) < 1 的時候
+判斷這個 feature 來自於哪個 domain
 
-你的 model 作用在這個 region
+在這個 task 就是要分辨這些 feature 來自於 MNIST 的 corpus
 
-把它對 f 作微分你得到的值就是 - y n hat
+還是來自於 MNIST-M 的 corpus
 
-在另外一個 case 因為值就是 0 所以做微分以後還是 0
+這件事情就是有一個 generator 的 output
 
-今天的微分值就有兩個可能
+然後有一個 discriminator 讓他的架構非常像 GAN
 
-如果作用在這個 region 就得到這個微分值
+但是跟 GAN 不一樣的是
+之前在 GAN 的 task 裡
 
-所以微分的值你把這一整項
+Generator 要產生一張 image 騙過 discriminator
+這件事很難
 
-大 L 對 w 做偏微分以後
+但是在 domain-adversarial training 裡面
 
-你得到的值就是這個樣子
+要騙過 domain classifier 太簡單了
 
-summation over 所有的 Training Data
+有一個 solution 是不管看到甚麼東西，output 都 0
+就騙過 classifier 了
 
-再看每一筆 Training Data 的 y n hat * f(x^n) 是不是小於 1
+所以只 train domain classifier 是不夠的
 
-如果是的話這一項 delta 值就是 1
+因為 feature extractor 可以輕易的騙過 domain classifier
 
-這個 1 就會乘上負的 y n hat
+所以要給 feature extractor 增加任務的難度
 
-這前面還會乘上一項
+所以 feature extractor 他 output 的 feature
 
-我寫錯這邊應該是上標 n
+不只要同時騙過 domain classifier
 
-這邊這一項就應該是 x 上標 n 下標 i
+還要同時讓 label predictor 做的好
 
-前面這一項 depend on 現在的參數是甚麼
+Label predictor 吃 feature extractor 的 output
 
-所以我們把它寫成 c n(w)
+他的 output 就是十個 class
 
-所以 update 參數的時候就把 w i 減掉 Learning Rate
+所以 feature extractor 不只要騙過 domain classifier
 
-乘上 c n(w) 乘上第 n 個 feature 裡面的的第 i 維
+同時還要滿足 label predictor 的需求
 
-就可以 update 參數 w i
+他抽出來的 feature 不只是要把 domain 的特性消掉
 
-就這樣子
+同時還要保留原來 digit 的特性
 
-所以 SVM 是可以用 Gradient Descent 來解
+如果把這三個 network 放在一起的話
 
-如果你只是要寫 linear 的 SVM
+實際上它只是一個大型的 neural network 而已
 
-其實你用 Keras 就可以秒做
+他有很多層就像一個在 multitask learning 會用到的 neural network 一樣
 
-你可能會說這跟我平常看到的 SVM 不一樣
+但是這個 neural network 是個各懷鬼胎的neural network
 
-我知道你平常看到的 SVM 是甚麼樣子
+一般的 neural network 的每一個參數，要做的事情都一樣
 
-我把我現在講的這個 Hinge Loss Function 變成你平常看到的 SVM
+有共同的目標，要 minimize loss
 
-你平常看到的 SVM 是怎麼樣呢
+要 optimize accuracy
 
-我們把 Hinge Loss 換成用一個 notation epsilon n 來取代它
+但是在這個 neural network 裡，他的參數是各懷鬼胎的
 
-epsilon n 就等於
+藍色這部分 label predictor 要做的是把 class 的分類正確率做的越高越好
 
-max(0,1 - y n hat * f(x n))
+Domain classifier 要做的是正確的 predict 一個 image 屬於哪個 domain
 
-上標 n
+Feature extractor 要做的是同時 improve Label predictor 的 accuracy
 
-max(0,1 - y n hat * f(x n))
+同時 minimize Domain classifier 的 accuracy
 
-我接下來甚麼都沒有做只是換了一下 notation 而已
+所以 feature extractor 是一個不好的隊友
 
-我們現在的目標是 minimize Total Loss
+Domain classifier 想要做 domain classification
 
-這一項其實可以有另外一個寫法
+Feature extractor 想要捅他隊友一刀
 
-我們要 0 跟 1 - y n hat * f(x) 裡面取大的那一個當作 epsilon n
+他隊友想要選總統但他背後捅他一刀
 
-所以 epsilon n 它會大於 0 也大於 1 - y n hat * f(x)
+他不想要讓他選總統
 
-這件事情其實就等於 epsilon n >= 0
+他想要做的事情跟他隊友要做的事情是相反的
 
-epsilon n >= 1 - y n hat * f(x)
+他是一個會陷害他隊友的 model
 
-假設我們不考慮 loss，無視上面這一塊
+Feature extractor 怎麼陷害隊友呢
 
-這個紅框框，上面紅框框裡面的式子
+這件事情很容易，只要加一個 gradient reversal 的 layer 就行了
 
-等於下面裡面紅框框的式子嗎
+也就是說在作 back propagation 的時候
 
-給大家三秒鐘的時間想一下
+Domain classifier 計算 back propagation 不是有 forward 跟 backward 兩個 path 嗎
 
-覺得相等的同學舉手
+在作 backward path 的時候
+Domain classifier 傳給 feature extractor 什麼樣的 value
 
-手放下，覺得不相等的同學舉手
+Feature extractor 就把他乘上一個負號
+也就是 domain classifier 告訴你某一個 value 應該要上升
 
-手放下，好像差距有點大
+他就會故意下降
+作一個跟 domain classifier 要求相反的事情
 
-我們來想想看
+Domain classifier 因為看不到真正的 image
+所以最後一定會 fail 掉
 
-這個 epsilon n 它是 0 跟 1 - y n hat * f(x) 的 max
+他所能看到的東西都是 feature extractor 告訴他的
 
-我今天說 epsilon n 可以大於 0 也可以大於它
+所以最後一定會無法分辨 feature extractor 所抽來的 feature 是來自於哪個 domain
 
-但是它不見得是正好等於他們的 max
+問題是，domain classifier 一定要奮力的掙扎
 
-它可以是 max + 1、+ 2、+ 一百萬
+這個 model 原理講起來很簡單
 
-所以如果我這樣講的話
+實際上的 training 可能跟 GAN 一樣是沒有那麼好 train 的
 
-我們再問一下
-你覺得上面下面這兩個式子是一樣的嗎
+Domain classifier 一定要奮力掙扎
 
-你覺得它不一樣的同學舉手
+他一定要努力判斷現在的 feature 是來自於哪個 domain
 
-謝謝手放下，其實人沒有變多
+如果 domain classifier 他比較弱、懶惰
 
-其實他們是不一樣的
+他一下就放棄不想做了
 
-如果我們無視上面這個式子的話
+就沒有辦法把前面的 feature extractor 逼到極限
 
-這兩個式子是不一樣的
+就沒有辦法讓 feature extractor 真的把 domain information remove 掉
 
-這兩個 epsilon n
+如果 domain classifier 很 weak
 
-一個符合這上面式子的 epsilon n 跟符合下面這兩個 constrain 的 epsilon n
+他一開始就不想做了，他 output 永遠都是 0 的話
 
-不同的 epsilon n 他們是不同的值
+那 feature extractor 胡亂弄甚麼 feature 都可以騙過 classifier 的話
 
-上面的式子跟下面的式子好像是不一樣的
+那就達不到把 domain 特性 remove 掉的效果
 
-但是這個只是表象上
+這個 task 一定要讓 domain classifier 奮力掙扎然後才死掉
 
-假設我們不考慮這個 Loss Function 的話
+這樣才能把 feature extractor 的潛能逼到極限
 
-上下這兩個疑似是不一樣
+這個其實是很新的方法
+引用的是 ICML,2015 的 paper 跟 JMLR,2016 的 paper
 
-我們這邊整理一下式子
+這是 paper 一些實驗的結果
 
-把 y n hat * f(x) 移到左邊
+作不同 domain 的 transfer
 
-epsilon 移到右邊變成 y n hat * f(x) >= 1 - epsilon n
+包括從 MNIST 上 transfer 到 MNIST-M 上
 
-所以上面這個式子跟下面這兩個是不一樣的
+從這個數字的 corpus，transfer 到另一個數字的 corpus
 
-但是今天重點就是今天加了 minimize Loss Function L 這件事情以後
+從這個數字的 corpus，transfer 到 MNIST 上面
 
-上面這個式子跟下面這個式子就會變得一模一樣
+兩種不同的道路號誌的 data 互相 transfer
 
-為甚麼呢
+如果看實驗結果的話
+縱軸代表用不同的方法
 
-因為現在我們要去 minimize L(f)
+這邊有一個 source only 的方法
+直接 source domain 上 train 一個 model
 
-你要選擇一個最小的 epsilon n
+然後 test 在 testing domain 上
 
-讓你的 L 能夠最小
+在這四個結果會發現如果只用 source only 的話
 
-雖然我們下面只有下 constrain 說
+Performance 是比較差的
 
-epsilon n 要大於等於 0
+這邊比較另一個 transfer learning 的方法
 
-epsilon n 要大於等於 1- y n hat * f(x)
+留給大家自己去參考文獻
 
-理論上它不需要正好等於 0
+這 proposed 的方法是剛剛講的 domain-adversarial training
 
-它不需要正好等於 1- y n hat * f(x)
+如果用 domain-adversarial training 得到的結果是這裡
 
-它可以是任何值
+我們現在最下面這行
 
-或者說我舉個最簡單的例子，epsilon n 我帶一兆
+最下面這行是直接拿 target domain 的 data 去做 training
 
-帶一個無窮大，它就符合這個 constrain
+會得到 performance 是最下面這個 row
 
-epsilon n 隨便帶一個很大的值
+這其實是 performance 的 upper bound
 
-它大於 0，也大於它就符合這個 constrain
+會發現如果用 source data 跟 target data train 出來的結果是天差地遠的
 
-它不需要等於他們之間兩個比較大的那個
+這中間有一個很大的 gap
 
-理論上這兩個東西是不相等的
+如果用 domain-adversarial training 可以發現有很好的 improvement
 
-epsilon n 帶任何一個很大的值
+在不同的 case 上面都有很好的 improvement
 
-就符合下面這個 constrain
+接下來要講的是 Zero-shot learning
 
-但問題是我們現在要做的事情
+在 Zero-shot learning 裡面跟剛才講的 task 是一樣的
 
-是要去 minimize L
+只有 source data 有 label，target data 沒有 label
+在剛才的 task 裡可以把 source data 當 training data
 
-當我們要做的事情是要 minimize L 的時候
+Target data 當作 testing data
+但實際上 Zero-shot learning 他的 define 又更加嚴苛一點
 
-我們就要想辦法讓 epsilon n 越小越好
+他的 define 是他的 source data、target data，他的 task 是不一樣的
 
-當 epsilon n 它的 constrain 要 >= 0
-跟大於 1 - y n hat * f(x)
+比如說，在影像上面，你的 source data 可能是要分辨貓跟狗
 
-要他最小的辦法就是讓 epsilon n 等於他們最大的
+Source data 裡面可能有貓的 class、狗的 class
+但 target data 裡面，image 是草泥馬
 
-所以加上我們的目標要 minimize total loss 的時候
+在 source data 裡是從來都沒有出現過草泥馬的
 
-上面這個紅框框的式子會跟下面這個紅框框的式子
-是一樣的
+如果 source data 裡面從來都沒有出現過草泥馬的話
 
-當我們把上面紅框框的式子轉成下面紅框框的式子
+Machine 有辦法看到他就說是草泥馬嗎？
+這實在是太強人所難
 
-這個就是你所熟悉的 SVM 了
+這個 task 在語音上很早就有 solution
 
-你所熟悉的 SVM 就是告訴我們 y n hat * f(x)
+語音本來就常常會遇到 Zero-shot learning 的問題
 
-y n hat 和 f(x) 要是同號的
+假如把不同的 word 都當作一個詞彙、一個 class 的話
 
-他們相乘以後要 >= 一個 margin 1
+本來在 training、testing 的時候，就有可能看到不同的詞彙
 
-但是這個 margin 是 soft 的，因為 soft 是軟的
+Testing data 本來就有一些詞彙
 
-有時候你沒辦法滿足這個 margin
+英文的詞彙這麼多，至少十萬個不同詞彙
 
-沒有辦法讓 y n hat * f(x) >= 1
+Testing data 本來就有一些詞彙，是在 training 的時候從來沒有看過
 
-那怎麼辦呢
+在語音上怎麼解決這個問題
 
-你把你的 margin 稍微放寬，把它減掉一個 epsilon n
+在語音上的作法是不要直接辨識一段聲音屬於哪一個 word
 
-這 epsilon n 會放寬你的 margin
+辨識的是一段聲音屬於哪個 phoneme
 
-這個 epsilon n 叫做 slack variable
+如果不知道 phoneme，就想成音標就好
 
-slack 大概是鬆弛的意思
+所以辨識的單位不要定成 word，而定成 phoneme
 
-讓你的 margin 變得比較鬆
+再做一個 phoneme 跟 table 之間對應關係的表
 
-但是這個鬆弛的 epsilon 絕對不能夠是負的
+這個東西叫做 lexicon，也就是辭典
 
-因為這負的不符合它的目的
+建一個文字跟 phoneme 對應關係的表根據人的 knowledge
 
-如果 epsilon n 是負的話你就是把 margin 變大而不是把 margin 變小
+在辨識的時候，只要辨識出 phoneme 就好
 
-所以這個 epsilon n 必須要有一個 constrain，要大於等於 0
+再去查表，這一段 phoneme 對應到哪一個 word
 
-那把這些事情合起來以後
+這樣就算有一些 word 是沒有出現在 training data 裡面的
 
-你會有一個你要 minimize 的對象
+只要他在你建好的 lexicon 裡面有出現過
 
-再加上一些 constrain
+你的 model 可以正確辨識出現在聲音屬於哪個 phoneme 的話
 
-這個 formulation 是一個 Quadratic Programming 的 problem
+就可以處理這個問題
 
-你就可以帶一個 Quadratic Programming 的 solver
+在影像上，可以把每一個 class，用他的 attribute 來表示
 
-然後把它解出來
+也就是說，有一個 database，database 裡面有所有不同
 
-你不見得要帶 Quadratic Programming 的 solver 才能解它
+可能的 object 跟他的特性
 
-剛才看到說 SVM 其實可以用 Gradient Descent 來解
+假設現在要辨識動物
 
-這個是這樣子的，Kernel Method
+但 training data 跟 testing data 他們的動物不一樣
 
-你隨便 google 就有一大堆東西
+但有一個 database
 
-在這一整套東西裡面
+這 database 告訴你每一種動物有什麼樣的特性
 
-我認為最重要的、大家最容易卡住的地方
+比如說，狗就是毛茸茸、四隻腳、有尾巴
 
-只要先說服你這樣一件事情
+魚有尾巴，沒有四隻腳、沒有毛茸茸
 
-要說服你說，實際上我們找出來的 weight
+Chimp，黑猩猩有毛茸茸，沒有四隻腳、沒有尾巴
 
-我們實際找出可以 minimize Loss Function 的 weight
+黑猩猩沒有尾巴，猴子才有尾巴
 
-我們寫作 w hat
+Attribute 要定的夠豐富，每一個 class 都要有獨一無二的 attribute
 
-它其實是我們 data 的 linear combination
+如果有兩個 class 他的 attribute 一模一樣的話
 
-w star 其實是 summation over 所有 training data 的 vector point，x^n
+等於那個方法會 fail 掉
 
-然後對所有的 x^n 都乘上一個 weight
+在 training 的時候，不直接辨識每一張 image 屬於哪一個 class
 
-alpha(上標 *, 下標 n)
+而是去辨識每一張 image 具備什麼樣的 attribute
 
-也就是說你找出來的 model 其實就是你的 data point 的 Linear Combination
+Neural network learning 的 target 就是看到猩猩的圖
 
-一般說服你這件事情的方法都是做
+就要說這是一個毛茸茸的動物、沒有四隻腳的動物、沒有尾巴的動物
 
-用 Lagrange multiplier 解一下剛才的那個式子然後說服你這件事情
+看到一個狗的圖，就要說這是毛茸茸的動物、有四隻腳的動物、有尾巴的動物
 
-我們這邊試著從另外一個角度來說服你
+在 testing 的時候，就算來了一張從來沒有看過的 image
 
-我們剛才說我們可以用 Gradient Descent 來 minimize SVM
+沒有關係，neural network 的任務也不是要 detect input 這張 image 是屬於哪一種動物
 
-所以我們算出來的 Gradient Descent 的式子就是長這個樣子
+只要 input 這張 image，他有甚麼樣的 attribute
 
-這個是對 w i update 的時候的式子
+Input 一張沒有見過的動物，但只要能夠把他的 attribute 找出來
 
-對 w 1 到 w k，假設現在 w 有 k 維
+就查表看哪一種，在 database，哪一種動物的 attribute 跟 model 的 output 最接近
 
-update 的式子都是一樣的
+有時候可能沒有一模一樣，也沒有關係，就看誰最接近
 
-唯一不一樣的地方只是你會換最後乘上去的 value
+哪一個動物的 attribute 跟 neural network 的 output 最接近
+那個動物就是你要找的
 
-在 update 第 1 維的時候，你乘上去的 value 就是 x n 的第 1 維
+有時候 attribute 可能非常複雜
+Attribute 的 dimension 可能很大
 
-在 update 第 i 維的時候，你乘上去的 value 就是 x n 的第 i 維
+甚至可以做 attribute 的 embedding
+也就是說現在有一個 embedding space
 
-在 update 第 k 維的時候，你乘上去的 value 就是 x n 的第 k 維
+把 training data 裡的每一張 image 都透過 transform
 
-把他們全部合起來
+把他變成 embedding space 上的一個點
 
-把這邊 w 1 到 w k 串成一個 vector
+然後把所有的 attribute 也都變成 embedding space 上一個點
 
-這邊 x1(上標 n) 到 xk(上標 n) 也串成一個 vector
+g 跟 f 都可以是 neural network
 
-你得到的結果就是每次你 update w 的時候
+training 的時候就希望 f 跟 g 越接近越好
 
-你都是把 w 減掉 eta 乘上 summation over x n
+在 testing 的時候如果有一張沒有看過的 image
 
-乘上一個 weight
+這個 image 的 attribute embedding 以後，跟哪一個 attribute 最像
 
-這意味著假設我們 initialize 的時候 w 是一個 zero vector
+那就知道他是什麼樣的 image
 
-你每次在 update w 的時候
+草泥馬翻譯就是 grass-mud horse
 
-你都是加上 data points 的 Linear Combination
+我們在這邊先休息一下
 
-最後得到的 solution
+各位同學大家好，我們來上課吧
+剛才講到 Attribute embedding
 
-用 Gradient Descent 解出來的 w
+image 跟 attribute 其實都可以描述成 vector
 
-得到的結果就是 w 的 Linear Combination
+所以想要做的事情是把
 
-這個 c^n(w) 是甚麼呢
+image 跟 attribute 投影到同一個空間裡面
 
-這個 c^n(w) 是 f 對 Loss Function 的偏微分
+可以想像成是對 image 的 vector，也就是這邊的 x
 
-如果我們用 Hinge Loss
+跟 attribute 的 vector，也就是這邊的 y
 
-Hinge Loss 他像 RELU 它有兩個 operation 的 region
+都做降維，降到同樣的 dimension
 
-如果他作用在 max = 0 的 region 的話
+把 x 通過一個 function f 都變成 embedding space 上面的 vector
 
-那它的這一項就會是 0
+把 y 通過另外一個 function g 也都變成 embedding space 上面的 vector
 
-所以當你在用 Hinge Loss 的時候你的這一項往往都是 0
+要怎麼找 f 跟 g 呢
 
-也就是不是所有的 x^n 都會被拿來加到 w 裡面去
+f 跟 g 可以說是 neural network
 
-所以最後解出來的 w*
+input 一張 image，他變成一個 vector
 
-它的 Linear Combination 的 weight 可能會是 sparse
+或 input 一個 attribute 的 vector，他變成一個 vector
 
-Linear Combination 的 weight 是 sparse 的意思是
+f 跟 g 怎麼找呢
 
-可能有很多的 data point 它對應的 alpha* 值等於 0
+你的 training target 就是，你希望說，假設我們已經知道說
 
-那些 alpha* 值不等於 0 的 x^n
+這個 y1 是 x1 的 attribute，y2 是 x2 的 attribute
 
-它就是 support vector
+希望找到 f 跟 g 可以讓 x1、y1 投影到 embedding space 以後越接近越好
 
-如果 alpha = 0 就一點作用都沒有
+x2、y2投影到 embedding space 以後越接近越好
 
-對這個 model 完全沒有影響力
+如果已經把 f 跟 g 找出來了
 
-alpha 是 non-zero 的你才會決定
+假如有一張從沒見過的 image 叫 x3 在你的 testing data 裡
 
-最後的 model、parameter 長甚麼樣子
+他也可以透過 f 變成 embedding space 上的一個 vector
 
-而這些可以決定 parameter 長甚麼樣子的 data point
+接下來就看這個 embedding vector 他跟
 
-他們就叫做 support vector
-所以叫做 Support Vector Machine
+這邊有一個錯，這邊應該是 x3
 
-在 data point 裡面不是所有的點都會被選作 support vector
+這個 x3 應該跟 y3 的 embedding 最接近
 
-只有少數的點、data point 會被選作 support vector
+y3 就是他的 attribute
 
-所以 SVM 相較於其他方法可能是比較 robust 的
+再看他對應到哪一個動物
 
-如果 Loss Function 選的是 Cross Entropy
+比如說他是 grass-mud horse，所以就是草泥馬
 
-在做 Logistic Regression 選的是 Cross Entropy，就沒有 sparse 的特性
+有時候會遇到一個問題：如果根本沒有 database 呢
 
-如果你看 Cross Entropy 的 Loss Function
+根本不知道每一個動物他的 attribute 是甚麼，怎麼辦
 
-它在每一個地方微分都是不等於 0 的
+那可以借用 word vector
 
-他沒有微分等於 0 的地方，微分都是不等於 0 的
+word vector 的每一個 dimension 就代表了現在這個 word
 
-所以解出來的 alpha 就不會是 sparse
+他的某種 attribute
 
-如果用 Hinge Loss，解出來的 alpha 就會是 sparse
+所以不一定需要有個 database 去告訴你每一個動物的 attribute 是甚麼
 
-解出來的 alpha 是 sparse 的意思是
+假設有一組 word vector，這組 word vector
 
-那些不是 support vector 的 data point
+你知道每個動物他對應的 word 的 word vector
 
-把它從 data base 裡面 remove 掉，對最後的結果一點影響都沒有
+這 word vector 你就會拿一個很大的 corpus
+比如說 Wikipedia train 出來
 
-如果有一個奇怪的 outlier，只要不要把它選做 support vector
+就可以把 attribute 直接換成 word vector
 
-對你最後 train 出來的 model 就不會有任何影響
+所以把 attribute 通通換成那個 word 的 word vector
 
-而不像其他的方法
-如果用 Logistic Regression
+再做跟剛才一樣的 embedding，就結束了
 
-每一個 data 都 count
+那其實剛才的 training，這邊可以稍微講一下
 
-每一筆 data 對你最後的結果都會造成影響
+假設我們的 training的criterion 是說
 
-今天我們把 w 寫成是 data point 的 Linear Combination
+我們要讓 x^n 通過f(x)
 
-最大的好處就是我們可以使用等一下說的 kernel 的 trick
+y^n 通過 g(y)
+他的距離越接近越好
 
-這個想法是這樣
+就是找一個 f 跟 g
+Minimize f(x^n) 跟 g(y^n) 的距離
 
-我們已經知道 w 就是 data point 的 Linear Combination
+這樣子你覺得 ok 嗎？其實這樣子是會有問題
 
-本來我們的 w 可以寫成這樣
+因為這樣 model 就只會 learn 到他把所有不同的 x 跟所有不同的 y
 
-這個 w 可以把它寫成
-我們把所有 data point x^1 到 x^N 排起來
+都投影到同一點，這樣子距離最少，就停住了
+所以如果 loss function 這樣定，其實是不行的
 
-排成一個 matrix X
+所以需要稍微重新設計一下 loss function
+前面這個 loss function 只有考慮到說
 
-然後 alpha 就是一個 vector
-裡面的值是 alpha^1、alpha^2 到 alpha^N
+如果我們知道 x^n 跟 y^n 是一個 pair，要讓他越接近越好
 
-我們把這個 matrix 乘上這個 vector
+但沒有考慮到的是，如果知道 x^n 跟另外一個 y 不是同一個 pair
 
-就會得到 X column 的 Linear Combination
+他們的距離應該要被拉大
+前面這個 loss function 沒有考慮到這件事
 
-也就是 matrix X 乘上 vector alpha
+所以應該要改一下這個 loss function
+怎麼改這個 loss function 呢？
 
-w 可以寫成 matrix X 乘上 vector alpha
+一個可能是把它改成 max 裡面的兩個 element 分別是
+0 跟 k – f(x^n) ⋅ g(y^n) 加上
 
-當我們知道 w 可以這麼寫以後
+max，找一個 m 不等於 n
+f(x^n) ⋅ g(y^m)
 
-可以做甚麼呢
+k 是自己 define 的 margin
+k 是一個 constant，training 的時候必須要自己 define
 
-我們可以改一下 function 的樣子
+今天有一個 max，其中一個 element 是 0
+另外一個 element 是一個看起來很長的式子
 
-本來的 function 是寫成 (w^T) * x
+他會從 0 跟這個式子裡面選一個最大的
+所以這一項的最小值就是 0
 
-現在已經知道 w = X * alpha
+甚麼時候會等於 0
+當你不是零的這一項，他的值小於 0 的時候
 
-所以 f(x) = (alpha^T) * (X^T) * x
+這個loss就會是0
+如果 k – f(x^n) ⋅ g(y^n) 再加上後面這一項
 
-x 是一個 vector
+max，m 不等於 n，f(x^n) ⋅ g(y^m) < 0 的時候
+這一項會是 zero loss
 
-X 的 transpose 是一堆 row 疊在一起
+再整理一下，把這兩項移到右邊，把左右對調
 
-alpha 的 transpose 是一個倒下來的 vector
+就得到下面這個式子
 
-把這個 vector 乘上這個 matrix 再乘上這個 vector 得到的是一個 scalar
+如果看下面這個式子的話就比較清楚這一項的涵義是甚麼
 
-把這個 vector x 乘上這個 X 的 transpose 以後
+下面這個式子的意思是，甚麼時候會有 zero loss 呢
 
-得到的是一個 vector
-得到的結果是甚麼呢
+當 f(x^n) 跟 g(y^n) 他的 inner product 值大於另外一個
 
-得到的結果是第一個 dimension 就是 x^1 跟 x 的 inner product
+假設在所有不是 y^n 的 y 裡面
 
-第二個 dimension 就是 x^2 跟 x 的 inner product
+找一個 m 出來
 
-最後一個 dimension 就是 x^N 跟 x 的 inner product
+這個 m 是跟 f(x^n) 最接近的
 
-接下來把這個 vector 跟這個 vector 在做 inner product 以後
+就算他們的 inner product 最大
 
-得到的結果就是 f(x) 等於 summation over alpha N
+還是要比正確答案，小一個 k
 
-乘上 x^N 跟 x 的 inner product
+如果 x^n 跟 y^n 之間的 inner product 值要很大
 
-f(x) 怎麼算
+要有多大呢？要大過所有其他的 y^m 跟 x^n 的 inner product
 
-把 x 帶進來，它跟 data base 裡面的每一個 x^N
+而且要大過一個 margin，k
 
-都乘上 inner product 以後
+如果定這個式子
 
-再把 inner product 的結果用 alpha N 做 weighted sum 就是你的 f(x)
+不只是把 pair 起來的 attribute 跟 image 拉近
 
-你可能會擔心 database 每一個 x^N 算一遍 inner product 會不會很費事
+同時也要把那些不成 pair 的東西，把它拆散
 
-其實還好，因為假如用 Hinge Loss，alpha 是 sparse 的
+其實還有一個更簡單的 zero-shot learning 的方法
 
-所以只要考慮那些 alpha 不等於 0 的 vector 就好
+叫 Convex combination of semantic embedding
 
-在等一下會把 x^N 跟 x 做 inner product 這件事情
+這個方法是說，也不要做甚麼 learning
 
-寫成一個 function
+假設有一個 off-the-shelf  語音辨識系統
 
-寫一個 function k(x^n, x)
+跟一個 off-the-shelf 的 word vector
 
-k(x^n, x) 就是 x^N 跟 x 的 inner product
+這兩個可能不是自己 train，或網路上載下來的，
 
-這個 function 叫做 Kernel Function
+就可以做這件事情
 
-今天已經知道 step 1 就是把 x^N 跟 x 帶進 Kernel Function
+把一張圖丟到 neural network 裡面去
 
-再乘上 alpha^N 再 summation 以後的結果
+他沒有辦法決定他是哪一個 class
 
-在 step 2 跟 step 3 呢
-我們要 maximize 的對象變成甚麼呢
+他覺得他有 0.5 的機率是 lion，0.5 的機率是 tiger
 
-我們的 model 寫成這個樣子
+接下來再去找 lion 跟 tiger 的 word vector
 
-不知道的東西其實變成是 alpha^N
+把 lion 跟 tiger 的 word vector 用 1:1 的比例混合
 
-inner product 裡面沒有參數你本來就知道的
+0.5 tiger 的 vector 加 0.5 lion 的 vector
 
-你不知道的東西是 alpha^N
+得到另外一個新的 vector
 
-在 step 2 跟 step 3 的問題就變成
+再看哪一個 word 的 word vector 跟混合的結果最接近
 
-要找一組最好的 alpha^N
+假設是 liger 這個字最接近的話
 
-它可以讓我們的 total loss 最小
+那這個東西就是 liger
 
-這個最好的 alpha^N 可以長甚麼樣子呢
+liger 是甚麼？
 
-Loss Function 就寫成 summation over 每一筆 data 的
+liger 就是獅虎，老虎跟獅子生下的後代叫 liger
 
-小 L 的 Loss Function
+這個是 paper 裡面舉的例子
 
-小 L 的 Loss Function 它吃兩個 input
+在這邊不需要做任何 training
 
-一個是 f(x^n)，一個是 y hat of n
+只要有一組 word vector，一個語音辨識系統
 
-f(x^n) 就是 step 1 的這個 function
+就可以做這樣子的 transfer learning
 
-可以把這個 function 帶進來
+以下是這個方法的實驗結果
+我覺得其實頗驚人的
 
-他寫起來就是這個樣子
+來比一下人類跟機器的差別
+來看這個，你覺得他是甚麼
 
-f(x^n) 就是下面這一項
+來問一下大家的意見吧
+覺得是海豹的同學舉手
 
-因為 summation over n 前面已經用過了
+覺得是海象的同學舉手
+覺得是海獅的同學舉手
 
-所以這邊 summation over n'
+機器覺得怎樣呢
+假設沒有做 transfer learning
 
-但是都是 summation over 所有的 training data
+直接拿一個 CNN
+他覺得最有可能是 sea lion，是海獅
 
-觀察投影片上的所有式子你會發現
+其他也是奇奇怪怪的
+cowboy boot，也滿像 cowboy boot
 
-我們不再需要真的知道 x 的 vector 是多少
+他說是海獅，如果你答海獅，你跟 machine 同一個等級
+正確答案 Stellar sea lion，北海獅
 
-真正需要知道的其實只有 x 跟另外一個 vector z 他們之間的 inner product 值
+這 ImageNet 其實是一個很崩潰的 corpus
+這是很崩潰的 task
 
-或者是只要知道 Penal Function 就可以做所有的 optimization
+在這種 task 上就覺得說機器是有可能贏過人的
+我覺得應該不可能有人答得出正確答案
 
-今天只需要知道 K(x^n', x^n) 的 value 是甚麼
+DeViSE 是另一個方法
 
-只需要知道 K(x^n, x) 的 value 是甚麼
+是剛才講的把 word vector 跟 image project 同一個 embedding space 上的結果
 
-並不需要真的去知道 x^n 跟 x 他的 vector 長甚麼樣子
+在這邊的結果並沒有很好
+比較荒謬的答案比如說 flip-flop
 
-我只要能夠算個出這一項、這一項其實就結束了
+這個是剛才講的完全不用 training 的方法
+結果很驚人，他的前五名裡面有北海獅
 
-等一下會看到這招可以給我們帶來一些好處
+而且其他答案也都是海獅
 
-這招就叫 Kernel Trick
+California sea lion，Australian sea lion，South American sea lion
 
-Kernel Trick 不是只能用在 SVM 裡面
+這邊有舉另外一個例子，剛剛用草泥馬當例子
 
-如果你回過頭去看 w 等於 data 的 Linear Combination 這件事情
+那個例子並不是亂取的，因為 ImageNet 裡面真的有草泥馬
 
-其實不是只有 SVM 適用，Logistic Regression 也可以用同樣的方法
+這個大家都知道是草泥馬
+machine的答案是這樣子
 
-所以你也可以有 Kernel based 的 Logistic Regression
+第一名是 Tibetan mastiff，是獒犬
 
-Linear Regression 也可以用同樣的方法
+然後是 titi monkey我也不知道是甚麼
 
-所以你也可以有 Kernel based 的 Regression
+然後 Koala，然後 chow-chow 好像是鬆獅狗之類的
 
-這些都是可以的，只是這些都不限在 SVM 上面
+他其實滿像獒犬的
 
-Kernel Trick 怎麼用呢
-Kernel Trick 是這樣
+llama 其實就是草泥馬
 
-我們之前有說過如果是 Linear 的 model
-他有很多的限制
+表面上看起來有答對，其實沒有答對
 
-可能要對 input 的 feature 做一個 Feature Transform
+因為答案是另外一種 lama
 
-他才能用 Linear model 來處理
+如果你有看過草泥馬傳奇的話
 
-如果在 Neural Network 裡面就好幾個 Hidden Layer 來做 Feature Transform
+其實是部落裡面最強的騎手才能騎牠
 
-假設有一筆 data
+草泥馬有很多種，至少有三種
 
-他是二維的 x1, x2
-想要先對他做 Feature Transform
+這種是最強的，反正不是 llama 就對
 
-在 Feature Transform 上面再去 apply Linear SVM
+llama 的臉是尖的
 
-在 Feature Transform 以後再去 apply Linear Model
+這種的臉是圓的
 
-假設 Feature Transform 的結果是我們把 phi(x)
+這個方法得到比較怪的結果
 
-變成 (x1)^2, 更號2 * x1 * x2 跟 (x2)^2
+其實這個 task 有點難，這可能是一個比較失敗的例子
 
-想要考慮 feature 和 feature 之間，也就是 x1 和 x2 之間的關係
+這個 network 也沒有得到正確的結果
 
-如果要算 K(x, z) 的時候
+它得到最接近的 domestic llama
 
-想要算 x 跟 z 的 Kernel Function
+Zero-shot learning 剛才舉的例子都是影像的例子
 
-也就是 x 跟 z 做完 Feature Transform 以後，做 inner product 的值
+最後舉一個文字的例子
 
-可以怎麼做呢
-最簡單的方法就是我把 x 跟 z
+這個結果滿新的，這個結果最近才被放到 arXiv 上面
 
-都帶到這個 Feature Transform 的 function 裡面
+是 google 的 paper
 
-把他們變成新的 feature
+現在不只要放 arXiv 還要做漂亮的動畫在部落格上面
 
-變成新的 feature 就可以直接做 Inner Product
+這個是做 machine translation
 
-算出來的結果就是這樣
-國中生都會算的東西
+在 training 的時候
 
-可以把這一項做一下轉化
+machine 看過如何把英文翻成韓文，有這種 data
 
-這一項是 (x1)^2 * (z1)^2 + 2(x1)(x2)(z1)(z2) + (x2)^2 * (z2)^2
+它知道怎麼把韓文翻成英文，有這種 data
 
-它可以被簡化成 ((x1)(z1) + (x2)(z2))^2
+它知道怎麼把英文翻成日文，有這種 data
 
-((x1)(z1) + (x2)(z2))^2 是甚麼
+它知道怎麼把日文翻成英文，有這種 data
 
-((x1)(z1) + (x2)(z2))^2 正好就是 [x1, x2], [z1, z2] 這兩個 vector 的 Inner Product
+接下來它從來沒有看過日文翻韓文的 data，但是它可以翻
 
-所以說我們把 x 跟 z
+它從來沒有看過韓文翻日文的 data，所以它也可以翻
 
-做 Feature Transform 再做 Inner Product
+這件事情怎麼做到的
 
-等同於他們在原來 Feature Transform 之前的 space 上面
+如果看部落格的文章，好像有第二版本的 title 很聳動
 
-先做 Inner Product 以後再平方
+Google 的 machine，發明了自己的 sequence language
 
-那這招有時候可以給我們帶來好處
+後來標題就被偷偷改了，後來看到有另外一個版本的標題
 
-因為有時候直接計算這個結果
+那篇部落格可能也不是 google 寫的
 
-直接計算 x 跟 z 帶進 Kernel Function 以後的 output
+為甚麼 Zero-shot learning 在這個 task 是可行的
 
-會比先做 Feature Transform 再做 Inner Product 還要更快速
+因為如果用同一個 model 做了不同語言之間的 translation 以後
 
-舉例來說，假設現在要做的事情是
+machine 可以學到的事情是怎樣的呢
 
-我的 x 跟 z 都不是 2 維，是高維，是 k 維
+它可以學到對不同語言的 input
 
-想要把她投影到一個更高維的平面
+都把不同語言的不同句子 project 到同一個 space 上面
 
-這更高維裡面，會考慮所有 feature 兩兩之間的關係
+而在這個 space 上面，它是 language independent 的
 
-假設原來有 k 維
+這個 space 上面的位置，只跟這個句子的 semantic 有關
 
-在更高維的平面就至少是 (C k 取 2) 維
+舉例來說，這個是 paper 裡面的例子
 
-要考慮所有 feature 之間兩兩關係
+這個 paper 說根據 learn 好的 translator
 
-所以 phi(x) 就是 (x1)^2 到 (xk)^2
+translator 有一個 encoder，它會把 input 的句子變成一個 vector
 
-√2(x1)(x2), √2(x1)(x3), √2(x2)(x3) 以此類推
+一個 decoder，根據這個 vector，解回前一個句子，就是翻譯的結果
 
-如果用 Kernel Trick 的話可以輕易的把
+如果把不同的語言，都丟到這個 encoder 裡面
 
-phi(x) 跟 phi(z) 的 Inner Product 的結果輕易的算出來
+讓它變成 vector 的話
 
-怎麼算呢？其實 phi(x) 跟 phi(z) 的 Inner Product 就是
+這些不同語言的不同句子，在這個 space 上的分佈有什麼樣的關係呢
 
-(x · z)^2
+比如說這三個，英文、韓文和日文的三個句子
 
-直接把 x 跟 z 做 Inner Product 再平方
+這三個句子講的是同一件事情、是一樣的意思
 
-只需要算 k 個 element 的相乘再做一次平方就好
+通過 encoder 的 embedding 以後，他們在 space 上面其實是差不多的位子
 
-但是如果先把他 project 到 high dimension 再做 Inner Product 的話
+其實就是在這個位置
 
-這個 dimension 很大，是 (C k 取 2) 維
+在這個圖上，不同的顏色代表同樣的意思
 
-如果 feature、dimension 越大，k 值的話
-這個 feature 就越長
+這些句子雖然是同樣的意思，但可能來自於不同的語言
 
-先做完 Feature Transform 再做 Inner Product 是會比
-先做 Inner Product 再取平方運算量還要大
+比如說這邊含紅色的這三條線
 
-這個是比較快的
+他們在這個 space 上面是在一起，代表同樣的意思
 
-這個平方可以拆成 ((x1)(z1) + (x2)(z2) + ⋅⋅⋅ + (xk)(zk))^2
+但其實他們來自於不同的語言
 
-這個平方展開的話裡面有二次項裡面有 (x1)^2 * (z1)^2, (x2)^2 * (z2)^2 等等
+你說這樣子算 machine 發明了一種新語言
 
-會有兩兩相乘的 2(x1)(x2)(z1)(z2) + 2(x1)(x3)(z1)(z3)
+其實也算是，如果把 embedding space 當作一種新的語言的話
 
-2(x2)(x3)(z2)(z3), 2(x2)(x4)(z2)(z4) 等等
+machine 做到的就是發現了一種 sequence language
 
-把 x 集中到一邊就可以得到這個 vector
+對每一種不同的語言，都先轉成只有他自己知道的 sequence language
 
-把 z 集中到另外一邊就得到 z 做完 Feature Transform 的東西
+再從這種 sequence language 轉成另外一種語言
 
-所以這一項呢
+就算是有某一個發音的 task，input 語言和 output 語言是 machine 沒有看過的
 
-就會等價於先做 Feature Transform 再做 Inner Product
+它也可以透過這種它自己學出來的 sequence language
+來做 translation
 
-還有一些更驚人的結果
+這邊是更多的 Zero-shot learning 的 paper給大家參考
 
-做 Kernel Basis 的
+其實 Zero-shot learning 像剛才看到用在 image 分類上面
 
-做 RBF Kernel
+其實現在也可以用在 caption generation 上
 
-做 RBF Kernel 的意思是
+希望 machine 如果看到一個從來沒看過的東西
 
-K(x, z) 就等於 x 跟 z 的距離乘上 (-1/2) 再取 exponential
+它也可以用自然語言來描述它現在到底看到甚麼、或看到甚麼動作
 
-這個東西就是在衡量 x 跟 z 之間的相似度
+剩下一點點部分
 
-如果 x 跟 z 越像 Kernel 的值就越大
+所以你遇到一個狀況是
 
-如果 x = z 的話，值就是 1
+target data 有 label，source data 沒有 label
 
-如果 x 跟 z 完全不一樣的話
+剛剛講的狀況都是 source data 有 label 的狀況
 
-它們的值就是 0
+有時候會遇到 source data 沒有 label 的狀況
 
-這個式子 exp((-1/2) ||x-z||2) 其實也可以化成
+但是 target data 可能有 label，可能沒有 label
 
-兩個 high dimension 的 vector 做 Inner Product 以後的結果
+這種 target data 有 label，source data 沒有 label 的狀況
 
-這兩個 vector 其實他們的 dimension 是有無窮多維
+叫做 Self-taught learning
 
-本來如果要把一個 x project 到無窮多維再做 Inner Product，你做不到
+target data 有 label，source data 沒有 label，這種是 Self-taught learning
 
-因為無窮多維是什麼樣的根本就不知道
+target data 沒有 label，source data 也沒有 label，這種是 Self-taught clustering
 
-但是如果直接算 x 跟 z 的距離
+在 Self-taught learning 裡面，作者強調這跟一般的 transfer learning 是不一樣的
 
-然後再乘 -1/2 再取 exponential
-其實等同於在無窮多維的空間裡面去做 Inner Product
+這個名詞都是大家自己定的
 
-無窮多維的空間長甚麼樣子
+在 Self-taught learning 作者裡面，它的想法是 transfer learning 是有 label 的
 
-可以把 exp((-1/2) ||x-z||2)
+在 source domain 是有 labeled data 的才叫 transfer learning
 
-變成 exp((-1/2) ||x||2 - (1/2) ||z||2 + x ⋅ z)
+Self-taught learning 不算是一種 transfer learning
 
-接下來把 x 的 norm、z 的 norm 這兩項提出來
-剩下 exp(x ⋅ z)
+不過後人都把 Self-taught learning 當作是一種 transfer learning
 
-把 x 的 norm 這一項用 Cx 來表示它，它跟 x 有關
+這個只是文字上面枝枝節節的小問題
 
-這一項用 Cz 來表示它，它跟 z 有關
-剩下 exp(x ⋅ z)
+有一個要強調的是 Self-taught learning 跟 semi-supervised learning 有一些不一樣的地方
 
-exp(x ⋅ z) 用泰勒展開式、用 Taylor Expansion 就變成
+Semi-supervised learning 在 learning的時候，也是有一些 labeled data
 
-它等於 Cx * Cz summation over i = 0 到無窮大
+一些 unlabeled data
 
-((x ⋅ z)^i)/ i!
+可以說 source data 是 unlabeled data，target data 是 labeled data
 
-這個有無窮大項
-從 0 次方一直 summation 到無窮多次方
+這也是一種 semi-supervised learning
 
-如果把它展開的話看起來就像這樣
+這種 semi-supervised learning 跟一般 semi-supervised learning 有一些不一樣
 
-CxCz + CxCz ( x ⋅ z ) + CxCz(1/2)( x ⋅ z )^2 ⋅⋅⋅
+一般 semi-supervised learning 會假設那些 unlabeled data 至少還是跟 labeled data是比較有關係的
 
-如果把每一項都拆開的話會得到甚麼
+但在 Self-taught learning 裡面
 
-Cx 跟 Cz 可以看成是兩個 vector
+那些 unlabeled data、那些 source data，跟 target data 關係比較遠
 
-他們都只有一個 dimension
+其實 Self-taught learning 概念很簡單
+假設 source data 夠多，雖然它是 unlabeled
 
-一個是 Cx，一個是 Cz 的 Inner Product
+可以去 learn 一個 feature extractor
+在原始的 Self-taught learning paper 裡面
 
-這一項可以看成是把原來 x 的 vector 乘上 Cx
+他的 feature extractor  是 sparse coding
+因為這 paper 比較舊，大概十年前
 
-把 z 的 vector 乘上 Cz 再做 Inner Product 以後的結果
+現在也不見得要用 sparse coding 也可以 learn
 
-這一項 x 跟 z 的平方
+比如說 auto-encoder
 
-x 跟 z 先做 Inner Product 再平方
-剛剛在前面例子已經看過
+用 auto-encoder 跟 decoder 來做feature extractor
 
-其實可以拆成兩個 high dimension 的 vector 再 Inner Product
+總之，有大量的 data，他們沒有 label
 
-所以 x 跟 z 的平方等於兩個 high dimension 的 vector 做 Inner Product 的結果
+可以做的是用這些 data learn 一個好的 feature extractor
 
-這 high dimension 的 vector 它會考慮兩個 dimension 之間的關係
+用這些 data learn 一個好的 representation
 
-如果是三次方它就會考慮三個 dimension 之間的關係
+用這個 feature extractor 在 target data 上面去抽 feature
 
-現在把屬於 x 的 vector 都串起來
+在 Self-taught learning 原始的 paper 裡面
 
-串成一個很長的 vector
+其實做了很多 task，這邊不要一一細講
 
-屬於 z 這邊的也都串起來
+這些 task 都顯示 Self-taught learning 是可以得到滿顯著的 improvement
 
-因為這邊有無窮多項
-
-所以串起來以後 x 跟 z 都有各自無窮長的 vector
-
-他們做 Inner Product 最後得到的結果
-
-就是這個 Kernel 所給你的結果
-
-所以使用 RBF Kernel 的時候
-
-就是在無窮多維的平面上去做事情
-
-不過如果在無窮多維的平面上做事情
-
-可以想像它其實是滿容易 Overfitting
-
-所以如果用 RBF Kernel 有時候要小心
-
-可能在 training data 上得到很好的 performance
-
-但是在 testing data 上得到很糟的 performance
-
-你也可以做 Sigmoid Kernel
-
-Sigmoid Kernel 是 K(x, z) = tanh(x · z)
-
-至於 tanh(x · z) 是哪兩個 high dimension vector 做 Inner Product 的結果
-
-自己回去用 Taylor Expansion 展開來看就知道了
-
-之前已經說過
-
-當要把 x 拿來做 testing 的時候、帶到 f 裡面的時候
-
-其實是計算 x 跟所有 training data 裡面的 x^n 的 Kernel 的 function output 然後再乘上 alpha n
-
-如果用的是 Sigmoid Kernel 的時候
-
-就是把 data 裡面所有的 x n 跟 x 做 Inner Product
-
-再去 Hyperbolic Tangent 再乘 alpha n 再全部合起來以後的結果
-
-如果用的是 Sigmoid Kernel
-
-這個 f(x) 就可以想成它其實是一個只有一個 hidden layer 的 Neural Network
-
-把 x 拿進來，它會跟所有的 x n 都做 Inner Product
-
-再通過 Hyperbolic Tangent
-
-對每一個 x 做 Inner Product 這件事情
-
-就好像是有一個 neural 它的 weight 就是某一筆 data
-
-把 x1 那一筆 data 拿出來當作這個 neural 的 weight
-
-把 x2 那一筆 data 拿出來當作第二個 neural 的 weight
-
-一直到把第 n 筆 data 拿出來當作第 n 個 neural 的 weight
-
-把他們都通過 Hyperbolic Tangent 得到 output
-
-然後再把它全部乘上 alpha
-
-然後把他們全部加起來
-
-突然發現我犯了一個錯
-這個 alpha 應該要下標
-
-上標下標都可以
-前面是下標，後面也要是下標才合適
-
-我們找出這些 alpha 把它 Weighted Sum 起來就得到最後的 f(x)
-
-這就是一個 Neural Network 只是它只有一個 Hidden Layer
-
-在這個 Neural Network 裡面它裡面的每一個 neural 的 weight
-
-就是某一筆 data
-
-那 neural 的數目呢
-
-neural 的數目就是看有幾個 support vector 就有幾個 neural
-
-既然有了 Kernel Trick，其實可以去直接設計 Kernel Function
-
-可以根本完全不用理會 x 跟 z 的 feature 長甚麼樣子
-
-只要有一個 Kernel Function 可以把 x 跟 z 這兩個東西帶進去
-
-它可以給你一個 value
-
-這個 value 代表了 x 跟 z 在某一個高維平面上的 vector 的 Inner Product 的話
-
-你根本就不需要在意 x 跟 z 他們的 vector 長甚麼樣子
-
-甚麼時候這招會有用呢
-假設 x 是有 structure 的 data
-
-比如說它是一個 sequence
-
-如果是一個 sequence 的話，其實不容易把 sequence 表示成 vector
-
-假設每一個 sequence 長度都不一樣
-
-就不容易把這些不同長度的 sequence 都用一個 vector 來描述他
-
-所以你根本不知道 x 長甚麼樣子
-你就不知道 phi(x) 應該長甚麼樣子
-
-但是可以直接定它的 Kernel Function
-
-我們知道 Kernel Function 就是投影到高維以後的 Inner Product
-
-所以 Kernel Function 往往就是一個類似 similarity 的東西
-
-如果你可以定一個 Function
-它是 evaluate x 跟 z 的 similarity
-
-就算 x 跟 z 它是有 structure 的 object
-
-比如說它是 tree structure
-
-它是 sequence 也沒有關係
-只要知道怎麼算兩個 sequence 之間的 similarity
-
-只要知道怎麼算兩個 tree structure similarity
-就有機會把它的 similarity 當作 Kernel 來使用
-
-你可能會懷疑
-我胡亂定一個 similarity
-
-它背後有 feature vector 可以 support 它嗎
-
-我們說這個 Kernel 是兩個 vector 做 Inner Product 以後的結果
-
-你胡亂定一個 function 它可以拆成兩個 vector Inner Product 以後的結果嗎
-
-不是所有的 function 都可以，但是有一個叫 Mercer's theory
-
-可以告訴你那些 function 是可以的
-
-所以你有辦法 check 定出來的 Kernel Function 它背後有沒有兩個 vector 做 Inner Product 這件事情
-
-也是可以 check 的
-
-所以在語音上，假設現在要做的分類對象
-其實是 Audio Segment
-
-Audio Segment，每一個 segment、每一段聲音訊號就是會用 vector sequence 來描述他
-
-每一段聲音訊號長度都不一樣
-
-所以 vector sequence 長度可能都不一樣
-
-現在做的 task 可能是
-
-給你一段聲音訊號，這是分類的問題
-它要看這段聲音訊號裡面語者的情緒
-
-它可能分成高興、生氣等等之類的
-
-要把它做分類
-
-你想要用SVM，但是一段聲音訊號沒有辦法直接用一個 vector 來描述他
-
-怎麼辦
-你可以直接定它的 Kernel
-
-就不要管一段聲音訊號變成 vector 之後長甚麼樣子
-
-直接定它的 Kernel
-直接定一個 function K(x, z)
-
-然後把 x 是一段聲音訊號帶進去
-
-z 是另外一段聲音訊號帶進去的時候
-
-這個 function 的 output 應該是甚麼
-
-你定好這個你就可以直接用 Kernel Trick 在 SVM
-
-就算你不知道一段聲音訊號描述成一個 vector 應該是甚麼樣子
-
-怎麼定兩個 sequence 間的 Kernel
-
-我就把 reference 留在這邊給大家參考
-
-其實在這邊還有很多，比如說 SVM 可以做 Regression
-
-SVM 做 regression 就是 Support Vector Regression
-
-它的精神是這樣，用幾句話講一下它的精神
-
-它的精神是，原來在做 Regression 的時候希望 model 的 output 跟 target 越近越好
-
-如果做 Support Vector Regression 的時候
-
-近到某一個距離裡面
-
-我本來想說某一個劍圍的距離
-但我想大家不知道甚麼是劍圍就算了
-
-張遼的劍圍
-算了我覺得這太沒有關係了
-
-進入 target 某一個距離裡面
-
-它的 loss 就是 0
-這個是 Support Vector Regression
-
-Ranking SVM
-
-Ranking SVM 常常被用在當你要考慮的東西是一個排序是 list 的時候
-
-比如說在 final project 裡面不是有個 recommendation 的題目
-
-他要你的 output 是一個 list
-
-你可以說我把它當作是一個 regression 的題目
-
-我給每一個 element 一個分數
-然後按照分數由高到低做搜索
-
-但這樣並沒有直接 optimize 你的問題
-
-其實可以直接考慮這個 list 的 ranking
-
-如果直接考慮 ranking 的 SVM 叫做 Ranking SVM
-
-或許在 final project 裡面用的到這個東西
-
-還有另外一個東西叫 One-class SVM
-
-它是會希望說屬於 positive 的 example 都自成一類
-
-negative 的 example 就散佈在其他地方
-
-這個都留一些 reference 給大家參考就好
-
-我們可以比較一下 Deep Learning 跟 SVM 的差別
-
-Deep Learning 的前幾個 layer 可以看作是 Feature Transformation
-
-最後一個 layer 可以看作是 Linear Classifier
-
-SVM 做的也是很類似的事情
-
-它前面先 apply 一個 Kernel Function
-
-把 feature 轉到 high dimension 上面
-
-在 high dimension space 上面就可以 apply Linear Classifier
-
-在 SVM 裡面一般 Linear Classifier 都會用 Hinge Loss
-
-事實上 SVM 的 kernel 是 learnable
-
-我列了一個 reference 給大家參考，事實上它是 learnable
-
-但是它沒有辦法 learn 的像 Deep Learning 那麼多
-
-你可以做的是你有好幾個不同的 kernel
-
-然後把不同 kernel combine 起來
-
-他們中間的 weight 是可以 learn 的
-
-當你只有一個 kernel 的時候
-
-SVM 就好像是只有一個 Hidden Layer 的 Neural Network
-
-當你把 kernel 在做 Linear Combination 的時候
-
-他就像一個有兩個 layer 的 Neural Network
-
-臺灣大學人工智慧中心
+台灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw

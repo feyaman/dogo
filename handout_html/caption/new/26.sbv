@@ -1,1691 +1,2541 @@
-台灣大學人工智慧中心
+臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-Transfer learning 指的意思是甚麼？
+那我們上次講了 generation 這件事情
 
-Transfer learning 指的意思是說
+然後，可以用 PixelRNN 來做
 
-假設你現在手上有一些跟你現在進行的 task 沒有直接相關的 data
+這邊 create 了一個 generative 的 task
 
-能不能用這些沒有直接相關的 data，來幫助我們做一些甚麼事情
+上次還講了 VAE
 
-比如說你現在要做的是，貓跟狗的 classifier
+我們沒有講太多它的原理
 
-那所謂的沒有直接相關的 data，是甚麼意思呢？
+我們來複習一下 VAE 做的事情
 
-所謂的沒有直接相關，有很多不同的可能
+Auto-encoder 我想大家都很熟悉了
 
-一個可能是，input 的 distribution 是類似的
+那 VAE 做的事情是甚麼呢？
 
-比如說，input distribution 一樣是動物的圖片
+VAE 做的事情是說
 
-但是 task 裡的 label 是無關的
+你一樣有一個 encode，有一個 decoder
 
-比如說現在你的另外一些 data 其實是要分大象跟老虎
+你現在 decoder 會 output 兩組 vector
 
-input domain 是像的，但是你的 task 是不一樣的
+這邊一組是 m1 到 m3
 
-還有另外一個可能是，input domain 不一樣，但 task 是一樣的
+另外一組是 σ1 到 σ3
 
-一樣是做貓跟狗的分類，但是圖片是招財貓和高飛狗的圖片
+接下來，你會 generate 一個 normal distribution
 
-跟原來圖片的 distribution 是非常不像的，但要做的task是一樣的
+你會 generate 一個 vector
 
-transfer learning 要問的問題就是，我們能不能夠在有一些不相干的 data 的情況下
+這個 vector 是從 normal distribution sample 出來的
 
-然後來幫助我們現在要做的 task
+接下來，你把 σ 這個 vector 取 exponential
 
-為甚麼我們要考慮 transfer learning 這樣的 task 呢？
+然後，再乘上 random sample 出來的這個 vector
 
-舉例來說，在 speech recognition 裡面
+再加上原來 m 這個 vector
 
-可能你現在要做的事情，是台語的語音辨識
+得到你的 code, c，然後把那個 code 丟進
 
-但是台語的 data 是很少的
+decoder 裡面，產生 image，那你希望說
 
-但其實，語音的 data 是很容易蒐集的，你隨便去 YouTube 爬一下，就可以爬到一大堆英文、中文、其他語言的 data
+input 跟 output 越接近越好
 
-那我們能不能夠用其他語言的 data，來 improve 台語的語音辨識這件事情
+另外 Auto-encoder 還有另外一項 constraint
 
-或者是如果在 image recognition 裡面，或許是現在有興趣的 task 是做 medical 的image
+那我回去的時候，我發現我上次的投影片呢
 
-你想要讓機器自動診斷說，有沒有 tumor 之類的，這是現在很流行做的事情
+寫的是相反的，所以
 
-可是這種 medical的image 其實是很少的，不可能手上有太多這種 image
+差了一個負號
 
-但是實際上 image 的 data 我們永遠都不缺
+所以如果按照原來的寫法，這邊應該是 maximize
 
-胡亂網路爬就有一大堆 image
+那如果是用 minimize 的話，下面就應該再加一個負號
 
-或 download MNIST，裡面有超過一百萬張 image
+再來的問題就是
 
-有這麼多 image，只是不是 medical 的 image
+為甚麼要用 VAE 這個方法
 
-這些其他的 image 對你現在要考慮的 task，有沒有可能有幫助
+原來的 Auto-encoder 會有甚麼樣的問題呢？
 
-或者是在文件的分析上，你現在要分析的文件
+如果你看文獻上的話
 
-是某個很 specific 的 domain，比如說你想要分析的是，某種特別的法律的文件
+VAE，如果你看它原來的 paper 的話
 
-那這種法律的文件或許 data 很少，但是假設你可以從網路上 collect 一大堆的 data
+它有很多很多的式子，你就會看的一頭霧水的
 
-那這些 data，有沒有可能是有幫助的
+那在講那些式子之前呢
 
-那其實 transfer learning 這件事情可能嗎？
+我們先來看 intuitive 的理由
 
-用不相干的 data、來自其他 domain 的 data
-來幫助我們現在的 task 是有可能的嗎
+為甚麼要用 VAE？
 
-是有可能的，因為我們在現實生活中，我們都是不斷的在做 transfer learning
+如果是原來的 Auto-encoder 的話
 
-比如說，你可能是一個研究生，你可能想要知道研究生應該怎麼樣過日子
+原來的 Auto-encoder 它做的事情是
 
-那怎麼辦呢？你就可以參考"爆漫王"這樣子
+我們把每一張 image
 
-那在"爆漫王"裡面呢，其實漫畫家就是研究生
-責編就等同於指導教授
+變成一個 code，假設我們現在的 code 是一維
 
-漫畫家每周就要畫分鏡去給責編看，跟責編討論
+就是圖上的這條紅色的線
 
-每周跟指導教授進度報告一樣，畫分鏡就是跑實驗
+那你把滿月的這個圖
 
-目標就是要在 jump 上連載，在 jump 連載就是投稿期刊
+變成 code 上的一個 value
 
-連 word embedding 都知道這件事情
+然後，再從這個 value 做 decode
 
-雖然我們沒有研究生的守則，但是從"爆漫王"裡面，我們可以知道身為一個研究生
+把它變成原來的圖，那如果是弦月的圖
 
-應該要做什麼樣的事情
+也是一樣變成 code 上的一個 value
 
-你可能會覺得說，拿漫畫來跟神聖的研究做類比，有點不倫不類
+接下來，你再把它從 code 上的一個 value 變回原來的圖
 
-我跟你說，漫畫家都是用生命來畫漫畫的，其實比我們做研究認真多了
+假設我們今天是在滿月和弦月的 code 中間
 
-我不知道大家有沒有看過"爆漫王"，我簡介一下"爆漫王"的劇情，用三十個字
+sample 一個點，你覺得它原來
 
-"爆漫王"就是說有兩個高中生，一個叫真城，一個叫高木
+然後，再把這個點做 decode
 
-他們不知道怎麼回事，就很想當漫畫家，後來就當了漫畫家
+變回一張 image，它會變成甚麼樣子呢？
 
-有一次，因為每週都要連載，實在太累了，真城就累到要住院、開刀
+你心裡或許期待著說
 
-住院的時候，他手還握著畫筆畫漫畫，大家都阻止他
+它會變成滿月和弦月中間的樣子
 
-他女朋友來看他，決定要支持他，他女朋友握著他的手繼續畫下去
+但是，這只是你的想像而已
 
-這個就好像說，你今天在做研究的時候，你覺得每周都進度報告太累了
+其實，因為我們今天用的 encoder 和 decoder
 
-譬如說累到生病住院了，其他人都叫你不要再做研究
+我們今天用的 encoder 和 decoder，它都是 non-learner
 
-你女朋友來看你，把你的手壓在鍵盤上，繼續寫 code
+它都是一個 neural network
 
-比如說裡面有一個天才漫畫家，叫新妻惠一兒
+所以，你其實很難預測說
 
-應該在影射尾田榮一郎，新妻惠一兒想要結束他現在的連載
+在這個滿月和弦月中間到底會發生甚麼事情
 
-跟總編說要結束現在的連載，他跟總編談一個條件
+你可能想像是，滿月和弦月中間的月象
 
-我從現在開始接下來十周，我都要是 jump 人氣第一名
+但未必，它可能根本就是另外一個東西
 
-如果我做到的話你就要讓我結束連載，如果做不到我就繼續畫到死為止
+那如果用 VAE 有甚麼好處呢？
 
-叫你跟指導教授說我做這個題目很膩，我想要畢業
+如果用 VAE 的好處是
 
-指導教授說你接下來連發十篇 paper 都拿 best paper award 我就讓你畢業
+實際上，VAE 在做的事情
 
-如果做不到就繼續做到死為止，就是這個概念
+就等於我下面說的這件事情
 
-他們是比我們還要認真很多的，所以我覺得研究生都應該看一下"爆漫王"
+當你把這個滿月的圖變成一個 code 的時候
 
-transfer learning 是這樣子的，transfer learning 有很多很多的方法
+它會在這 code 上面再加上 noise
 
-他是很多方法的集合，你以下聽到的 terminology，這個地方有點混亂
+它會希望，在加上 noise 以後
 
-不同的文獻，他用的詞彙其實是不一樣的
+這個 code reconstruct 以後，還是一張滿月
 
-有些方法有人說算是 transfer learning
-有些方法有人又說不算是 transfer learning
+也就是說，原來的 Auto encoder 只有這個點
 
-這邊是很混亂的
+需要被 reconstruct 回滿月的圖
 
-如果你看到我跟別人說的不一樣，並不是我錯，或者是別人錯
+但是對 VAE 來說，你會將上 noise
 
-這個地方就是很混亂
+在這個範圍之內的圖 reconstruct 回來以後
 
-你只要知道那個方法是甚麼就好了
+都應該仍然要是滿月的圖
 
-我們講法是我們現在有一個我們想要做的 task
+這個弦月的圖也是一樣
 
-有一些跟這個 task 有關的 data，這個叫做 target data
+弦月的 code 再加一個 noise
 
-我們有一些 data 是跟這個 data 無關的 data，這個 data 叫做 source data
+reconstruct 回來以後
 
-target data 他有可能是有 label，也可能沒有 label
-source data 也有可能是有 label，也有可能沒有 label
+這個 range 的 code 都要變成弦月的圖
 
-所以現在我們會有四種可能，之後我們會分這四種可能來討論
+你會發現說，在這個位置
 
-Transfer learning 我們可以分成四個不同的象限來討論他
+在這個地方，這個 code 的點
 
-我們的 data 分成兩種，一種是 target data，一種是 source data
+它同時希望被 reconstruct 回弦月的圖
 
-所謂的 target data 是跟我們現在考慮的 task 是直接相關的
+同時也希望被 reconstruct 回滿月的圖
 
-source data 跟我們現在考慮的 task 沒有直接的關係
+那可是你只能夠 reconstruct 回一張圖而已
 
-甚麼叫做"沒有直接的關係"，這個定義是比較模糊的
+怎麼辦？
 
-有很多不同的定義方式
+那 VAE training 的時候
 
-雖然 input 都是 image，但 image 的 distribution 是很不一樣的
+你要 minimize  這個 mean square error
 
-比如說一個是真正的實物 image，一個是動畫的 image
+所以，最後產生這個位置
 
-他們就差很多，那就可以算是和這個 task 沒有直接相關
+所產生的圖
 
-我們可以分成我們的 target data 有可能是有 label 的，有可能是沒有 label 的
+會是一張介於滿月和弦月中間的圖
 
-source data，也可能同時是有 label 的，也可能是沒有 label 的
+同時讓它最像滿月，也最像弦月
 
-總共有四種可能，分別對這四種可能的情況，介紹些方法
+那你產生的圖會是甚麼樣子呢？
 
-我們先來講，假設我們現在我們的 target data 跟 source data 同時都有 label 的情況下
+或許就是，界於滿月和弦月之間的月象圖
 
-我們可以做甚麼事情
-最常見的也最簡單的作法就是 fine-tune 你的 model
+所以，如果你用 VAE 的話
 
-甚麼意思呢？ 我們先來看一下我們現在的 task
+你從你 code 的 space上面
 
-在我們 task 裡面，我們的 target 和 source data 通通都有 label
+去 sample 一個 code
 
-target data 我們就用上標 t 來表示
+在產生 image 的時候
 
-target data 裡有我們要找的 function 的 input，x 上標 t，跟他的 output，y 上標 t
+你可能會得到比較好的 image
 
-source data 裡有 function 的 input，x 上標 s，跟 y 上標 s
+如果是原來的 Auto-encoder 的話
 
-通常我們會假設 target data 的量非常少
+你 random sample 一個 point
 
-如果 target data 量很多，就當作一般 machine learning 的 problem
+你得到的，可能看起來都不像是一個真實的 image
 
-直接拿 target data 來 train 你的 model 就好了
+所以，VAE 就是這樣
 
-也不需要做 transfer learning
+這個 m，這個 encoder 的 output, m 代表是原來的 code
 
-在做 transfer learning 的假設是 target data 的量是非常少的
+那這個 c，代表是加上 noise 以後的 code
 
-而 source data 是很多的，雖然 source data 跟我們的 task 沒有關係
+decoder 要根據加上 noise 以後的 code
 
-但我們想知道說，在 target data 很少的情況下
+把它 reconstruct 回原來的 image
 
-如果有一大堆不相干的 source data
-到底有沒有可能會有幫助
+那這個 σ 跟 e 是甚麼意思呢？
 
-如果今天 target data 的量非常少，少到只有幾個 example
+這個 σ，它就代表了
 
-這個叫做 one-shot learning
+現在這個 noise的 variance
 
-從名字來看好像只有一個 example，所以叫 one-shot
-但有時候也不見得只有一個 example 才能稱之為 one-shot
+它代表了你的 noise 應該要有多大
 
-反正意思就是如我 target data 的量非常非常少，你可以說你在做 one-shot learning
+因為 variance 是正的
 
-這樣子的 task 有什麼樣的例子呢
+所以，這一邊會取一個 exponential
 
-語音上最典型的例子呢，就是 speaker 的 adaptation
+因為 neural network 的 output
 
-甚麼意思呢？我現在的 target data 是某一個人的聲音
+假設你沒有用 activation function 去控制它的話
 
-我們要辨識某一個人的聲音
-這個人的聲音不可能太多的label data
+它的 output 可正可負
 
-不可能對這個人的 audio 去做太多的 transcription
-只有他非常少量的 transcription
+假設你這一邊是 linear的 output 的話
 
-他可能只有對你的 machine 說三句話
-只有這三句話的 label 而已
+那 output 可正可負
 
-但 source data 你有一大堆的 audio data 來自於不同人的
-這些 audio data 都有 transcription
+所以取一個 exponential 確保它一定是正的
 
-通常這種 data 你要 collect 上萬小時都是有可能的
+可以被當做是 variance 來看待
 
-當然不可能直接用 target data、某一個 speaker 他的 data 去 train 語音辨識系統
+那現在當你把這個 σ
 
-這樣一定會壞掉，你會希望說，好幾萬個小時的 source data 對這個 task 有甚麼幫助
+乘上這個 e
 
-這邊的處理方式可以非常直覺，怎麼做呢
+這個 e 是從一個 normal distribution sample 出來的值
 
-你就拿你的 source data 直接去 train 一個 model
+當你把這個 σ 乘上 e 再加到 m 的時候
 
-接下來你去 fine-tune 你的 model ，用這個 target data
+就等於是你把這個 m 加上了 noise
 
-甚麼叫做用 target data 來 fine-tune 你的 model 呢
+就等於是你把原來 code 加上 noise
 
-這個想法非常直覺，你就把你在 source data 上 train 出來的 model
+那這個 e 呢
 
-當作是 training 的 initial value ，當作是初始值
+是從 normal distribution sample 出來的
 
-然後再用 target data train 下去就結束了
+所以，它的 variance 是固定的
 
-但是這邊可能會遇到的 challenge 是 source data 真的非常少
+但是，乘上不同 σ 以後呢
 
-今天就算在 target data 上 train 出一個好的 model
+它的 variance 的大小就有所改變
 
-當你把它當 model 的 initialization
+所以這一個 variance 決定了 noise的大小
 
-在 source data 再去做 training 可能 train 下去就壞掉
+而這一個 variance大小
 
-所以在 train 的時候要很小心
-有很多不同的技巧
+這個 variance 是從 encoder 產生的
 
-有一個技巧叫 conservative training
+也就是說 machine 在 training 的時候
 
-conservative training 是說現在有大量的 source data
+它會自動去 learn 說，這個 variance 應該要有多大
 
-在語音辨識裡面，他就是很多不同 speaker 的聲音都有 transcription
+但是，如果就只是這樣子是不夠的
 
-可以去 train 一個拿來做語音辨識的 neural network
+假如你現在的 training 就只考慮說
 
-接下來呢，你有 target data
+我現在 input 一張 image
 
-target data 是某個 speaker 的聲音跟 transcription
+然後，我中間有這個加 noise 的機制
 
-你可能只有五句、十句這麼多而已
+noise 的 variance 是自己 learn 的
 
-怎麼辦呢？ 如果你直接拿這些 target data 去 train
+然後，decoder 要 reconstruct 回原來的 image
 
-Train 下去就壞掉
-你可以說我在 training 的時候，下一些 constrain
+那你要 minimize 這個 reconstruction error
 
-讓 training 的時候，train 完了新的 model 跟舊的 model 不要差太多
+如果你只有做這一件事情的話，是不夠的
 
-我下一個 constrain，下一個 constrain 其實就是加一個 regularization
+你 train 出來的結果呢
 
-我們在 training 的時候，你會加L1、L2的 regularization
+是不會，並不會如同你預期的樣子
 
-在 conservative training 裡面，你會加另外一種不同的 regularization
+為甚麼呢？
 
-新的 model 的 output 跟舊的 model 的 output 在看到同一筆 data 的時候
+因為這個 variance 現在自己學的
 
-他們的 output 越接近越好
+假設你讓 machine 自己決定說 variance 是多少
 
-或者是下 constrain 是新的 model 跟舊的 model
+那它一定會決定說
 
-他們的 L2 norm 差距越小越好
+variance 是 0 就好了 ，對不對
 
-總之就是做一些事情，讓新的 model 跟舊的 model 差距不要太大
+就讓大家自己決定分數是多少
 
-這樣就可以防止 overfitting
+那每一個人都會是 100 分
 
-防止 target data 只有一點點，train 下去就壞掉的情形
+所以，這邊這個 variance
 
-另外一個方法是 layer的transfer
+如果你只讓 machine 自己決定的話
 
-現在有用 source data train 好的一個 model
+它就會覺得說，variance 是 0 就好了
 
-你把這 model 裡的某幾個 layer 拿出來
+那你就等於是原來的 Auto-encoder
 
-直接 copy 到新的 model 裡面去
+因為 variance 是 0 的話，就不會有這個
 
-你把某幾個 layer 直接 copy 到新的 model 裡面去
+不同的 image overlap的情形
 
-接下來你用你的 source data ( 應該是target data ) 只去 train 沒有 copy 的 layer
+這樣你 reconstruction error 是最小的
 
-可能只有保留一個 layer 是沒有 copy 的
+所以，你要在這個 variance 上面呢
 
-source data ( 應該是target data ) 就只 train 那個 layer 就好
+去做一些限制
 
-這樣的好處就是 source data ( 應該是target data ) 只需要考慮非常少的參數
+你要強迫它的 variance 不可以太小
 
-就可以避免 overfitting 的情形
+怎麼做呢？所以，我們另外再加了這一項
 
-當然如果 source data ( 應該是target data ) 夠多了
+其實就是對 variance 做了一些限制
 
-我還是要 fine-tune 整個 model，也是可以的
+怎麼說呢，這一項是這樣子
 
-layer transfer 是一個非常常見的小技巧
+你看它這一邊有 exp(σi) - (1 + σi)
 
-現在可能問題是；那些 layer 應該被 transfer，那些 layer 不應該被 transfer 呢
+那 exp(σi) 畫在圖上的話
 
-有趣的是在不同的 task 上面，需要被 transfer 的 layer 往往是不一樣的
+它是藍色的這一條線
 
-比如說，在語音辨識上，通常是 copy 最後幾層
+(1+σi) 畫在圖上，它是紅色的這一條線
 
-然後重新 train input 那一層
+當你把藍色這一條線減紅色這一條線的時候
 
-在語音上你可想成每一個人用同樣的發音方式，但因為口腔結構略有差異
+你得到是綠色的這一條線
 
-同樣的發音方式，得到的聲音是不一樣的
+綠色這一條線的最低點呢
 
-那 neural network 前幾層是從聲音訊號裡面，得知說話的人的發音方式
+是落在 σ = 0 的地方
 
-再根據發音方式，他就可以得到現在說的是哪一個詞彙，就可以得到辨識的結果
+注意一下，σ 之後會再乘 exponential，所以σ = 0
 
-從這個角度來看，從發音方式到辨識結果，neural network 的後面幾層
+意味這說，它的 variance 是 1
 
-是跟說話的人沒有關係的，所以是可以被 copy 的
+exp = 0，是 1
 
-不一樣的是，從聲音訊號，到發音方式這一段
+所以 σ = 0 的時候，loss 最低
 
-可能是每個人都不一樣的
+意味著說， 你的 variance 等於 1 的時候
 
-所以在做語音辨識的時候，常見的作法是把 neural network 的後幾層是 copy 的
+loss 最低
 
-只有前面可能第一層用 target data、某一個 speaker 的 data train
+所以，machine 就不會說，讓 variance 等於 0，然後
 
-但是在 image 的時候，我發現是不一樣的
+minimizes reconstruction error，它還要考慮說
 
-因為在 image 的時候，通常是 copy 前面幾層，只 train 最後幾層
+variance 是不能夠太小
 
-為甚麼呢？因為在 image 你會發現當你在 source domain 上 learn 了一個 network
+那最後這一項 ( mi )^2
 
-你 learn 到的 CNN 通常前幾層他做的
+對這個 code 做這個
 
-就是 detect 最簡單的 pattern
+要 minimize code 的這個 L2-norm
 
-比如說前幾層，做的事情就是 detect 有沒有直線橫線，或者是有沒有簡單的幾何圖形
+怎麼解釋呢，其實很容易解釋
 
-所以在 image 上面，neural network 前幾層 learn 的東西
+你就想成是我們現在加了 L2 的 regularization
 
-他是可以被 transfer 到其他的 task 上面
+我們本來常常在 train Auto-encoder 的時候
 
-而最後幾層 learn 的東西往往比較 abstract
+你就會在你的 code 上面呢
 
-這個比較 abstract 他就沒有辦法 transfer 到其他的 task 上面去
+加一些 regularization
 
-在做影像處理、辨識的時候，反而是 copy 前面幾層
+讓它結果比較 sparse
 
-然後後面幾層重 train
-到底哪些 layer 要被 transfer
+比較不會 overfitting
 
-其實是 case by case
-特別是運用之妙，存乎一心
+比較不會 learn 出太多 trivial 的 solution
 
-這邊是 image 在 layer transfer 上的實驗
+那這個是直觀的理由
 
-這是出自 Bengio 在 NIPS,2014 的 paper
+如果比較正式解釋的話
 
-這個實驗做在 ImageNet 上，這個實驗他把 ImageNet 的 corpus
+要怎麼解釋它呢
 
-一百二十萬張 image 分成 source 跟 target
+以下就是 paper 上，比較常見的說法
 
-這個分法是按照 class 來分的
-我們知道 ImageNet 的 image
+假設我們回歸到我們到底要做的事情是什麼
 
-一個 typical 的 setup 是有一千個 class
+假設你現在要叫 machine 做的事情
 
-把其中五百個 class 歸為 source data
+是 generate 寶可夢的圖
 
-把另外五百個 class 歸為 target data
+每一張寶可夢的圖
 
-橫軸是我們在做 transfer learning 的時候，copy 了幾個 layer
+你都可以想成是高維空間中的一個點
 
-Copy 0 個 layer 就代表完全沒有做 transfer learning
+一張 image，假設它是 20*20 的 image
 
-這是一個 baseline ，就直接在 target data 上面 train 下去
+它在高維的空間中
 
-縱軸是 top-1 accuracy，所以是越高越好
+就是一個 20*20，也就是一個 400 維的點
 
-直接 train 下去的結果是白色這個點
+我們這邊寫做 x
 
-沒有做 transfer learning 是白色這個點
+雖然在圖上，我們只用一維來描述它
 
-如果今天 copy 前面幾個 layer，只有 train 最後幾個 layer 的時候
+但它其實是一個高維的空間
 
-如果今天 copy 第一個 layer，train 剩下的 layer
+那我們現在要做的事情
 
-Copy 前面兩個、三個 layer，在 source data 上 train 一個 model
+其實就是 estimate 高維空間上面的機率分佈，P(x)
 
-然後 copy 第一個 layer，或 copy 第二個，copy 第三個，一直到 copy 前面七個 layer
+我們要做的事情就是 estimate 這個 P(x)
 
-然後剩下的 layer 再用 target data 去 train，會得到什麼樣的結果
+只要我們能夠 estimate 出這個 P(x) 的樣子
 
-今天它的結果是會變差的
+注意，這個 x 其實是一個 vector
 
-但是如果只有 copy 前面幾個 layer 的時候
+假設我們可以 estimate 出 P(x) 的樣子
 
-只有 copy 第一個 layer 的時候，performance 稍微有點進步
+我們就可以根據這個 P(x)
 
-不過 copy 前面兩個 layer，performance 幾乎是持平的
+去 sample 出一張圖
 
-但是 copy 的 layer 太多，結果是會壞掉
+那找出來的圖
 
-這個實驗顯示說在不同的 data 上面，train 出來的 neural network
+就會像是寶可夢的樣子
 
-前面幾個 layer 是可以共用的
+因為你取 P(x) 的時候，你會從機率高的地方
 
-後面幾個可能是沒有辦法共用的
+比較容易被 sample 出來
 
-上面這條橙色的線是說，如果 copy 完以後，還有 fine-tune 整個 model 的話
+所以，這個 P(x) 理論上應該是在
 
-把第一個 layer，在 source domain 上 train 一個 model
+有寶可夢的圖的地方
 
-然後把第一個 layer copy 過去以後，再用 target domain fine-tune 整個 model
+這有寶可夢的圖，如果你今天
 
-包括前面 copy 過的 layer 的話
+這個圖長得像一隻寶可夢的話，它的機率是大的
 
-那得到 performance 是橙色這條線
+它的機率是大的
 
-在所有的 case 上面都是有進步的
-其實這個結果滿 surprised
+這個是噴火龍家族，他們的機率是大的
 
-不要忘了，這可是 ImageNet 的 corpus
+這個是水箭龜家族，他們機率是大的
 
-一般在做 transfer learning 的時候，都是假設 target domain 的 data 非常少
+如果是一張怪怪的圖的話
 
-這邊 target domain 可是有六十萬張，你可能都沒有處理過這麼多的 image
+比如說，這一個看起來像是皮卡丘，又有一點不像
 
-這 target domain 的 data 是非常多的
+這個看起來像是一隻綿羊，又像是一個雲
 
-但是就算在這個情況下，再多加了另外六十張 image 做 transfer learning
+這一邊呢，機率是低的
 
-其實還是有幫助的
+這一邊機率是低的
 
-這兩條藍色的線跟 transfer learning 比較沒有關係
-不過是這篇paper裡面發現一個有趣的現象
+如果我們今天能夠 estimate 出
 
-假設呢，假設呢
-他想要做一個對照組
+這一個 probability distribution
 
-在 target domain 上面 learn 一個 model
+那就結束了
 
-把前幾個 layer copy 起來
+那怎麼 estimate 一個 probability 的 distribution 呢？
 
-再用一次 target domain 的 data train 剩下幾個 layer
+我們可以用 Gaussian mixture model
 
-前面幾個 layer 就 fix 住，只 train 後面幾個 layer
+我不知道在座有多少人知道 Gaussian mixture model
 
-直覺上這樣做應該跟直接 train 整個 model 沒有太大差別
+我好奇問一下
 
-但最後發現假設你 fix 前面幾個 layer
+知道 Gaussian mixture model 的同學舉手一下
 
-先 train 好一個 model，fix 前面幾個 layer
+好手放下，謝謝
 
-接下來只 train 後面幾個 layer
+很多人都知道 Gaussian mixture model
 
-接下來重新 train 後面幾個 layer
+那太好了
 
-結果有些時候是會壞掉的
+有學過語音課的話，就聽過 Gaussian mixture model
 
-他的理由是 training 的時候，前面的 layer 跟後面的 layer
+Gaussian mixture model 在做甚麼呢？
 
-他們其實是要互相搭配
+我們現在有一個 distribution，它長這個樣子
 
-所以如果只 copy 前面的 layer，然後只 train 後面的 layer
+黑色的、很複雜
 
-其實 performance 會是比較差的
+我們說這個很複雜的黑色 distribution，它其實是
 
-後面的 layer 就沒有辦法跟前面的 layer 互相搭配，結果有點差
+很多的 Gaussian
 
-如果可以 fine-tune 整個 model 的話，performance 就跟有沒有 transfer learning 是一樣的
+我這一邊藍色的代表 Gaussian
 
-這是另一個有趣的發現，作者自己對這件事情是滿 surprised
+有很多的 Gaussian
 
-這是另外一個實驗結果
+用不同的 weight 疊合起來的結果
 
-這個實驗結果是
-紅色這條線是前一頁看到的紅色的這條線
+假設你今天 Gaussian 的數目夠多
 
-這邊假設 source 跟 target 是比較沒有關係的
+你就可以產生很複雜的 distribution
 
-把 ImageNet 的 corpus 分成 source data 跟 target data 的時候
+所以，雖然黑色很複雜
 
-把自然界的東西，通通當作 source
+但它背後其實是有很多 Gaussian 疊合起來的結果
 
-target 通通是人造的東西，桌子、椅子等等
+那這個式子怎麼寫它呢？
 
-這樣 transfer learning 會有什麼樣的影響
+你會把它寫成這樣
 
-如果 source 跟 target 的 data 是差很多的
+首先，如果你要從 P(x) sample 一個東西的時候
 
-在做 transfer learning 的時候，performance 會掉的比較多
+你怎麼做？
 
-前面幾個 layer 影響還是比較小的
+你先決定你要從哪一個 Gaussian sample 東西
 
-如果只 copy 前面幾個 layer，仍然跟沒有 copy 是持平的
+假設現在有一把 Gaussian
 
-這意味著，就算是 source domain 跟 target domain 是非常不一樣的
+有一把 Gaussian
 
-一邊是自然的東西，一邊是人造的東西
+每一個 Gaussian 背後都有一個 weight
 
-在 neural network 第一個 layer，他們仍然做的事情很有可能是一樣的
+每一個 Gaussian 都有自己的 weight
 
-綠色的這條線，爛掉的這條線是假設前面幾個 layer 的參數是 random 的
+這一邊有一把 Gaussian，每一個都有它自己的 weight
 
-會發生甚麼事情呢？得到的結果就是爛掉，這是一個 baseline
+那接下來呢
 
-另外一個要講的是 multitask learning
+你再根據每一個 Gaussian 的 weight
 
-multitask learning 跟 fine-tune 略有不同的地方就是
+去決定你要從哪一個 Gaussian sample data
 
-在 fine-tune 裡面我們 care 的是 target domain 做得好不好
+然後，再從你選擇的那個 Gaussian 裡面 sample data
 
-在 source domain 上 learn 一個 model
+如果你選擇 1 這個 Gaussian的話
 
-在 target domain 上 fine-tune
+那你就從這個地方sample data
 
-care 的是 target domain 做得好不好，fine-tune 以後 source domain 壞掉就算了
+如果選擇 2 的話，就從這個地方
 
-在 multitask learning 裡面，其實同時 care target domain 跟 source domain 做得好不好
+3 就從這個地方、4 就從這個地方、5 就從這個地方
 
-care 在這兩個 domain 上，能不能夠同時把它做好
+以此類推
 
-如果是用 deep learning base 方法的話，特別適合來做這種 multitask 的 learning
+所以，怎麼從 Gaussian mixture model 
+sample 一個 data 呢？
 
-可以丟一個 neural network
-假設兩個不同的 task，他們用的是同樣的 feature
+你就這樣做
 
-比如說，都做影像辨識，只是影像辨識的 class 不一樣的話
+首先，你有一個 multinomial  的 distribution
 
-我就 learn 一個 neural network，input 就是兩個不同 task 同樣的 feature
+你從這一個 multinomial distribution 裡面
 
-但是中間會分叉出來，一部分的 network  他的 output 是 task A 的答案
+決定你要去 sample 哪一個 Gaussian
 
-一部分的 network 他的 output 是 task B 的答案
+今天 m 代表第幾個 Gaussian
 
-這麼做的好處是，task A 跟 task B 他們在前面幾個 layer 會是共用的
+它是一個 integer
 
-在前面幾個 layer，會同時使用 task A 跟 task B 的 data 去同時 train 前面幾個layer
+決定好你要從哪一個 m sample Gaussian 以後
 
-前面幾個 layer 是用比較多的 data train 的，所以可能有比較好的 performance
+你要從哪一個 Gaussian sample data 以後
 
-做這件事的前提就是，要確定這兩個 task 有沒有共通性，是不是可以共用前面幾個 layer
+決定哪一個 Gaussian 以後
 
-有一些更 crazy 的 task，現在連 input 都是沒有辦法 share 的
+每一個 Gaussian 有自己的 mean
 
-今天兩種不同的 task，不同的 input 都用不同的 neural network
+μ(上標 m)，有一個自己的 variance,  Σ(上標 m)
 
-把它 transform 到同一個 domain 上面去
-在同一個 domain 上，再 apply 不同的 neural network
+所以，你有了這個 m 以後
 
-一條路去做 task A，一條路去做 task B
-中間可能有某幾個 layer 是 share 的
+你就可以從，你就可以找到這個
 
-如果在這樣的 task 下，也可以做 transfer learning
+mean 跟 variance
 
-就算是 task A、task B 的 input、output 完全不一樣
+根據這個 mean 跟 variance
 
-如果覺得中間幾個 layer 他們有共同的地方
+你就可以 sample 一個 x 出來
 
-還是可以用這樣子的 model 架構來處理
+所以，今天整個 P(x) 寫成
 
-Multitask learning 一個很成功的例子是多語言的語音辨識
+summation over 所有的 Gaussian
 
-假設現在有一大堆不同語言的 data
+那一個 Gaussian 的 weight, P(m) 再乘上
 
-假設有法文、德文、西班牙文、義大利文還有中文
+有了那一個 Gaussian以後
 
-在 train model 的時候，train 你拿來做語音辨識的 neural network 的時候
+從那一個 Gaussian sample 出 x 的機率，P(x|m)
 
-可以 train 一個 model，它同時可以辨識這五種不同的語言
+那在 Gaussian mixture model 裡面
 
-而這個 model 前面幾個 layer 他們會共用參數
+有種種的問題，比如說你需要決定 mixture 的數目
 
-後面幾個 layer，每個語言可能有自己的參數
+但是，如果你知道 mixture的數目的話
 
-這麼做是合理的，因為雖然是不同的語言，但都是人類說的
+接下來給你一些 data，x
 
-前面幾個 layer 就可以 share 同樣的資訊、可以共用同樣的參數
+你要 estimate 這一把 Gaussian
 
-其實在 translation 也可以用同樣的事情
+跟它的每一個 Gaussian 的 weight
 
-假設要做中翻英、中文翻日文，那可以把這兩個 model 一起 train
+跟它的 mean 跟 variance
 
-在一起 train 的時候，在中翻英、中文翻日文
+其實是很容易的
 
-都要先把中文的 data 做process
-那把中文的 data 先做process
+你只要用 EM Algorithm 就好了
 
-那一部分的 neural network 就可以是兩種不同語言的 data 共同使用
+你不知道這個是甚麼沒有關係
 
-這個 transfer 到底可以 transfer 的多廣？
+反正這是很容易的事情
 
-比如說德文法文都是同樣語系的語言
-所以他們是可以 transfer 的
+現在每一個 x
 
-但這些歐洲的語言跟中文或許是不能 transfer 的
+它都是從某一個 mixture 被 sample 出來的
 
-目前在語音的發現是，幾乎所有的語言都可以 transfer
+這件事情其實就很像是
 
-過去還有人蒐集了十幾種語言，把他們互相之間兩兩做 transfer
+在做 classification 一樣
 
-做了一個很大的 N x N 的 table，每一個 case 都有進步
+每一個我們所看到的 x
 
-目前發現大部分的 case，不同人類的語言
-就算覺得他們不是非常像，他們也都可以互相 transfer
+它都是來自於某一個分類
 
-這邊舉的例子是從歐洲的語言 transfer 到中文上面
+它都是來自於某一個 class
 
-這邊中文的 data 不是太多，可能是十小時
+但是，我們之前有講過說
 
-橫軸是中文 training 的 data
+把 data 做 classification
 
-縱軸是辨識的 character 的 error rate
+做 clustering 其實是不夠的
 
-一開始 data 很少，假設只有用中文直接 train 一個 model
+更好的表示方式是用
 
-現在 data 很少，Error rate 當然就很大，當 data 越來越多
+Distributed 的 representation
 
-到一百多小時的時候，error rate 就可以壓到 30 以下
+也就是說，每一個 x
 
-今天如果有一大堆的歐洲語言，把歐洲語言跟中文一起做 multitask training
+它並不是屬於某一個 class
 
-用這些歐洲語言的 data，來幫助中文 model 的前面幾層，讓他 train 得更好
+某一個 cluster，而是它有一個 vector
 
-會發現就算是中文 data 很少的情況下
+來描述它的各個不同面相的 attribute
 
-有做 transfer learning，可以得到比較好的 performance
+描述它各個不同面向的特質
 
-當中文的 data 越多的時候，中文本身的 performance 越好
+所以 ，VAE 其實就是 Gaussian mixture model 的
 
-就算是中文有一百小時的 data，借用一些歐洲語言來的 knowledge
+distributive representation 的版本
 
-對這個辨識還是有微幅的幫助的
+怎麼說？首先呢
 
-這邊的好處是，假設做 multitask learning 的時候
+我們要 sample 一個 z
 
-會發現有一百多個小時，跟你只有這邊大概是五十個小時以內
+這個 z 是從一個 normal distribution sample 出來的
 
-如果有做 transfer learning 的話，你只需要二分之一以下的 data
+z 是一個 vector
 
-就可以跟原來有兩倍的 data 做的一樣好
+它從一個 normal distribution 被 sample 出來
 
-常常有人擔心說， transfer learning 會不會有負面的效應
+那這個 z 是一個 vector
 
-會不會有 negative 的 transfer 的結果
+這個 vector 的每一個 dimension
 
-是有可能的，如果兩個 task 不像的話
-Transfer 就是 negative 的
+就代表了某種 attribute
 
-兩個 task 不像，讓 neural network 同時做兩個 task
-反而把結果弄糟了
+代表你現在要 sample 的那個東西的某種特質
 
-有人總會思考，兩個 task 之間到底能不能夠 transfer
-然後 try and error ，這樣很浪費時間
+z 的每一個 dimension
 
-所以有人 propose 這個 progressive neural networks
-這個 progressive neural networks 其實是很新的作法
+就代表了它要 sample 的某種東西的特質
 
-這個是 16 年的放在 arXiv 上的 paper
-會發現它是有很多問題的
+假設 z 它長這樣
 
-這個方法是這樣子
-現在有個 Task 1，先 train 一個 Task 1 的 neural network
+假設 z 長這樣
 
-藍色這個 neural network
-Train 好以後，它的參數就 fix 住了
+它是一個 Gaussian distribution
 
-現在要做 Task 2，一樣有一個 neural network
+現在我們在這個圖上呢
 
-但是 Task 2 它的每一個 hidden layer 都會去接前面 Task 1 某一個 hidden layer 的
- output
+就假設它是一維的
 
-所以在 training 的時候，它的好處是就算 Task 1 跟 Task 2 非常的不像
+但在實際上 z 可能是一個 10 維的、100 維的 vector
 
-首先，Task 2 的 data 不會去動到 Task 1 的 model
+到底有幾維，是由你自己決定
 
-所以 Task 1 一定不會比原來更差
+假設現在 z 呢，就是一維的 Gaussian
 
-再來 Task 2 他去借用 Task 1 的參數，但是它可以把這些參數直接設成 0
+接下來，你sample 出這個 z 以後
 
-這樣子也不會影響 Task 2 的 performance
-最糟的情況下，就跟自己 train 的 performance 是差不多的
+根據 z ，你可以決定 μ 跟 σ
 
-如果有 Task 3，也就做一樣的事情
+你可以決定 Gaussian 的 mean 跟 variance
 
-Task 3會同時從 Task 1 和 Task 2 的 hidden layer 得到 information
+剛才在 Gaussian mixture model 裡面
 
-你可能會覺得這個 model 怪怪的
+你有 10 個 mixture，你就是 10 個 mean
 
-如果有五個 Task，那第五個 Task 不是要同時接前面四個 Task 嗎？
+跟 10 個 variance
 
-對，他是怪怪的。作者也有說怪怪的，等待大家提出更好的想法
+但是，今天在這個地方
 
-假設 target data 是 unlabeled
+你的 z 有無窮多個可能
 
-而 Source data 是 labeled 時候
+它是 continuous，不是 discrete
 
-這邊的 task 是這樣
+所以你的 z，有無窮多的可能
 
-在 source data 有 function 的 input，也有 function 的 output
+所以，你的 mean 跟 variance
 
-但在 target data 只有 function 的 input，沒有 function 的 output
+也有無窮多的可能
 
-舉例來說，source data 是 MNIST 的 image
+那怎麼找到這個 mean 跟 variance 呢？
 
-Target data 是另外一個 corpus，MNIST-M 的 image
+怎麼給一個 z，找 mean 跟 variance 呢？
 
-把 MNIST 的 image 加上一些奇怪的顏色跟背景
+你這一邊的做法就是
 
-MNIST 是有label的
+假設 mean 跟 variance 都來自一個 function
 
-我們知道每一張 image 對應到哪個 digit
+都來自一個 function
 
-但 MNIST-M 沒有 label
+你把 z 代進產生 mean 的這個 function
 
-在這種情況下，通常把 source data 視作 training data
+它就給你 μ(z)
 
-把 target data 視作 testing data
+μ(z)代表說，現在，如果你的
 
-這邊的問題是 training data 跟 testing data 是非常的 mismatch
+你的 hidden 的東西
 
-在這種 source data，MNIST 上 train 出來的一個 model
+你的 attribute 是 z 的時候
 
-直接 apply 到另外一個 corpus 上面，他也 work 的
+你在這個 x 這個 space 上的 mean是多少
 
-雖然另外一個 corpus 要做的事情，也是辨識數字零到九
+同理，σ(z) 代表說你的 variance 是多少
 
-但他們 input 的 image 是非常不一樣的
+代表說，你現在如果從
 
-要怎麼把 source data 上 learn 出來的 model 也可以 apply target data 上面呢？
+這個 latent 的 space 裡面得到 z 的時候
 
-如果直接 learn 一個 model
+你的 variance 是多少
 
-Input 是一張 image
+所以，實際上
 
-不管 mismatch training 跟 testing 也沒有關係
+所以，實際上這個 P(x) 是怎麼產生的呢？
 
-直接 learn 一個 model 下去看看會怎樣
+在 z 這個  space上面
 
-會發現結果是會爛掉的
+每一個點都有可能被 sample到
 
-如果把一個 neural network 當作是一個 feature 的 extractor
+只是在中間這邊呢
 
-Neural network 的前面幾層可以看作是在抽 feature
-後面幾層可以看作是在做 classification
+這個點被 sample 到的機率比較大
 
-如果把 neural network 的前面幾層看作是在抽 feature 的話
-把 feature 拿來看會發現甚麼事呢
+在 tail 的地方，點被 sample 到的機率比較小
 
-會發現不同 domain 的 data，他的 feature 完全不一樣
+當你 sample 出一個點以後
 
-如果把 MNIST 的 feature 丟進去的話，是藍色的這些點
+你在 z 的 space 上面 sample 出一個 point 以後
 
-藍色的這些點很明顯分成十群
+那一個 point 會對應到 一個 Gaussian
 
-零到九，十個數字
+這一個點對應到這一個 Gaussian
 
-但如果把另外一個 corpus 的 image 丟進去的話
+這個點對應到這一個 Gaussian
 
-會發現抽出來的 feature 就是紅色這群
+這一個 點對應到這一個Gaussian，等等
 
-這邊有把 t-SNE 降維以後的結果
+每一個點都對應到一個 Gaussian
 
-反正做出來就是紅色這一群
+至於某一個點對應到什麼樣的 Gaussian
 
-會發現作 feature extraction 的時候
+它的 mean 跟 variance是多少
 
-原來 source domain 的 image 跟 target domain 的 image
+是由某一個 function 所決定的
 
-他們根本就不在同一個位置裡面
+所以，當你用這一個概念
 
-抽出來的 feature 完全不一樣
+當你今天你的這個 Gaussian
 
-後面的 classifier 雖然可以把藍色的部分做好
+是從一個 normal distribution 所產生的時候
 
-但紅色的部分就無能為力
+現在你等於就是有無窮多的 Gaussian
 
-這邊希望做到前面 feature extractor
-可以把 domain 的特性去除掉
+原來 Gaussian mixture model 裡面
 
-這招叫 domain-adversarial training
-等一下會講為甚麼出現 adversarial 這個字
+最多甚麼 512 的，那個太少
 
-之前已經看過 adversarial 這個字
-在前面講 GAN 的時候
+我們現在有無窮多個 Gaussian
 
-GAN 就是 generative adversarial 的 model
-這邊又出現 adversarial
+那另外一個問題就是
 
-這邊 adversarial 跟 GAN 的原理是非常像的
-希望 feature extractor 可以把 domain 的特性消掉
+我們怎麼知道每一個 z
 
-也就是 feature extractor 的 output
+應該對應到怎樣的 mean 跟 variance
 
-不應該是紅色跟藍色的點分成兩群
+這個 function 怎麼找呢？
 
-不同的 domain 不應該是分成兩群
+我們知道說 neural network 就是一個 function
 
-而是不同的 domain 都應該被混合在一起
+所以，你可以說我就是 traing 一個 neural network
 
-希望 feature extractor 的 output 是可以把不同 domain 的 image 混在一起
+這個 neural network input z
 
-也就是把不同 domain 的特性消掉
+然後，它的 output  就是兩個 vector
 
-怎麼 learn 這樣的 feature extractor 呢
+第一個 vector 代表了 input 是 z 的時候
 
-在後面接一個 domain 的 classifier
+你 Gaussian 的 mean
 
-把 feature extractor 的 output 丟給 domain classifier
+這個 σ 代表了 variance
 
-Domain classifier 也是一個 classification 的 task
+那 variance 時常說，它是一個 matrix
 
-他要做的是根據 feature extractor 給他的 feature
+你可以說，你可以把 matrix 拉直當作它的 output
 
-判斷這個 feature 來自於哪個 domain
+或者是你可以只 output diagonal 的地方
 
-在這個 task 就是要分辨這些 feature 來自於 MNIST 的 corpus
+然後，假設 non-diagonal 的地方都是 0
 
-還是來自於 MNIST-M 的 corpus
+這樣都是可以的
 
-這件事情就是有一個 generator 的 output
+反正，我們有一個 neural network
 
-然後有一個 discriminator 讓他的架構非常像 GAN
+它可以告訴我們說
 
-但是跟 GAN 不一樣的是
-之前在 GAN 的 task 裡
+在 z 這一個 space 上每一個點
 
-Generator 要產生一張 image 騙過 discriminator
-這件事很難
+它對應到 x space 的時候呢
 
-但是在 domain-adversarial training 裡面
+你的這一個 distribution，mean 跟 variance 分別是多少
 
-要騙過 domain classifier 太簡單了
+那現在這個 P(x) 的 distribution 會長什麼樣子呢？
 
-有一個 solution 是不管看到甚麼東西，output 都 0
-就騙過 classifier 了
+這個 P(x) 的 distribution 呢
 
-所以只 train domain classifier 是不夠的
+就會變成是 P(z)的機率
 
-因為 feature extractor 可以輕易的騙過 domain classifier
+跟我們知道 z 的時候，x 的機率
 
-所以要給 feature extractor 增加任務的難度
+再對所有可能的 z 做積分
 
-所以 feature extractor 他 output 的 feature
+這邊不能夠是相加
 
-不只要同時騙過 domain classifier
+不能夠是 summation，必須要是積分
 
-還要同時讓 label predictor 做的好
+因為這個 z 是 continuous 的
 
-Label predictor 吃 feature extractor 的 output
+那有人可能會有一個困惑就是
 
-他的 output 就是十個 class
+為甚麼這邊一定是這個 Gaussian 呢
 
-所以 feature extractor 不只要騙過 domain classifier
+為什麼這邊一定是 Gaussian 呢？
 
-同時還要滿足 label predictor 的需求
+你可以不是 Gaussian 這個樣子
 
-他抽出來的 feature 不只是要把 domain 的特性消掉
+它可以是一種花的樣子
 
-同時還要保留原來 digit 的特性
+在文獻上確實有人會把它弄成一朵花的樣子
 
-如果把這三個 network 放在一起的話
+它可以是任何的東西
 
-實際上它只是一個大型的 neural network 而已
+這個是你自己決定的
 
-他有很多層就像一個在 multitask learning 會用到的 neural network 一樣
+當然這個 Gaussian，說起來是合理的
 
-但是這個 neural network 是個各懷鬼胎的neural network
+你就假設說，每一個 attribute 它的分佈就是 Gaussian
 
-一般的 neural network 的每一個參數，要做的事情都一樣
+比較極端的 case 總是比較少的嘛
 
-有共同的目標，要 minimize loss
+比較沒有特色的東西總是比較多的嘛
 
-要 optimize accuracy
+然後，attribute 跟 attribute之間是 independent 的
 
-但是在這個 neural network 裡，他的參數是各懷鬼胎的
+這樣子的假設其實也是合理的
 
-藍色這部分 label predictor 要做的是把 class 的分類正確率做的越高越好
+不過，這個形狀是你自己假設的
 
-Domain classifier 要做的是正確的 predict 一個 image 屬於哪個 domain
+你可以假設是任何的形狀
 
-Feature extractor 要做的是同時 improve Label predictor 的 accuracy
+你可以假設任何形狀
 
-同時 minimize Domain classifier 的 accuracy
+那現在這個
 
-所以 feature extractor 是一個不好的隊友
+但是，你不用擔心說
 
-Domain classifier 想要做 domain classification
+你如果假設 Gaussian 會不會對 P(x) 帶來很大的限制
 
-Feature extractor 想要捅他隊友一刀
+會不會說，如果假設 z 是 Gaussian distribution 的話
 
-他隊友想要選總統但他背後捅他一刀
+有一些 P(x)，你就沒有辦法描述
 
-他不想要讓他選總統
+其實，你不用太擔心這個問題
 
-他想要做的事情跟他隊友要做的事情是相反的
+你不要忘了這個 NN 是非常 powerful 的
 
-他是一個會陷害他隊友的 model
+NN 可以 represent 任何 function
 
-Feature extractor 怎麼陷害隊友呢
+只要 neuron 夠多，NN 可以 represent 任何 function
 
-這件事情很容易，只要加一個 gradient reversal 的 layer 就行了
+所以，今天從 z 到 x 中間的 mapping 可以是很複雜
 
-也就是說在作 back propagation 的時候
+所以，就算你的 z 是一個 normal distribution
 
-Domain classifier 計算 back propagation 不是有 forward 跟 backward 兩個 path 嗎
+最後這個 P(x) 呢
 
-在作 backward path 的時候
-Domain classifier 傳給 feature extractor 什麼樣的 value
+它也可以是一個非常複雜的 distribution
 
-Feature extractor 就把他乘上一個負號
-也就是 domain classifier 告訴你某一個 value 應該要上升
+再來呢，所以我們現在的式子是這樣子的
 
-他就會故意下降
-作一個跟 domain classifier 要求相反的事情
+我們知道 P(x) 可以寫成對 z 的積分
 
-Domain classifier 因為看不到真正的 image
-所以最後一定會 fail 掉
+然後乘上P(z)，還有乘上 P(x|z)
 
-他所能看到的東西都是 feature extractor 告訴他的
+P(z) 是一個 normal distribution
 
-所以最後一定會無法分辨 feature extractor 所抽來的 feature 是來自於哪個 domain
+這個 x given z 呢
 
-問題是，domain classifier 一定要奮力的掙扎
+我們先知道 z 是什麼，然後我們就可以決定 x
 
-這個 model 原理講起來很簡單
+它是從什麼樣子的 mean 跟 variance 的 Gaussian裡面
 
-實際上的 training 可能跟 GAN 一樣是沒有那麼好 train 的
+被 sample 出來的
 
-Domain classifier 一定要奮力掙扎
+但是這一個 function 有 z
 
-他一定要努力判斷現在的 feature 是來自於哪個 domain
+它有什麼樣的 mean 跟 variance
 
-如果 domain classifier 他比較弱、懶惰
+它們中間的關係是不知道的
 
-他一下就放棄不想做了
+是等著要被找出來的
 
-就沒有辦法把前面的 feature extractor 逼到極限
+但是，問題是要怎麼找呢？
 
-就沒有辦法讓 feature extractor 真的把 domain information remove 掉
+它的 criterion 就是要 maximize 我們的  likelihood
 
-如果 domain classifier 很 weak
+我們現在手上已經有一筆 data x
 
-他一開始就不想做了，他 output 永遠都是 0 的話
+那你希望找到一組
 
-那 feature extractor 胡亂弄甚麼 feature 都可以騙過 classifier 的話
+找到一個 μ 的 function
 
-那就達不到把 domain 特性 remove 掉的效果
+找到一個 σ 的 function
 
-這個 task 一定要讓 domain classifier 奮力掙扎然後才死掉
+它可以讓這個
 
-這樣才能把 feature extractor 的潛能逼到極限
+你現在已經觀察到的 data
 
-這個其實是很新的方法
-引用的是 ICML,2015 的 paper 跟 JMLR,2016 的 paper
+你現在手上已經有的 image
 
-這是 paper 一些實驗的結果
+它的每一個 x 代表了一個 image
 
-作不同 domain 的 transfer
+你現在手上已經有的 image
 
-包括從 MNIST 上 transfer 到 MNIST-M 上
+它的 P(x) 取 log 以後
 
-從這個數字的 corpus，transfer 到另一個數字的 corpus
+它的值相加以後是被 maximize 的
 
-從這個數字的 corpus，transfer 到 MNIST 上面
+這個就是 maximize 我們已經看到 image 的  likelihood
 
-兩種不同的道路號誌的 data 互相 transfer
+這邊只是複習一下這個 z 怎麼產生這個 μ 跟 σ 呢
 
-如果看實驗結果的話
-縱軸代表用不同的方法
+它是透過了一個 NN
 
-這邊有一個 source only 的方法
-直接 source domain 上 train 一個 model
+所以，我們要做的事情就是，調這個 NN 裡面的參數
 
-然後 test 在 testing domain 上
+調這個 NN 裡面每一個 neuron 的 weight 跟 bias
 
-在這四個結果會發現如果只用 source only 的話
+使得這個 likelihood 可以被 maximize
 
-Performance 是比較差的
+但是在這邊，等一下會引入另外一個 distribution
 
-這邊比較另一個 transfer learning 的方法
+它叫做 q(z|x)
 
-留給大家自己去參考文獻
+它跟這個 NN 是相反的
 
-這 proposed 的方法是剛剛講的 domain-adversarial training
+它是 given z，決定這個 x 的 mean 跟 variance
 
-如果用 domain-adversarial training 得到的結果是這裡
+這邊是 given x，決定在 z 這個 space 上面的
 
-我們現在最下面這行
+mean  跟 variance
 
-最下面這行是直接拿 target domain 的 data 去做 training
+也就是說，我們有另外一個 NN
 
-會得到 performance 是最下面這個 row
+這邊寫成 NN'，你 input x 以後
 
-這其實是 performance 的 upper bound
+它會告訴你說，對應的 z 的 mean
 
-會發現如果用 source data 跟 target data train 出來的結果是天差地遠的
+跟對應的 z  的 variance
 
-這中間有一個很大的 gap
+你給它 x 以後
 
-如果用 domain-adversarial training 可以發現有很好的 improvement
+它會決定這個 z 要從什樣的 mean 跟甚麼樣的 variance
 
-在不同的 case 上面都有很好的 improvement
+被 sample 出來
 
-接下來要講的是 Zero-shot learning
+上面這個 NN，其實就是 VAE 裡面的 decoder
 
-在 Zero-shot learning 裡面跟剛才講的 task 是一樣的
+下面這個 NN，其實就是 VAE 裡面的 encoder
 
-只有 source data 有 label，target data 沒有 label
-在剛才的 task 裡可以把 source data 當 training data
+那我們現在先不要管 NN 這一件事情
 
-Target data 當作 testing data
-但實際上 Zero-shot learning 他的 define 又更加嚴苛一點
+我們現在就先只看 這個式子就好
 
-他的 define 是他的 source data、target data，他的 task 是不一樣的
+P(x|z) 我們就先不要在意它是不是從 NN 產生的
 
-比如說，在影像上面，你的 source data 可能是要分辨貓跟狗
+反正這個就是一個機率，我們要去把它找出來
 
-Source data 裡面可能有貓的 class、狗的 class
-但 target data 裡面，image 是草泥馬
+怎麼找呢？
 
-在 source data 裡是從來都沒有出現過草泥馬的
+這個 log P(x)
 
-如果 source data 裡面從來都沒有出現過草泥馬的話
+它可以寫成積分
 
-Machine 有辦法看到他就說是草泥馬嗎？
-這實在是太強人所難
+over z 的積分，然後 q(z|x) * logP(x) dz這樣
 
-這個 task 在語音上很早就有 solution
+我們想說為什麼是這樣呢？
 
-語音本來就常常會遇到 Zero-shot learning 的問題
+因為 q(z|x)，它是一個 distribution
 
-假如把不同的 word 都當作一個詞彙、一個 class 的話
+這個式子對任何 distribution 都成立
 
-本來在 training、testing 的時候，就有可能看到不同的詞彙
+我們假設 q(z|x) 是一個從路邊撿來的 distribution
 
-Testing data 本來就有一些詞彙
+它可以是任何一個 distribution
 
-英文的詞彙這麼多，至少十萬個不同詞彙
+那任何一個 distribution，你都可以寫成
 
-Testing data 本來就有一些詞彙，是在 training 的時候從來沒有看過
+寫成這個樣子
 
-在語音上怎麼解決這個問題
+對不對？因為這個積分跟 P(x) 是無關的
 
-在語音上的作法是不要直接辨識一段聲音屬於哪一個 word
+所以，可以把 P(x)這一項提出 來
 
-辨識的是一段聲音屬於哪個 phoneme
+然後，積分的部分就會變成 1
 
-如果不知道 phoneme，就想成音標就好
+所以，左式就等於右式
 
-所以辨識的單位不要定成 word，而定成 phoneme
+這個沒有什麼好講的，這式子什麼都沒有做
 
-再做一個 phoneme 跟 table 之間對應關係的表
+再來呢，也是一個其實什麼都沒有做的式子
 
-這個東西叫做 lexicon，也就是辭典
+這個 P(x) 可以寫成 P(z,x) / P(z|x)
 
-建一個文字跟 phoneme 對應關係的表根據人的 knowledge
+那你把 P(z|x) 展開 一下就會發現說
 
-在辨識的時候，只要辨識出 phoneme 就好
+這一項等於這一項，這也沒什麼好講的
 
-再去查表，這一段 phoneme 對應到哪一個 word
+那接下來又是一個甚麼都沒有做的式子
 
-這樣就算有一些 word 是沒有出現在 training data 裡面的
+就是，本來我們把 P(z, x) / q(z|x)
 
-只要他在你建好的 lexicon 裡面有出現過
+然後，再把 q(z|x) / P(z|x)
 
-你的 model 可以正確辨識出現在聲音屬於哪個 phoneme 的話
+左式也等於右式
 
-就可以處理這個問題
+因為這個 q 其實是可以消掉的
 
-在影像上，可以把每一個 class，用他的 attribute 來表示
+這個小學生應該就知道
 
-也就是說，有一個 database，database 裡面有所有不同
+這個式子也等於是什麼事都沒有做這樣子
 
-可能的 object 跟他的特性
+接下來，這個東西被放在 log 裡面
 
-假設現在要辨識動物
+我們知道 log 相乘等於拆開後相加
 
-但 training data 跟 testing data 他們的動物不一樣
+所以，log 這一項乘這一項
 
-但有一個 database
+等於 log 這一項加 log 這一項
 
-這 database 告訴你每一種動物有什麼樣的特性
+那接下來呢，觀察一下這兩項到底代表什麼事情
 
-比如說，狗就是毛茸茸、四隻腳、有尾巴
+右邊這一項，它代表了一個 KL divergence
 
-魚有尾巴，沒有四隻腳、沒有毛茸茸
+這個 P(z|x) 是一個 distribution
 
-Chimp，黑猩猩有毛茸茸，沒有四隻腳、沒有尾巴
+q(z|x) 是另外一個 distribution
 
-黑猩猩沒有尾巴，猴子才有尾巴
+現在 x 是給定的，所以你有兩個 distribution
 
-Attribute 要定的夠豐富，每一個 class 都要有獨一無二的 attribute
+當有兩個 distribution 的時候
 
-如果有兩個 class 他的 attribute 一模一樣的話
+你可以算一個東西，叫做 KL divergence
 
-等於那個方法會 fail 掉
+KL divergence 代表的是這兩個 distribution 相近的程度
 
-在 training 的時候，不直接辨識每一張 image 屬於哪一個 class
+它們兩個相近的程度
 
-而是去辨識每一張 image 具備什麼樣的 attribute
+如果 KL divergence 它越大
 
-Neural network learning 的 target 就是看到猩猩的圖
+代表這兩個 distribution 越不像
 
-就要說這是一個毛茸茸的動物、沒有四隻腳的動物、沒有尾巴的動物
+這兩個 distribution 一模一樣的時候，
+KL divergence 會是 0
 
-看到一個狗的圖，就要說這是毛茸茸的動物、有四隻腳的動物、有尾巴的動物
+所以，KL divergence 它是一個距離的概念
 
-在 testing 的時候，就算來了一張從來沒有看過的 image
+它衡量了兩個 distribution 之間的距離
 
-沒有關係，neural network 的任務也不是要 detect input 這張 image 是屬於哪一種動物
+這一項就是 KL divergence 的式子
 
-只要 input 這張 image，他有甚麼樣的 attribute
+這一項是一個距離
 
-Input 一張沒有見過的動物，但只要能夠把他的 attribute 找出來
+所以，它一定是大於等於 0 的
 
-就查表看哪一種，在 database，哪一種動物的 attribute 跟 model 的 output 最接近
+最小也是 0 而已
 
-有時候可能沒有一模一樣，也沒有關係，就看誰最接近
+至於這個為什麼 KL divergence的這個
 
-哪一個動物的 attribute 跟 neural network 的 output 最接近
-那個動物就是你要找的
+反正你就記起來就是了
 
-有時候 attribute 可能非常複雜
-Attribute 的 dimension 可能很大
+那因為這一項一定是大於等於 0 的
 
-甚至可以做 attribute 的 embedding
-也就是說現在有一個 embedding space
+所以，這一項會是
 
-把 training data 裡的每一張 image 都透過 transform
+L 的 lower bound
 
-把他變成 embedding space 上的一個點
+L 一定會大於等於這一項
 
-然後把所有的 attribute 也都變成 embedding space 上一個點
+這一項你可以再拆一下，P(z, x) = P(x|z) * P(z)
 
-g 跟 f 都可以是 neural network
+所以，L 一定會大於這一項
 
-training 的時候就希望 f 跟 g 越接近越好
+那這一項就是一個 lower bound
 
-在 testing 的時候如果有一張沒有看過的 image
+我們叫它 L(下標 b)
 
-這個 image 的 attribute embedding 以後，跟哪一個 attribute 最像
+那現在我們知道事情是這樣
 
-那就知道他是什麼樣的 image
+這個 log Probability，就是我們要 maximize  的對象
 
-草泥馬翻譯就是 grass-mud horse
+它是由這兩項加起來的結果
 
-我們在這邊先休息一下
+Lb 它長成這個樣子
 
-各位同學大家好，我們來上課吧
-剛才講到 Attribute embedding
+它長成這個樣子
 
-image 跟 attribute 其實都可以描述成 vector
+在這個式子裡面
 
-所以想要做的事情是把
+P(z)是 normal distribution，是已知的
 
-image 跟 attribute 投影到同一個空間裡面
+我們不知道的是 P(x|z)  跟 q(z|x)
 
-可以想像成是對 image 的 vector，也就是這邊的 x
+那我們本來要做的事情
 
-跟 attribute 的 vector，也就是這邊的 y
+我們本來要做的事情是要找 P(x|z)
 
-都做降維，降到同樣的 dimension
+讓這個 P，讓這個 likelihood 越大越好
 
-把 x 通過一個 function f 都變成 embedding space 上面的 vector
+現在我們要做的事情
 
-把 y 通過另外一個 function g 也都變成 embedding space 上面的 vector
+變成找 P(x|z) 和 q(z|x)
 
-要怎麼找 f 跟 g 呢
+讓 Lb 越大越好
 
-f 跟 g 可以說是 neural network
+我們本來只要找這一項，本來只要找這一項
 
-input 一張 image，他變成一個 vector
+現在順便也要找這一項
 
-或 input 一個 attribute 的 vector，他變成一個 vector
+把這兩項合起來
 
-f 跟 g 怎麼找呢
+我們希望同時找這兩項
 
-你的 training target 就是，你希望說，假設我們已經知道說
+然後去 maximize 這個 Lb
 
-這個 y1 是 x1 的 attribute，y2 是 x2 的 attribute
+突然多找一項是要做什麼呢？
 
-希望找到 f 跟 g 可以讓 x1、y1 投影到 embedding space 以後越接近越好
+如果我們現在只找這一項的話
 
-x2、y2投影到 embedding space 以後越接近越好
+如果假設我們現在只找這一項
 
-如果已經把 f 跟 g 找出來了
+然後去 maximize Lb 的話
 
-假如有一張從沒見過的 image 叫 x3 在你的 testing data 裡
+你如果 maximize 這一項
 
-他也可以透過 f 變成 embedding space 上的一個 vector
+你如果調整這一項
 
-接下來就看這個 embedding vector 他跟
+你如果找這一項 P(x|z)
 
-這邊有一個錯，這邊應該是 x3
+讓 Lb 被 maximize 的話
 
-這個 x3 應該跟 y3 的 embedding 最接近
+那因為你要找的這一個 log
 
-y3 就是他的 attribute
+你要找的這個 likelihood，它是 Lb 的 upper bound
 
-再看他對應到哪一個動物
+所以，你增加 Lb 的時候
 
-比如說他是 grass-mud horse，所以就是草泥馬
+你有可能會增加你的 likelihood
 
-有時候會遇到一個問題：如果根本沒有 database 呢
+但是，你不知道你的這個 likelihood
 
-根本不知道每一個動物他的 attribute 是甚麼，怎麼辦
+跟你的 lower bound 之間到底有什麼樣的距離
 
-那可以借用 word vector
+你想像你希望能做到的事情是
 
-word vector 的每一個 dimension 就代表了現在這個 word
+當你的 lower bound 上升的時候
 
-他的某種 attribute
+當你的 lower bound 上升的時候
 
-所以不一定需要有個 database 去告訴你每一個動物的 attribute 是甚麼
+你的 likelihood 是會比 lower  bound 高，
+然後你的 likelihood 也跟著上升
 
-假設有一組 word vector，這組 word vector
+但是，你有可能會遇到一個比較糟糕的狀況是
 
-你知道每個動物他對應的 word 的 word vector
+你的 lower bound 上升的時候
 
-這 word vector 你就會拿一個很大的 corpus
-比如說 Wikipedia train 出來
+likelihood 反而下降
 
-就可以把 attribute 直接換成 word vector
+雖然，它還是 lower bound，它還是比 lower bound 大
 
-所以把 attribute 通通換成那個 word 的 word vector
+但是，它有可能下降
+因為根本不知道它們之間的差距是多少
 
-再做跟剛才一樣的 embedding，就結束了
+所以，引入 q 這一項呢
 
-那其實剛才的 training，這邊可以稍微講一下
+其實可以解決剛才說的那一個問題
 
-假設我們的 training的criterion 是說
+為什麼呢？因為你看這個是 likelihood
 
-我們要讓 x^n 通過f(x)
+likelihood = Lb + KL divergence
 
-y^n 通過 g(y)
-他的距離越接近越好
+如果你今天去這個調這個 q(z|x)，調 q 這一項
 
-就是找一個 f 跟 g
-Minimize f(x^n) 跟 g(y^n) 的距離
+去 maximize Lb 的話，會發生什麼事呢？
 
-這樣子你覺得 ok 嗎？其實這樣子是會有問題
+你會發現說，首先 q 這一項
 
-因為這樣 model 就只會 learn 到他把所有不同的 x 跟所有不同的 y
+跟 log P(x) 是一點關係都沒有的
 
-都投影到同一點，這樣子距離最少，就停住了
-所以如果 loss function 這樣定，其實是不行的
+對不對？log P(x) 只跟 P(x|z) 有關
 
-所以需要稍微重新設計一下 loss function
-前面這個 loss function 只有考慮到說
+這個 q 代什麼東西，這個值都是不變的
 
-如果我們知道 x^n 跟 y^n 是一個 pair，要讓他越接近越好
+所以，這個值都是不變的
 
-但沒有考慮到的是，如果知道 x^n 跟另外一個 y 不是同一個 pair
+藍色這一條長度都是一樣的
 
-他們的距離應該要被拉大
-前面這個 loss function 沒有考慮到這件事
+但是，我們現在卻去 maximize Lb
 
-所以應該要改一下這個 loss function
-怎麼改這個 loss function 呢？
+maximize Lb 代表說你 minimize 了這個 KL divergence
 
-一個可能是把它改成 max 裡面的兩個 element 分別是
-0 跟 k – f(x^n) ⋅ g(y^n) 加上
+也就是說你會讓
 
-max，找一個 m 不等於 n
-f(x^n) ⋅ g(y^m)
+你的 lower bound 跟你的這個 likelihood
 
-k 是自己 define 的 margin
-k 是一個 constant，training 的時候必須要自己 define
+越來越接近
 
-今天有一個 max，其中一個 element 是 0
-另外一個 element 是一個看起來很長的式子
+如果你 maximize q 這一項的話
 
-他會從 0 跟這個式子裡面選一個最大的
-所以這一項的最小值就是 0
+所以，今天假如你固定住這個
 
-甚麼時候會等於 0
-當你不是零的這一項，他的值小於 0 的時候
+假如你固定住這個 P，假如你固定住 P(x|z) 這一項
 
-這個loss就會是0
-如果 k – f(x^n) ⋅ g(y^n) 再加上後面這一項
+然後一直去調 q(z|x) 這一項的話
 
-max，m 不等於 n，f(x^n) ⋅ g(y^m) < 0 的時候
-這一項會是 zero loss
+你會讓這個 Lb 一直上升，一直上升，一直上升
 
-再整理一下，把這兩項移到右邊，把左右對調
+最後這一個 KL divergence 會完全不見
 
-就得到下面這個式子
+假如你最後可以找到一個 q
 
-如果看下面這個式子的話就比較清楚這一項的涵義是甚麼
+它跟這個 p(z|x) 正好完全 distribution 一模一樣的話
 
-下面這個式子的意思是，甚麼時候會有 zero loss 呢
+你就會發現說你的 likelihood 就會跟
 
-當 f(x^n) 跟 g(y^n) 他的 inner product 值大於另外一個
+lower bound 完全停在一起
 
-假設在所有不是 y^n 的 y 裡面
+它們就完全是一樣大
 
-找一個 m 出來
+這個時候呢，如果你再把 lower bound 上升的話
 
-這個 m 是跟 f(x^n) 最接近的
+因為你的 likelihood 一定要比 lower bond 大
 
-就算他們的 inner product 最大
+所以這個時候你的 likelihood 呢
 
-還是要比正確答案，小一個 k
+你就可以確定它一定會上升
 
-如果 x^n 跟 y^n 之間的 inner product 值要很大
+所以，這個就是引入 q 這一項它有趣的地方
 
-要有多大呢？要大過所有其他的 y^m 跟 x^n 的 inner product
+今天我會得到一個副產物
 
-而且要大過一個 margin，k
+當你在 maximize q 這一項的時候
 
-如果定這個式子
+你會讓這個 KL divergence 越來越小
 
-不只是把 pair 起來的 attribute 跟 image 拉近
+意謂這說，你就是讓這個 q 跟 P(z|x)
 
-同時也要把那些不成 pair 的東西，把它拆散
+注意一下，這兩項是不一樣的
 
-其實還有一個更簡單的 zero-shot learning 的方法
+這個方向是不一樣的
 
-叫 Convex combination of semantic embedding
+你會讓這個 q(z|x) 跟 P(z|x) 越來越接近
 
-這個方法是說，也不要做甚麼 learning
+所以我們接下要做的事情呢
 
-假設有一個 off-the-shelf  語音辨識系統
+就是找這一個跟這一個
 
-跟一個 off-the-shelf 的 word vector
+然後可以讓 Lb 越大越好
 
-這兩個可能不是自己 train，或網路上載下來的，
+讓 Lb 越大越好
 
-就可以做這件事情
+就等同於我們可以讓 likelihood 越來越大
 
-把一張圖丟到 neural network 裡面去
+而且你順便會找到
 
-他沒有辦法決定他是哪一個 class
+這個 q 可以去 approximation of p(z|x)
 
-他覺得他有 0.5 的機率是 lion，0.5 的機率是 tiger
+那這一項 Lb 它長什麼樣子呢
 
-接下來再去找 lion 跟 tiger 的 word vector
+這一項 Lb 我們剛才講過它就是長這個樣子
 
-把 lion 跟 tiger 的 word vector 用 1:1 的比例混合
+然後 log 裡面相乘，可以把它拆開
 
-0.5 tiger 的 vector 加 0.5 lion 的 vector
+可以把它拆開
 
-得到另外一個新的 vector
+我們把 P (z) 跟 q(z|x) 放在一邊
 
-再看哪一個 word 的 word vector 跟混合的結果最接近
+把這一項放在另外一邊
 
-假設是 liger 這個字最接近的話
+那如果你觀察一下的話
 
-那這個東西就是 liger
+會發現 P(z) 是一個 distribution
 
-liger 是甚麼？
+q(z|x) 也是一個 distribution
 
-liger 就是獅虎，老虎跟獅子生下的後代叫 liger
+所以，這一項是一個 KL divergence
 
-這個是 paper 裡面舉的例子
+這一項是 P(z) 跟 q(z|x) 的 KL divergence
 
-在這邊不需要做任何 training
+那如果複習一下，這個 q 是什麼呢
 
-只要有一組 word vector，一個語音辨識系統
+q 是一個 neural network
 
-就可以做這樣子的 transfer learning
+q是一個 neural network
 
-以下是這個方法的實驗結果
-我覺得其實頗驚人的
+當你給 x 的時候，它會告訴你說
 
-來比一下人類跟機器的差別
-來看這個，你覺得他是甚麼
+q(z|x) 它是從什麼樣的
 
-來問一下大家的意見吧
-覺得是海豹的同學舉手
+mean 跟 variance 的 Gaussian 裡面 sample 出來的
 
-覺得是海象的同學舉手
-覺得是海獅的同學舉手
+所以，我們現在如果你要
 
-機器覺得怎樣呢
-假設沒有做 transfer learning
+minimize 這個 P(z) 跟 q(z|x) 的 KL divergence 的話呢
 
-直接拿一個 CNN
-他覺得最有可能是 sea lion，是海獅
+你就是去調這個 output、這個 output
 
-其他也是奇奇怪怪的
-cowboy boot，也滿像 cowboy boot
+你去調你的這個 q 對應的那一個 neural network
 
-他說是海獅，如果你答海獅，你跟 machine 同一個等級
-正確答案 Stellar sea lion，北海獅
+你去調你的那個 q 對應的那一個 neural network
 
-這 ImageNet 其實是一個很崩潰的 corpus
-這是很崩潰的 task
+讓它產生的 distribution 可以跟這個
 
-在這種 task 上就覺得說機器是有可能贏過人的
-我覺得應該不可能有人答得出正確答案
+一個 normal distribution 越接近越好
 
-DeViSE 是另一個方法
+這一件事情的這個推導呢
 
-是剛才講的把 word vector 跟 image project 同一個 embedding space 上的結果
+我們就把他放在，你就參照 VAE 原始的 paper
 
-在這邊的結果並沒有很好
-比較荒謬的答案比如說 flip-flop
+那 minimize 這一項
 
-這個是剛才講的完全不用 training 的方法
-結果很驚人，他的前五名裡面有北海獅
+其實就是我們剛才說的這一項
 
-而且其他答案也都是海獅
+剛才說的在 reconstruction error 外
 
-California sea lion，Australian sea lion，South American sea lion
+另外再加的那一個，看起來像是 regularization 的式子
 
-這邊有舉另外一個例子，剛剛用草泥馬當例子
+它要做的事情就是 minimize 這個 KL divergence
 
-那個例子並不是亂取的，因為 ImageNet 裡面真的有草泥馬
+它要做的事情就是希望說
 
-這個大家都知道是草泥馬
-machine的答案是這樣子
+這一個 q(z|x) 的 output
 
-第一名是 Tibetan mastiff，是獒犬
+跟 normal distribution 是接近的
 
-然後是 titi monkey我也不知道是甚麼
+那我們還有另外一項
 
-然後 Koala，然後 chow-chow 好像是鬆獅狗之類的
+另外一項是這樣子
 
-他其實滿像獒犬的
+另外一項是要這個積分
 
-llama 其實就是草泥馬
+over q(z|x) * log[P(x|z)] 對 z 做積分
 
-表面上看起來有答對，其實沒有答對
+這一項的意思就是
 
-因為答案是另外一種 lama
+你可以想像，我們有一個 log P(x|z)
 
-如果你有看過草泥馬傳奇的話
+然後，它用 q(z|x) 來做這個 weighted sum
 
-其實是部落裡面最強的騎手才能騎牠
+所以，你可以把它寫成
 
-草泥馬有很多種，至少有三種
+[log P(x|z)] 根據 q(z|x) 的這個期望值
 
-這種是最強的，反正不是 llama 就對
+根據它的期望值
 
-llama 的臉是尖的
+所以這一邊這個式子的意思呢
 
-這種的臉是圓的
+這一邊這個式子的意思就好像是說
 
-這個方法得到比較怪的結果
+我們從 q(z|x)  去 sample data
 
-其實這個 task 有點難，這可能是一個比較失敗的例子
+給我們一個 x 的時候
 
-這個 network 也沒有得到正確的結果
+我們去計算，我們去根據這個 q(z|x)，這個機率分佈
 
-它得到最接近的 domestic llama
+去 sample 一個 data
 
-Zero-shot learning 剛才舉的例子都是影像的例子
+然後，要讓 log P(x|z) 的機率越大越好
 
-最後舉一個文字的例子
+那這一件事情其實就 Auto-encoder 在做的事情
 
-這個結果滿新的，這個結果最近才被放到 arXiv 上面
+什麼意思呢？
 
-是 google 的 paper
+怎麼從 q(z|x) 去 sample 一個 data 呢？
 
-現在不只要放 arXiv 還要做漂亮的動畫在部落格上面
+你就把 x 丟到 neural network 裡面去
 
-這個是做 machine translation
+它產生一個 mean 跟一個 variance
 
-在 training 的時候
+根據這個 mean 跟 variance
 
-machine 看過如何把英文翻成韓文，有這種 data
+你就可以 sample 出一個 z
 
-它知道怎麼把韓文翻成英文，有這種 data
+接下來，我們要做的事情
 
-它知道怎麼把英文翻成日文，有這種 data
+你已經做這一項了
 
-它知道怎麼把日文翻成英文，有這種 data
+這一邊就是這一項
 
-接下來它從來沒有看過日文翻韓文的 data，但是它可以翻
+你已經根據現在的 x sample 出 一個 z
 
-它從來沒有看過韓文翻日文的 data，所以它也可以翻
+接下來，你要 maximize 這一個 z
 
-這件事情怎麼做到的
+產生這個 x 的機率
 
-如果看部落格的文章，好像有第二版本的 title 很聳動
+那這個 z 產生這個 x 的 機率是甚麼呢
 
-Google 的 machine，發明了自己的 sequence language
+這個 z 產生這個 x 的機率
 
-後來標題就被偷偷改了，後來看到有另外一個版本的標題
+是把這個 z 丟到另外一個 neural network 裡面去
 
-那篇部落格可能也不是 google 寫的
+它產生一個 mean 跟 variance
 
-為甚麼 Zero-shot learning 在這個 task 是可行的
+要怎麼讓這個機率越大越好呢？
 
-因為如果用同一個 model 做了不同語言之間的 translation 以後
+要怎麼讓這個 NN output
 
-machine 可以學到的事情是怎樣的呢
+所代表 distribution 產生 x 的 機率越大越好呢？
 
-它可以學到對不同語言的 input
+假設我們無視 variance 這一件事情的話
 
-都把不同語言的不同句子 project 到同一個 space 上面
+後來在一般實作裡面
 
-而在這個 space 上面，它是 language independent 的
+你可能不會把 variance  這一件事情考慮進去
 
-這個 space 上面的位置，只跟這個句子的 semantic 有關
+你只考慮 mean 這一項的話
 
-舉例來說，這個是 paper 裡面的例子
+那你要做的事情就是
 
-這個 paper 說根據 learn 好的 translator
+讓這個 mean 呢
 
-translator 有一個 encoder，它會把 input 的句子變成一個 vector
+讓你的這個 mean 跟你的 x 越接近越好
 
-一個 decoder，根據這個 vector，解回前一個句子，就是翻譯的結果
+你現在是一個 normal
 
-如果把不同的語言，都丟到這個 encoder 裡面
+你現在是一個 Gaussian distribution
 
-讓它變成 vector 的話
+那 Gaussian distribution 在 mean 的地方機率是最高的
 
-這些不同語言的不同句子，在這個 space 上的分佈有什麼樣的關係呢
+所以，如果你讓這個 NN
 
-比如說這三個，英文、韓文和日文的三個句子
+output 的這個 mean 正好等於你現在這個 data x 的話
 
-這三個句子講的是同一件事情、是一樣的意思
+這一項 log P(x|z) 它的值是最大的
 
-通過 encoder 的 embedding 以後，他們在 space 上面其實是差不多的位子
+所以，現在這整個 case 就變成說
 
-其實就是在這個位置
+input 一個 x，然後，產生兩個 vector
 
-在這個圖上，不同的顏色代表同樣的意思
+然後 sample 一下產生一個 z，再根據這個 z
 
-這些句子雖然是同樣的意思，但可能來自於不同的語言
+你要產生另外一個 vector
 
-比如說這邊含紅色的這三條線
+這個 vector 要跟原來的 x 越接近越好
 
-他們在這個 space 上面是在一起，代表同樣的意思
+這件事情其實就是
 
-但其實他們來自於不同的語言
+就是 Auto-encoder 在做的事情
 
-你說這樣子算 machine 發明了一種新語言
+你要讓你的 input 跟 output 越接近越好
 
-其實也算是，如果把 embedding space 當作一種新的語言的話
+它就是 Auto-encoder 在做的事情
 
-machine 做到的就是發現了一種 sequence language
+所以這兩項合起來
 
-對每一種不同的語言，都先轉成只有他自己知道的 sequence language
+就是剛才我們前面看到的 VAE 的 loss function
 
-再從這種 sequence language 轉成另外一種語言
+如果你聽不懂的話也沒有關係
 
-就算是有某一個發音的 task，input 語言和 output 語言是 machine 沒有看過的
+前面有提供了比較  intuitive 的想法
 
-它也可以透過這種它自己學出來的 sequence language
-來做 translation
+那其實 VAE 有另外一個是叫做 conditional 的 VAE
 
-這邊是更多的 Zero-shot learning 的 paper給大家參考
+conditional VAE 這邊我們就簡單講一下概念就好
 
-其實 Zero-shot learning 像剛才看到用在 image 分類上面
+conditional VAE 它可以做的事情是說
 
-其實現在也可以用在 caption generation 上
+比如說，如果你現在讓 VAE 可以產生手寫的數字
 
-希望 machine 如果看到一個從來沒看過的東西
+讓 VAE 可以產生手寫的數字
 
-它也可以用自然語言來描述它現在到底看到甚麼、或看到甚麼動作
+它就是看一個，給它一個 digit
 
-剩下一點點部分
+然後，它把這個 digit 的特性抽出來
 
-所以你遇到一個狀況是
+它抽出它的特性
 
-target data 有 label，source data 沒有 label
+比如說，它的筆劃的粗細等等
 
-剛剛講的狀況都是 source data 有 label 的狀況
+然後，接下來呢
 
-有時候會遇到 source data 沒有 label 的狀況
+你在丟進 encoder 的時候
 
-但是 target data 可能有 label，可能沒有 label
+你一方面給它
 
-這種 target data 有 label，source data 沒有 label 的狀況
+有關這一個數字的特性的 distribution
 
-叫做 Self-taught learning
+另外一方面告訴 decoder 說
 
-target data 有 label，source data 沒有 label，這種是 Self-taught learning
+它是什麼數字
 
-target data 沒有 label，source data 也沒有 label，這種是 Self-taught clustering
+那你就可以 generate 一大排
 
-在 Self-taught learning 裡面，作者強調這跟一般的 transfer learning 是不一樣的
+你就可以根據這一個 digit
 
-這個名詞都是大家自己定的
+generate 跟它 style 很相近的 digit
 
-在 Self-taught learning 作者裡面，它的想法是 transfer learning 是有 label 的
+這個應該是在 MNIST 上面的結果
 
-在 source domain 是有 labeled data 的才叫 transfer learning
+我的 reference 在下面，這是在 MNIST 上面的結果
 
-Self-taught learning 不算是一種 transfer learning
+這是在另外一個數字的 corpus 上面的結果
 
-不過後人都把 Self-taught learning 當作是一種 transfer learning
+你會發現說
 
-這個只是文字上面枝枝節節的小問題
+conditional VAE 確實可以根據某一個 digit
 
-有一個要強調的是 Self-taught learning 跟 semi-supervised learning 有一些不一樣的地方
+畫出其他的這個 style 相近的數字
 
-Semi-supervised learning 在 learning的時候，也是有一些 labeled data
+這一邊是一些 reference 給大家參考
 
-一些 unlabeled data
+那 VAE 其實有一個很嚴重的問題
 
-可以說 source data 是 unlabeled data，target data 是 labeled data
+就是因為它有這問題，所以
 
-這也是一種 semi-supervised learning
+之後又 propose 了 GAN
 
-這種 semi-supervised learning 跟一般 semi-supervised learning 有一些不一樣
+那 VAE 有什麼樣的問題呢？
 
-一般 semi-supervised learning 會假設那些 unlabeled data 至少還是跟 labeled data是比較有關係的
+VAE 其實它從來沒有去真的學怎麼產生一張
 
-但在 Self-taught learning 裡面
+看起來像真的 image，對不對？
 
-那些 unlabeled data、那些 source data，跟 target data 關係比較遠
+因為它所學到的事情是
 
-其實 Self-taught learning 概念很簡單
-假設 source data 夠多，雖然它是 unlabeled
+它想要產生一張 image
 
-可以去 learn 一個 feature extractor
-在原始的 Self-taught learning paper 裡面
+跟我們在 data base 裡面某張 image 越接近越好
 
-他的 feature extractor  是 sparse coding
-因為這 paper 比較舊，大概十年前
+但是，它不知道的事情是
 
-現在也不見得要用 sparse coding 也可以 learn
+我們在 evaluate 它產生的 image
 
-比如說 auto-encoder
+跟 data base 裡面的 image 的相似度的時候
 
-用 auto-encoder 跟 decoder 來做feature extractor
+我們是用，比如說，mean square error 等等
 
-總之，有大量的 data，他們沒有 label
+來 evaluate 兩張 image 中間的相似度
 
-可以做的是用這些 data learn 一個好的 feature extractor
+今天呢，假設我們這個
 
-用這些 data learn 一個好的 representation
+這個 decoder 的 output 跟真的 image 之間
 
-用這個 feature extractor 在 target data 上面去抽 feature
+有一個 pixel 的差距
 
-在 Self-taught learning 原始的 paper 裡面
+它們有某一個 pixel 是不一樣的
 
-其實做了很多 task，這邊不要一一細講
+但是，這個不一樣的 pixel，它落在不一樣的位置
 
-這些 task 都顯示 Self-taught learning 是可以得到滿顯著的 improvement
+其實是會得到非常不一樣的結果
 
-台灣大學人工智慧中心
+假設這個不一樣的 pixel
+
+它是落在這個地方
+
+它落在這個地方
+
+它只是讓 7 的筆劃比較長一點
+
+跟它落在另外一個地方
+
+它落在這個地方
+
+對人來說 ，你一眼就可以看出說
+
+這個是 machine generate，是怪怪的 digit
+
+這個搞不好是真的
+
+因為你根本看不出來跟原來的 7 有什麼差異
+
+它只是稍微長一點，看起來還是很正常
+
+但是，對 VAE 來說，都是一個 pixel 的差異
+
+對它來說，這兩張 image 是一樣的好或一樣的不好
+
+所以，VAE 它學的事情
+
+只是怎麼產生一張 image 
+跟 data base 裡面的 image 一模一樣
+
+它從來沒有想過說要
+
+真的產生一張可以假亂真的 image
+
+所以，如果你用 VAE 來做 training 的時候
+
+其實你產生出來的 image
+
+VAE 所產生出來的 image
+
+往往都是 data base 裡面的 image
+
+的 linear combination 而已
+
+因為它從來沒有學過要產生新的 image
+
+它唯一做的事情只有模仿而已
+
+它唯一做的事情只有
+
+希望它產生的 image 跟 data base 的某張 image 越像越好
+
+它只是模仿而已
+
+或者最多就是把原來 data base 裡面的image 做 linear combination
+
+它做一些 combination，它沒辦法產生一些新的 image
+
+所以，這樣感覺沒有非常的 intelligent
+
+所以，接下來就有人 propose
+
+有另外一個方法叫做 Generative Adversarial Network
+
+Adversarial 是對抗的意思
+
+它縮寫是 GAN
+
+你會發現它是很新的 paper
+
+它最早出現的時候 是 2014 年的 1 2月
+
+所以，大概是兩年前的 paper
+
+以下呢，我們引用了 Yann LeCun 對 GAN 的 comment
+
+就是有人在 Quora 上面
+
+問了說這個
+
+Unsupervised learning 的 approach 
+哪一個是最有 potential 的
+
+然後，Yann LeCun 他親自來回答，他說呢
+
+Adversarial Training is the coolest thing since sliced bread.
+
+since sliced bread，大家知道是什麼意思嗎？
+
+我 google了一下，這是個片語
+
+如果翻譯成中文的話，是有史以來的意思
+
+since sliced bread 是什麼意思呢？
+
+sliced bread 是切片麵包的意思
+
+那這個片語的典故，好像是說
+
+在過去麵包店是不幫你切麵麵包的
+
+吐司麵包烤完之後，他是不幫你切的
+
+所以你買回去之後，要自己切很麻煩
+
+後來就人發明說，應該先切了以後再賣
+
+然後，大家都很高興這個樣子
+
+所以，since sliced bread
+
+它的英文片語就是有史以來的意思
+
+它說這是有史以來最強的、最酷的方法
+
+他這邊還講了一些別的，他說
+
+What's missing at the moment is a good understanding of it.
+
+so we can make it work reliably.
+
+It's very finicky.
+
+Sort of like CovNet were in the 1990s,
+
+when I had the reputation of being the only person who could make them work(which wasn't true).
+
+這其實是 GAN 非常難 train
+
+感覺好像只有 Ian 跟 Goodfellow
+
+才 propose 他們可以做得起來
+
+其他人做起來，你可以 google 一下那個 GAN 的 code
+
+很多都在 MNIST 上面
+
+他們產生的 digit，都不是很好看
+
+我們用 VAE 隨便做都可以打爆這些東西
+
+所以產生的 image 很怪
+
+但是，你如果看 paper 的話
+
+它的 performance 是滿好的
+
+所以，它裡面還有很多不為人知的技巧
+
+像過去大家相信說只有 Yann LeCun 可以 train 起來 CNN
+
+不過其實不是這樣子
+
+那其實我很無聊，我又收集了，找到另外一則這樣
+
+就是有人問說
+
+有沒有什麼最近的 breakthroughs 在 deep learning 裡面
+
+然後，Yann LeCun 又來回答了，他說
+
+The most important one, in my opinion, 
+is adversarial training.
+
+also called GAN.
+
+This is an idea proposed by Ian Goodfellow.
+
+他說這個是 the most interest idea
+
+in the last ten years in ML
+
+所以，你就來看這個十年來最有趣的想法到底是怎麼樣
+
+這個 GAN 的概念
+
+有點像似擬態的演化
+
+比如說，這是一個枯葉蝶
+
+這個是一個枯葉蝶
+
+他長得就跟枯葉一模一樣
+
+枯葉蝶是怎麼變的跟枯葉一模一樣呢？
+
+怎麼變成這麼像的呢？
+
+也許一開始他長的是這個樣子
+
+然後呢，但是他有天敵
+
+類似麻雀的天敵
+
+比如像波波這樣子的天敵
+
+天敵會吃這個蝴蝶
+
+天敵辨識是不是蝴蝶的方式，就是他知道蝴蝶不是棕色
+
+他就吃不是棕色的東西
+
+所以蝴蝶就演化，他就變成是棕色的
+
+但是，他的天敵也會跟著演化
+
+波波就會變成比比鳥這樣
+
+然後這個比比鳥知道說，蝴蝶是沒有葉脈的
+
+所以，他會吃沒有葉脈的東西
+
+他會 ignore 有葉脈的東西
+
+所以，蝴蝶又再演化
+
+就會變成枯葉蝶，他就產生葉脈
+
+但是，他的天敵也會再演化
+
+這個好像是神獸
+
+這個好像不是波波演化來的，不過沒有關係
+
+然後，他的天敵也還會再演化
+
+所以，這兩個東西呢
+
+天敵和枯葉蝶，他們就會共同的演化
+
+所以，枯葉蝶就會長得越來越樣枯葉
+
+直到最後沒有辦法分辨為止
+
+所以這跟 GAN 的概念，是非常類似的
+
+GAN 的概念是這個樣子
+
+首先，有一個第一代的 Generator
+
+第一代的 Generator 它很廢，它可能根本就是 random 的
+
+它會 generate 一大堆奇怪的東西
+
+看起來不像是真正地 image 的東西
+
+假如我們現在叫它 Generate 4 個 digit
+
+那接下來有一個的第一代 Discriminator
+
+他就是那個天敵
+
+Discriminator 做的事情是
+
+他會根據 real 的 image
+
+跟 Generator 所產生的 image
+
+去調整它裡面的參數
+
+去評斷說，一張 image 是真正的 image
+
+還是 Generator 所產生的 image
+
+接下來呢，這個 Generator 根據這個 Discriminator
+
+等一下會講說 Generator
+
+怎麼根據 Discriminator去演化
+
+Generator 根據 Discriminator
+
+他又去調整了他的參數
+
+所以，第二代的 Generator
+
+他產生的參數，他產生的 digit 就可能就更像真的
+
+接下來，Discriminator 會再根據第二代的Generator
+
+產生的 digit 跟真正的 digit
+
+去 update 他的參數
+
+接下來，有了第二代的 Discriminator
+
+就會再產生第三代的 Generator
+
+第三代 Generator 產生的數字又更像真正的這個數字
+
+就是第三代 Generator 他產生的這些數字
+
+可以騙過第二代的 Discriminator
+
+第二代產生的這些數字，可以騙過第一代的 Generator
+
+但是，這個第一代的 Discriminator
+
+他產生的數字，可以騙過第二代的 Discriminator
+
+但是，Discriminator 會再演化
+
+可能又可以再分辨第三代 Generator 產生的數字
+
+跟真正的數字之間的差距
+
+你要注意一個地方就是，這個 Generator 啊
+
+他從來沒有看過真正的 image長什麼樣子
+
+Discriminator 有看過真正的 image 長什麼樣子
+
+它會比較真正的 image 跟 Generator 的 output 的不同
+
+但是，Generator 從來沒有看過真正的 image
+
+他做的事情，只是想去騙過 Discriminator
+
+所以，因為 generator 從來沒有看過真正 image
+
+所以，Generator 他可以產生出來的那一些 image
+
+是 data base 裡面從來都沒有見過的
+
+所以，這比較像是，我們想要 machine 做的事情
+
+我們現在看 Discriminator 是怎麼 train 的
+
+這一邊是比較直覺的
+
+這個 Discriminator 他就是一個 neural network
+
+他的 input 就是一張 image
+
+他的 output  就是一個 number
+
+它的 output 就是一個 scalar
+
+你可能通過 sigmoid function，讓他的值介於 0 到 1 之間
+
+1 就代表說 input 這張 image 是真正的 image
+
+假如你是要做手寫數字辨識的話
+
+那 input image 就是真正的人手寫的數字
+
+0 代表是假的，是 Generator 所產生的
+
+那 Generator 是什麼呢？
+
+Generator 在這一邊，其實
+
+他的那個架構就跟 VAE 的 decoder 是一模一樣的
+
+他也是一個 neural network
+
+他的 input 就是從一個 distribution
+
+他可以是某某 distribution 或是任何其他的 distribution
+
+從某一個 distribution sample 出來的一個 vector
+
+你把這個 sample 出來的 vector
+
+丟到 Generator 裡面
+
+他就會產生一個數字
+
+產生一個 image
+
+你給他不同的 vector
+
+他就產生不同樣子的 image
+
+那先用 Generator 產生一堆假的 image
+
+然後，我們有真正的 image
+
+Discriminator 就是把這一些 Generator
+
+所產生的 image
+
+都 label 為 0，也都 label 為 fake
+
+然後，把這個真正的 image
+
+都 label 為 1
+
+也就是都 label 為 true
+
+接下來，就只是一個 binary classification 的 problem
+
+大家都很熟
+
+你就可以 learn 一個 Discriminator
+
+接下來，怎麼 learn 這個 Generator 呢？
+
+Generator 的 learn 法是這個樣子
+
+現在已經有了第一代的 Discriminator
+
+怎麼根據第一代的 Discriminator
+
+把第一代的 Generator 再 update 呢
+
+首先，如果我們隨便給，輸入一個 vector
+
+他會產生一張隨便的 image
+
+那這一個 image 可能沒有辦法騙過這個 Discriminator
+
+你把 Generator 產生的 image 丟到 Discriminator 裡面
+
+他可能說，這有 87% 像這樣子
+
+然後，接下來要做的事情是甚麼呢？
+
+接下來，我們要做的事情是調這個 Generator 的參數
+
+調這個 Generator 的參數
+
+讓 Discriminator 會認為說 Generator
+
+generate 出來的 image 是真的，也就是說
+
+要讓 Generator generate 出來的 image
+
+丟到 Discriminator 以後，Discriminator 的 output
+
+必須要越接近越好
+
+所以，你希望 Generator generate 是長這樣子的 image
+
+他可以騙過 Discriminator
+
+Discriminator output 是 1.0
+
+覺得他是一個真正的 image
+
+這件事情怎麼做呢
+
+其實，因為你知道這個 Generator 是一個 neural network
+
+那 Discriminator 也是一個 neural network
+
+你把這個 Generator 的 output
+
+丟到這個當作 Discriminator 的 input
+
+然後，再讓他產生一個 scalar
+
+這一件事情，其實就好像是
+
+你有一個很大很大的 neural network
+
+他這邊有很多層
+
+他這一邊也有很多層
+
+然後，你丟一個 random 的 vector
+
+他 output 就是一個 scalar
+
+所以，一個 Generator 加一個 Discriminator，他合起來
+
+就是一個很大的 network
+
+他既然乘起來是一個很大的 network
+
+那你要讓這個 network
+
+再丟進一個 random vector
+
+他 output 1 是很容易的，你就做 Gradient Descent 就好
+
+你就用 Gradient Descent 調參數
+
+希望丟進這一個 vector 的時候
+
+他的 output 是要接近 1 的
+
+但是，你這邊要注意的事情是
+
+你在調這個參數的時候
+
+你在調這個 network 參數的時候
+
+你在做 Backpropagation 的時候
+
+你只能夠調整這個 Generator 的參數
+
+你只能算 generator 的參數對 output 的 gradient
+
+然後去 update Generator 的參數
+
+你必須要 fix 住 Discriminator 的參數
+
+如果你今天不 fix 住 Discriminator 的參數，
+會發生什麼事情呢？
+
+你會發生，對 Discriminator 來說
+
+要讓他 output 1 很簡單阿
+
+就他最後output 的時候，bias 設 1
+
+然後其他都設 2，weight 都設 0，它 output 就 1 了
+
+所以，Discriminator，你要讓這整個 network
+
+input 一個 random 的 vector，output 是1 的時候
+
+你要把 Discriminator 這個參數鎖住
+
+Discriminator 參數必須要是 fix 住的
+
+然後，input 一個 Generator，只調 generator 的參數
+
+這樣 generator 產生出來的 image
+
+才會像是，才是一個可以騙過 Discriminator 的 image
+
+這邊有一個來自 GAN 原始 paper 的 Toy example
+
+我們來說明一下，這個 Toy example 是什麼意思
+
+這個 Toy example 是這樣子
+
+他說，現在我們的這個 z space
+
+也就是這個 decoder 的 input
+
+我們知道 decoder 的 input 就是一個 z
+
+就是一個 hidden 的 vector
+
+hidden 的這個 vector
+
+這個 z 他是一個 one dimensional 的東西
+
+那他丟到 Generator 裡面
+
+他會產生另外一個 one dimension 的東西
+
+這個 z 可以從任何的 distribution 裡面 sample 出來
+
+這邊在這個例子裡面
+
+他顯然是從一個 uniform 的 distribution 裡面
+
+sample 出來的
+
+然後，你把這一個 z 通過 neural network 以後
+
+每一個不同的 z，他會給你不同的 x
+
+這個 x 的分布，就是綠色的這個分布
+
+綠色這個分布，現在要做的事情是
+
+希望這個 Generator 的 output 可以越像 real data 越好
+
+他這一邊的 real data 就是黑色的這個點
+
+假設有一組 real data 就是黑色的這個點
+
+你要找的這個 distribution 是黑色的這個點
+
+那你希望你的 Generator 的 output
+
+也就是這個綠色 distribution
+
+可以跟黑色的這個點，越接近越好
+
+如果按照 GAN 的概念的話
+
+你就是把這個 Generator 的 output x
+
+跟這個 real 的 data
+
+這些黑色的點，丟到 Discriminator 裡面
+
+然後，讓 Discriminator 去判斷說
+
+現在這個 value，其實現在這個 x
+
+real data 都只是一個 scalar 而已
+
+現在這個 scalar，他是來自真正的 data 的機率
+
+跟來自於 Generator 的 output 的機率
+
+如果他是真正的 data 的話就是 1
+
+反之就是 0
+
+Discriminator 的 output，就是綠色的 curve
+
+那假設現在，Generator 他還很弱
+
+所以，他產生出來的 distribution
+
+是這個綠色的 distribution
+
+那這個 Discriminator 他根據 real data
+
+跟這個 Generator distribution 他的樣子呢
+
+你給他這個 x 的值，他的 output
+
+可能就會像是這一條藍色的線
+
+這一條藍色的線告訴我們說
+
+Discriminator 認為說，如果是在這一帶的點
+
+他比較有可能是假的
+
+他的這個值是比較低的
+
+如果是落在這一帶的點
+
+他比較有可能是從 Generator 產生的
+
+落在這一帶的點
+
+他比較有可能是 real data
+
+接下來，Generator 就根據
+
+Discriminator 的結果去調整他的參數
+
+Generator 要做的事情是騙過 Discriminator
+
+既然 Discriminator 認為
+
+這個地方比較有可能是 real data
+
+Generator 就把他的 output 往左邊移
+
+他就把他的 output 往左邊移
+
+那你說有沒有可能會移太多
+
+比如說，通通偏到左邊去，是有可能的
+
+所以 GAN 很難 train 這樣
+
+這個要小心的調參數
+
+小心的調參數，讓他不要移太多
+
+這綠色的 distribution 就可以稍微偏一點
+
+比較接近真正 real 的黑色的點的 distribution
+
+所以，Generator 會騙過他
+
+他就產生新的 distribution
+
+然後，接下來 Discriminator
+
+會再 update 綠色的這一條線
+
+這一個 process 就不斷反覆地去進行
+
+直到最後呢
+
+Generator 產生的 output 跟 real data 一模一樣
+
+那 Discriminator 會沒有任何辦法
+
+分辨真正的 data
+
+你有問題嗎？
+
+其實這個就是現在 train GAN 的時候
+
+所遇到最大的問題
+
+你不知道 Discriminator 是不是對的
+
+因為你說 Discriminator 現在得到一個很好的結果
+
+那可能是 Generator 太廢
+
+有時候 Discriminator 得到一個很差的結果
+
+比如說，他認為說每一個地方
+
+每一個地方他都無法分辨說
+
+是 real value 還是 fake value
+
+這個時候並不代表說 Generator generate 的很像
+
+有可能只是 Discriminator 太弱了
+
+所以，這是一個現在還沒有好的 solution 的難題
+
+所以，真正在 train GAN 的時候，你會怎麼做呢？
+
+你會一直坐在電腦旁邊，看他產生 image 這樣，你懂嗎 ?
+
+因為你從 Discriminator 跟 Generator 的 loss
+
+你看不出來他 generate 的 image 有沒有比較好
+
+所以，變成說你 Generator 每 update 一次參數
+
+Discriminator 每 update 一次參數
+
+你就去看看他
+
+你就拿 generated 的 image 看看有沒有比較好
+
+如果變差以後
+
+方向走錯了，再重新調一下參數這樣子
+
+所以，這個非常非常的困難
+
+非常非常的困難
+
+我們這一邊其實有人在線上放了一個 demo
+
+我們來看一下這個 demo
+
+非常 realistic 的 image
+
+這個是 OpenAI 產生的 image
+
+如果我們問你說
+
+你覺得左邊是 real image
+
+還是右邊是 real image
+
+你覺得左邊是電腦產生的 image 的同學舉手一下
+
+有人，請放下
+
+覺得右邊是電腦產生的 image 的同學舉手一下
+
+好，手放下
+
+其實他還是沒有辦法騙過人
+
+你看這邊還有很多怪怪的的東西就是了
+
+很多東西很像
+
+這個馬還蠻像
+
+這個有飛魚，有大嘴巴的貓
+
+有很多怪怪的東西
+
+所以，他其實沒有辦法騙過人
+
+我覺得如果放單一一張，光看這個馬
+
+他可能可以騙過人
+
+OpenAI 他們有做那個實驗
+
+好像有 21% 的 image
+
+就有 21% machine generate 的 image 會被誤判成 real
+
+所以，他其實是可以騙過部分的人
+
+另外，這一邊又有一個很驚人的結果
+
+在文獻上非常驚人的結果
+
+就是說先拿很多房間的照片
+
+讓 machine 去 train GAN
+
+他可以 generate 房間的照片
+
+那我們說，那個 Generator 就是你 input 一個 vector 給他
+
+他就會 output 一張 image 給你
+
+那你現在可以在那個
+
+input 的 space 上調你的 vector，去產生不同的 output
+
+所以，他說他先 random 找幾個 vector
+
+random 找 5 個 vector
+
+產生 5 張房間的圖
+
+接著，再從這一個點移動你的這個 vector 到這個點這樣
+
+所以，就發現說你的 image 逐漸地變化
+
+逐漸的變化，然後跑到這個點
+
+然後再逐漸的變化，再跑到這個點
+
+你會發現一些有趣的地方，比如說，這邊有一個窗戶
+
+它慢慢的就變成一個類似電視的東西
+
+或是這邊有一個電視
+
+它慢慢的就變成了窗戶這樣子
+
+我覺得最驚人結果
+
+是有人，有日本人他用 GAN
+
+很神奇的，很神奇的東西
+
+就傳說中，你只要能夠
+
+一旦你能夠成功使用他
+
+他就可以召喚不可思議的力量
+
+但是，大部分的時候，你都沒有辦法成功的召喚它
+
+它有點像是神之卡的感覺這樣
+
+你只要能夠操控那個神，就可以獲得不可思議的力量
+
+他大部分的時候你都無法操控他
+
+昨天晚上我想說，我可不可以自己
+
+generate 一些寶可夢
+
+弄到 5 點我搞不起來，所以後來我想我還是去睡好了
+
+就很麻煩
+
+因為，它最大的問題就是你沒有一個很明確的 signal
+
+它可以告訴你說，現在的 Generator
+
+到底做的怎麼樣
+
+沒有一個很明確的 signal 可以告訴你這件事
+
+在一個 stander NN 的 training 裡面
+
+你就看那一個 loss，loss 越來越小
+
+代表說現在 training 越來越好
+
+但是，在 GAN 裡面，你其實要做的事情是
+
+keep 你的 Generator 跟 Discriminator，
+他們是 well match 的
+
+他們必需要不斷屬於一種競爭的狀態
+
+他們必須要不斷處於可以
+
+他們要像塔史亮跟進藤光一樣
+
+不斷處於這種勢均力敵的狀態
+
+他們必須要成為對手
+
+那個第三堂課的時候
+
+會請作業一、二、三做得特別好的同學來分享一下
+
+他是怎麼做的
+
+作業三就有人用 GAN
+
+所以，代表是有人有做起來
+
+那這很麻煩，因為在 GAN 裡面
+
+你要讓 Discriminator 跟 Generator
+
+他們一直維持一種勢均力敵的狀態
+
+所以，你必須要用不可思議的平衡感
+
+來調整這兩個 Discriminator 跟 Generator 的參數
+
+讓他們一直處於勢均力敵的狀態
+
+今天這個其實很像是在做 Alpha Go 一樣
+
+你有兩個 agent
+
+然後，你要讓他們一直是處於一樣強的狀態
+
+當今天你的 Discriminator fail 的時候
+
+因為我們最後 training 的終極的目標
+
+是希望 Generator 產生出來的東西
+
+是 Discriminator 完全無法分別的
+
+就是 Discriminator 在鑑別真的或假的 image 上面
+
+它的正確率是 0
+
+但是，往往當你發現你的 Discriminator 整個 fail 掉的時候
+
+並不代表說 Generator 真的 generate 很好的 image
+
+往 你遇到的狀況是你的 Generator 太弱
+
+那很多時候，我在 train 的時候還會遇到的狀況
+
+就是 Generator 它不管 input 什麼樣的 vector
+
+它 output 都給你一張非常像的東西
+
+那一張非常像的東西
+
+不知道怎麼回事就騙過了 Discriminator
+
+那個就是 Discriminator 的罩門
+
+它無法分辨那一張 image
+
+那它整個就 fail 掉了，但並不代表說你的 machine
+
+真的得到好的結果
+
+我要說的大概就是這樣
+後面是一些 reference 給大家參考
+
+臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw

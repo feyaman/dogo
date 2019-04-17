@@ -2,1144 +2,1864 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-各位同學，大家好
+deep learning 現在非常的熱門
 
-我們開始上課吧
+所以，它可以用在甚麼地方
 
-我們今天要講的是 Backpropagation
+我覺得真的還不需要多講
 
-也就是實際上，如果你要用 Gradient Descent 的方法
+我覺得大家搞不好都知道得比我更多
 
-來 train 一個 neural network 的時候呢
+我相信如果你隨便用 deep learning 當作關鍵字
 
-你應該要怎麼做？
+胡亂 google 一下
 
-那我們上次其實已經講過了 neural network 的基本架構
+你就可以找到一大堆的、exciting 的 result
 
-那我就發現，在作業二裡面
+所以，我們就直接用這個圖呢
 
-好多人都已經 implement neural network 的 approach
+來簡單地 summarize 一下這個趨勢
 
-那或許你已經對這個方法非常地清楚了
+這個圖呢，是 google 的 Jeff Dean
 
-但是我不知道說，你是不是清楚說
+它在 sigmoid 的一個 keynote speech 的一張投影片
 
-到底實際上，在 train neural network 的時候
+那這個圖想要表達的事情是這樣
 
-Backpropagation 這個 algorithm 是怎麼運作的
+橫軸代表時間
 
-我們就來講一下 Backpropagation 這個 algorithm
+從 2012 的 Q1 到 2016
 
-是怎麼讓 neural network 的 training 變得比較有效率
+縱軸，代表說在 google 內部
 
-那在 Gradient Descent 裡面
+有用到 deep learning 的 project 的數目
 
-我們知道說 Gradient Descent 的方法就是
+那可以發現說，這個趨勢
 
-假設你的 network 有一大堆的參數
+是從幾乎 0 到超過 2000
 
-一堆 w，一堆 b
+所以，這個使用 deep learning 的 project 數目呢
 
-那你先選一個初始的參數
+是指數成長的
 
-你先選一個初始的參數在哪裡
+那如果你看它的應用的話
 
-然後計算這個 θ^0 對你的 loss function 的 Gradient
+它有各種不同的應用，涵蓋幾乎你可以想像的領域
 
-也就是計算每一個
+比如說，Android, Apps, drug discovery
 
-network 裡面的參數，w1, w2, b1, b2 ......等等
+Gmail, Image understanding, 
+Natural language understanding
 
-對你的 L(θ) 的偏微分
+Speech, 各種不同的應用
 
-計算出這個東西以後，這個 gradient 其實是一個 vector
+通通有用到 deep learning
 
-計算出這個 vector 以後，你就可以去更新你的參數
+那 deep learning 可以做的應用實在是太多了
 
-你就把 θ^0 減掉 learning rate
+我們這邊就不要花時間來講這些東西
 
-乘上 gradient，然後得到 θ^1
+如果要講這些東西的話呢
 
-那這個 process 就持續繼續下去
+再用兩、三堂課，其實也是講不完的
 
-再算一遍，在 θ^1 的 gradient
+那這個隨便 google 就有的東西呢，我們就不要再講了
 
-然後，再把 θ^1 減掉 gradient
+我們來稍微回顧一下
 
-update 成 θ^2，這個 process 就一直持續下去
+這個 deep learning 的歷史
 
-所以，在 neural network 裡面呢
+在歷史上呢，它是有經過好幾次的沉沉浮浮
 
-當你用 Gradient Descent 方法的時候，
-跟我們在做 Logistic Regression
+首先，在 1958 年
 
-還有 Linear Regression 等等，是沒有太大的差別的
+有一個技術叫做 Perceptron 被提出來
 
-但是，最大的差別就是
+Perceptron 這個技術，它也是一個 linear 的 model
 
-最大的問題是，在 neural network 裡面
+它非常非常像
 
-我們有非常非常多的參數
+我們在前一堂課講的 Logistic Regression
 
-那現在，如果你要做語音辨識系統的話呢
+它只是沒有 sigmoid 的部分
 
-你的 neural network 通常會有，7, 8 層
+但它還是 linear 的 model
 
-每層有 1000 個 neuron，它有上百萬個參數
+那一開始，有人提出這個想法的時候
 
-所以，這個 vector 呢
+提出 Perceptron 這個想法的時候呢
 
-它是非常非常長的
+大家非常非常的興奮
 
-這是一個上百萬維的 vector
+這個是 Frank Rosenblatt
 
-所以，現在最大的困難就是
+在海軍的 project 裡面提出來的
 
-你要如何有效地去把這一個百萬維的 vector
+他一開始提出來的時候，大家覺得非常非常興奮
 
-有效地把它計算出來
+那個時候要做 Perceptron 的運算呢
 
-那這個就是 Backpropagation 在做的事情
+如果你看 Bishop 的教科書，裡面有一張的機器呢
 
-所以，Backpropagation 並不是一個
+看起來是房間那麼大的機器
 
-和 Gradient Descent 不同的
+那個時候，New York Times 據說還寫了一個報導說
 
-training 的方法，它就是 Gradient Descent
+從此以後，人工智慧就要產生了
 
-它只是一個比較有效率的演算法
+電腦可以自己學習，就像現在這個樣子
 
-讓你在計算這個 gradient，這個 vector 的時候
+可是後來呢
 
-是可以比較有效率地把這個 vector 計算出來
+MIT 有一個
 
-其實，Backpropagation 呢，裡面沒有
+有人呢，就寫了一本教科書
 
-特別高深的數學
+這本教科書的名字就叫做 Perceptron
 
-你唯一需要記得的就只有 Chain Rule
+這本教科書裡面，他就指出了 linear 的 model
 
-那我們用一張投影片，迅速地幫大家複習一下，
-什麼是 Chain Rule
+是有極限的，就像我們在上一張投影片講的
 
-假設你現在有兩個 function，h 跟 g
+linear model 有很多事都辦不到
 
-g input x 就得到 y
+就像是我們剛才舉的那麼簡單的 example
 
-h input y 就得到 z
+它都辦不到
 
-所以，如果你今天給 x 一個小小的變化的話
+然後大家希望就破滅了
 
-給 x 一個變化的話，它會影響到它的 output y
+然後，當時在 1958 年，剛提出 Perceptron 的時候呢
 
-所以，y 會跟這有變化
+有各種驚人的 application
 
-y 有變化以後，又會影響到 z，所以 z 會跟著有變化
+就像現在 deep learning 一樣，有人就說
 
-如果我們今天要計算 dz/dx 的話
+我用了 Perceptron
 
-我們要計算 x 對 z 的微分的話
+結果我可以分辨說，給我一張照片
 
-要怎麼算呢？你可以把它拆成兩項
+那照片裡面有坦克，或是一般的卡車
 
-x 對 z 的微分
+那它可以正確地分辨說，那些照片裡面是坦克
 
-它就等於 y 對 z 的微分
+那些照片裡面是卡車
 
-乘上 x 對 y 的微分
+就算那些坦克呢，被藏在叢林裡面
 
-那這個怎麼來的，你就問一下微積分老師
+就算被樹木蓋住呢，也偵測得出來
 
-你可以就把這個 y 消掉
+那其他人就覺得說，太厲害了，這就是人工智慧
 
-所以左邊就等於右邊，
-但不要讓你的微積分老師知道這件事情
+可是既然 Perceptron 有這樣的
 
-那第二個 case
+後來大家就發現說 Perceptron 其實很多 limitation
 
-我們來看 Chain Rule 第二個 case
+那怎麼可能分辨卡車跟坦克，這麼複雜的 object 呢？
 
-假設現在有 3 個 function，g, h, k
+所以，有人就去把那個 data，再拿出來看了一下
 
-g input s 就得到 x
+就發現說，原來卡車跟坦克的照片
 
-h input s 就得到 y
+是在不同的日子所拍攝的
 
-k input x, y 就得到 z
+所以，一天是雨天，一天是晴天
 
-所以，今天假如你改變了 s
+所以，這個照片本身的亮度就不一樣
 
-改變了 x，改變了 s
+所以，Perceptron 它唯一抓到的東西
 
-你會透過 g 和 h 這兩個 function 改變 x 跟 y
+就只有亮度而已
 
-改變了 s，就改變了 x 跟 y
+所以大家就崩潰了，這個方法的名字就臭掉了
 
-那改變了 x 跟 y 以後，透過 k 這個 function
+後來就有人想說，既然
 
-k 這個 function，input x 跟 y，output 是 z
+一個 Perceptron 不行，我能不能連接很多個 Perceptron
 
-改變了 x 跟 y 以後，你就改變了 z
+就像我們剛才講的，Logistic Regression
 
-所以，今天如果你要計算 s 對 z 的微分的話
+都接在一起，它應該就很 powerful
 
-那這個 s，是透過兩條路徑去影響 z
+這個就叫做 Multi-layer 的 Perceptron
 
-它可以透過 x 去影響 z，也可以透過 y 去影響 z
+事實上，1980 年代
 
-所以，s 對 z 的微分
+Multi-layer 的 Perceptron 它的技術
 
-就可以寫成，就拆成兩項
+基本上在 1980 年代的時候呢
 
-拆成兩項，根據這兩條 path 拆成兩項
+就都開發得差不多了
 
-這個 s 對 z 的微分
+那個時候已經開發完的技術
 
-就可以寫成 x 對 z 的微分
+其實就跟今天的 deep learning
 
-乘上 s 對 x 的微分，就是上面這條路徑
+是沒有太 significant 的差別的
 
-加上 y 對 z 的微分乘上 s 對 y 的微分，也就是
+然後，有一個關鍵的技術是 1986 年的時候
 
-下面這條路徑
+Hinton propose 的 Backpropagation
 
-所以，你大一微積分有好好學的話呢
+那其實同時也有很多人 propose Backpropagation
 
-這個就是我們都學過的 Chain Rule
+只是大部分人把這個 credit 歸給 Hinton 的 paper
 
-那我們等一下呢，會需要用到這個東西
+他那篇 paper 是比較著名的
 
-那再回到這個 neural network 的 training
+但是，在這個時候遇到的問題就是
 
-我們知道說，我們會定一個 loss function
+通常超過 3 個 layer 的 neural network
 
-那這個 loss function 是甚麼呢？
+你就 train 不出好的結果
 
-這個 loss function 是 summation over
+通常一個還可以，再多你就 train 不出好的結果了
 
-所有 training data 的
+那後來在 1989 年
 
-某一個 loss 值，C^n
+有人就發現了一個理論
 
-我們說，假設給定我們一組 neural network 的參數 θ
+就是說，一個 hidden layer
 
-我們把一個 training data x^n
+其實就可以
 
-代到這個 neural network 裡面，它會 output 一個 y^n
+model 任何可能的 function
 
-那同時呢，我們會有一個
+了解嗎？只要一個 neural network 有一個 hidden layer
 
-我們希望這個 neural network 的 output：y^n\head
+它就可以是任何的 function
 
-它希望它如果 output y^n\head 的話
+它就已經夠強了，所以根本沒有必要
 
-就是最正確的，那我們會
+疊很多個 hidden layer
 
-定義一個 y^n 跟 y^n\head 之間距離的 function
+所以，這個 Multi-layer 的 Perceptron 的方法，又臭掉了
 
-這邊寫作 C^n
+然後，大家就比較喜歡做 SVM
 
-C^n 代表 y^n 跟 y^n\head 之間的距離
+那這個方法就臭掉了，據說那一陣子呢
 
-如果 C^n 大的話，代表 y^n 跟 y^n\head 之間的距離很遠
+Multi-layer 的 Perceptron 這個方法
 
-所以，這個 network 的 parameter 的 loss
+也有人叫它 neural network 這個方法
 
-是比較大的，是比較不好的
+它就像是一個髒話一樣
 
-那如果這個 C^n 很小的話，代表
+寫在 paper 裡面，那個 paper 一定被 reject
 
-這個 parameter 是好的
+後來呢
 
-那我們 summation over 所有 training data 的 C^n
+有人就想到一個突破的點
 
-summation over 所有 training data
+這個突破的點，關鍵的地方就是
 
-根據這個參數 θ
+把它改個名字，這個方法已經臭掉了
 
-它的 output 跟它的目標
+只好改一個名字，把它改成 deep learning
 
-它的 output y^n 跟它的目標 y^n\head 之間的距離
+整個就潮起來了
 
-就是得到我們的 total loss，L
+所以我講說，改名字其實是有很大的力量的
 
-那你把這個式子
+大家現在都不想念博士
 
-左右兩邊都對某一個參數 w 做偏微分的話呢
+我們把博士改個名字，大家都想唸了
 
-你就得到右邊這個式子
+下次跟系主任建議一下
 
-你就得到 ∂L/∂w 等於
+很多人覺得說，有一個關鍵的技術是
 
-summation over 所有的 training data
+應該在 2006 年提的
 
-n = 1 到 N
+用 Restricted Boltzmann Machine 做 initialization
 
-∂C^n (θ)/∂w
+很多人覺得說，這是個突破這樣
 
-這個應該是沒有甚麼問題
+甚至有一陣子呢
 
-之所以寫這個式子，只是要講說
+大家的認知是，到底 deep learning 跟
 
-接下來，我們就不用
+1980 年代的 Multi-layer Perceptron
 
-計算 ∂L/∂w
+有何不同呢？它的不同之處在於
 
-我們就只考慮，我們如何去計算
+如果你有用 RBM 做 initialization
 
-對某一筆 data 的 ∂C^n (θ)/∂w
+你在做 Gradient Descent 的時候，不是要找一個
 
-你只要能夠把一筆 data 的
+初始的值嗎？如果你是用 RBM 找的，叫 deep learning
 
-∂C^n (θ)/∂w 算出來
+你沒有用 RBM 找的，是傳統的、
+1980 年代的  Multi-layer Perceptron
 
-再 summation over 所有的 training data
+後來呢，大家逐漸意識到說
 
-你就可以把 total loss 對某一個參數的
+因為 RBM 這個方法呢
 
-偏微分算出來了
+非常的複雜，假設沒有
 
-所以，我們等一下就只 focus 在怎麼計算
+假設你是 machine learning 的初學者的話
 
-對某一筆 data，它的 cost C^n 對 w 的偏微分
+你看這個 paper，我相信你是看不懂的
 
-我們就只 focus 在怎麼計算這一項上面
+如果我們今天要講 RBM
 
-怎麼做呢？
+要從現在開始
 
-我們先考慮某一個 neuron
+假設用我們上課那些知識，講到讓你聽懂
 
-我們先從底下這個 neural network 裡面
+要再另外多講 3 周這樣子
 
-拿一個 neuron 出來，考慮它
+它是有用到一些比較深的理論
 
-那這一個 neuron，它是在第一個 layer 的 neuron
+大家覺得說，哇！這個這麼複雜
 
-所以，它前面的 input
+一定就是非常的 powerful 阿
 
-就是外界給它的 input，x1, x2
+而且它不是 Neural network base 的方法
 
-假設它只有兩個 input，x1 跟 x2
+它是 graphical model
 
-分別乘上 weight w1, w2，再加上 b
+它這個大家覺得說，這個這麼複雜，我們看都看不懂
 
-會得到 z
+這個一定是有用的
 
-這個我想大家應該都非常熟悉，這個 z 呢
+後來大家逐漸試來試去以後，就發現說
 
-就是 x1w1 + x2w2 + b
+這招其實沒什麼用這樣子
 
-那得到這個 z 以後，通過了 activation function
+你可以發現說，如果你讀 deep learning 的文獻
 
-再經過了非常非常多的事情以後
+現在已經不太有人用 RBM 做 initialization 了
 
-你會得到最終的 output，y1, y2
+因為這一招帶給我們的幫助呢
 
-那現在的問題是這樣
+並沒有說特別大
 
-假設我們從這邊拿一個 w 出來
+連 Hinton 自己都知道這點，
+他在某篇 paper 裡面提過這件事情
 
-等一下，我們就拿 w 當作 z
+只是大家可能都沒有注意到那篇 paper 就是了
 
-但是 b 也是一樣，就拿 weight 當作 z
+所以說，但是他有個最強的地方
 
-來看怎麼計算，某一個 weight 對 cost
+它最強的地方就是它讓大家
 
-對 example 的某一個 cost 的偏微分
+重新、再一次對這個 model 有了興趣
 
-那 b 的話，想必你可以以此類推，就把它算出來
+因為它很複雜，所以大家就會開始想要研究
 
-那 ∂C/∂w 怎麼算？
+deep learning 是什麼樣的東西，花很多力氣去研究
 
-這個 ∂C/∂w 阿
+所以，其實我聽過有一個
 
-按照 Chain Rule，你就可以把它拆成兩項
+google 的人對 RBM 的評論
 
-∂z/∂w * ∂C/∂z
+他說這個方法就是石頭湯裡面的石頭
 
-這個 z 可以把它消掉，沒有問題
+石頭湯的故事大家聽過嗎？
 
-所以 ∂C/∂w 可以根據 Chain Rule 拆成兩項
+就有一個人說，我要煮一碗石頭湯
 
-那這兩項，我們就分別去把它計算出來
+有一個士兵，他到一個村莊裡面借宿
 
-前面這項是很簡單的
+然後，他說：我要煮一碗石頭湯
 
-後面這項，是比較複雜的
+然後，大家都說：你要怎麼煮一碗石頭湯？
 
-那計算前面這一項
+我用石頭就可以了
 
-計算 ∂z/∂w 的這個 process 呢
+就用石頭煮一碗湯，如果再加點鹽就更好了
 
-我們稱之為 Forward pass
+就加點鹽
 
-那你等下會知道說為什麼叫 Forward pass
+再加點米就更好了，再加點米
 
-那計算前面這一項 ∂C/∂z 的 process
+再加點菜就更好了，再加點菜
 
-我們稱之為 Backward pass
+然後，就煮了一鍋湯
 
-那我們等一下會講說，為什麼叫做 Backward pass
+大家就覺得好好喝，用石頭就可以煮湯這樣
 
-那我們就先看一下，怎麼來計算這個  ∂z/∂w
+但是，那個石頭其實並沒有什麼作用
 
-怎麼來計算  ∂z/∂w
+所以，其實 RBM 就類似這種東西
 
-好，那我們先看這個 w1
+然後，我覺得有一個關鍵的突破是在 09 年的時候
 
-那你怎麼計算 ∂z/∂w1 呢？
+我們，知道要用 GPU 來加速
 
-就是秒算
+這件事情還頗關鍵的，過去如果你做 deep learning
 
-就是秒算，因為 z 就長這個樣子嘛
+train 一次，一周就過去了
 
-然後，w1 在這邊
+然後，結果實驗又失敗，你就不會想做第 2 次了
 
-所以，一眼就可以知道說，它是 x1
+其實，我小時候，其實也不是小時候啦
 
-那 ∂z/∂w2 呢？
+我多年前有跟一個學弟試著想要做 deep learning
 
-所以，你一眼就可以看出說
+可是，那個時候還不知道疊很多層
 
-它就是 x2，這個都是秒算這樣子
+那個時候大家都疊一層
 
-那它的規律是這樣，它的規律就是
+直覺想法就知道說，一定要疊很多層阿
 
-∂z/∂w，就是看這個 w 前面接的東西是什麼
+怎麼會只有疊一層？
 
-那微分以後就是什麼
+所以想說，我們來把它疊很多層吧
 
-這個 w1 前面，它的 input 是接 x1
+然後，我們就開始做，train 一次要一周
 
-它的 input 是 x1，所以微分以後就是 x1
+train 完以後，結果沒有比較好
 
-w2 呢，它前面的 input 是 x2
+就沒有人想要再繼續做下去了
 
-所以微分以後就是 x2
+本來想找專題生做，專題生也都不想做
 
-那它的規律就是這個樣子
+就沒有人要做，這個題目就沒有人要做了
 
-所以，今天假如給你一個 neural network
+那個時候我們把他好好做出來的話，我們現在就發了
 
-那它裡面有一大推的參數
+不過那時候，我們不知道要用 GPU
 
-一大堆的參數，但是你要
+所以，train 一次要一周，想要做出來也是很難
 
-計算這裡面每一個參數
+現在有 GPU 以後，本來要一周的東西
 
-對 z 的偏微分
+你可能幾個小時，就可以馬上看到結果了
 
-你要計算這裡面每一個參數的 ∂w 跟 ∂z
+那在 11 年的時候
 
-這件事情呢，非常非常的容易
+這個方法被引入到語音辨識裡面
 
-因為我們剛才知道，它的規律就是
+語音辨識發現說，這招果然很有用
 
-∂z/∂w 就是看你這個 w 的 input 是什麼，它就是甚麼
+然後，開始瘋狂地用 deep learning 的技術
 
-所以，如果有人問你說，現在 input 是 1 跟 -1
+到 12 年的時候呢
 
-那這個 1，它對
+這個 deep learning 的技術
 
-它的 activation function 的 input z 的偏微分是什麼呢？
+贏了一個很重要的 image 的比賽
 
-你就可以瞬間回答它說，就是 -1
+所以，在 image 那邊的人
+也瘋狂地用 deep learning 的技術
 
-因為這個 1，前面接 -1
+其實，deep learning 的技術並沒有
 
-所以，這個參數對 z 的偏微分就是 -1
+很複雜，它其實非常簡單
 
-同理，比如說這個 -1，它對 z 的偏微分就是 1
+我們之前講說，machine learning 就是 3 個 step
 
-這個 -2，它對 z 的偏微分就是 1
+那其實 deep learning 也一樣就是，這 3 個 step
 
-這個 1，它對 z 的偏微分就是 1，以此類推
+講說 deep learning 就這 3 個 step
 
-接下來呢
+就好像是在說，把那個大象放進冰箱一樣
 
-接下來假如有人問你說，這個 w
+大象放進冰箱，大家知道嗎？
 
-對它的 activation function 的 input z 的偏微分是什麼呢？
+把門打開，把大象趕進去
 
-你其實也可以瞬間就回答它
+把冰箱門關起來，就把大象放進冰箱了
 
-你只要知道說，這個 w 前面接的 weight
+3 個 step 聽起來就像這樣子
 
-前面接的 input 是什麼
+deep learning 是很簡單的
 
-那這個 w 前面接的 input 是
+你其實可以非常快的了解，其實你可以秒懂它
 
-某一個 neuron 的 output，對不對？
+其實在 deep learning 裡面
 
-這個 w 前面接的 input
+我們說，在 machine learning 裡面第一個 step
 
-是第一個 hidden layer 的 neuron 的 output
+就是要 define 一個 function
 
-那這個 hidden layer 的 neuron 的 output 要怎麼算呢？
+這個 function，其實就是一個 Neural network
 
-這個大家都知道，對不對？就是把
+那這個 Neural network 是
 
-1 跟 -1 丟進去，然後根據我們熟悉的 neuron 的運算
+是甚麼呢？我們剛才已經講說呢
 
-然後看看它的 output 是什麼，就是什麼
+我們把這個 Logistic Regression 呢
+
+前後 content 在一起
+
+然後把一個 Logistic Regression 稱之為 Neuron
+
+整個稱之為 Neural Network
+
+我們其實就得到了一個 Neural Network
+
+那我們可以用不同的方法
+
+來連接這些 Neural Network
+
+我們用不同的方法來連接這些 Neural Network
+
+我們就得到了不同的 structure
+
+在這個 Neural Network 裡面
+
+我們有一大堆的 Logistic Regression
+
+每個 Logistic Regression，它都有自己的 weight
+
+跟自己的 bias
+
+這些 weight 跟 bias 集合起來
+
+就是這個 network 的 parameter
+
+我們這邊用 θ 來描述它
+
+那這些 Logistic Regression
+
+或這些 Neuron
+
+我們應該怎麼把它接起來呢
+
+我們應該怎麼把它接起來呢
+
+有各種不同的方式
+
+怎麼連接，其實是你手動去設計的
+
+是你手動去連接的
+
+最常見的連接方式呢？
+
+叫做 Fully Connected Feedforward Network
+
+在 Fully Connected Feedforward Network 裡面呢
+
+你就把你的 Neuron 排成一排一排
+
+這邊有 6 個 Neuron，就兩個兩個一排
+
+然後，每一組 Neuron，它都有一組 weight
+
+都有一組 bias
+
+那這個 weight 跟 bias 是根據 training data 去找出來的
+
+假設上面這個藍色 Neuron 
+它的 weight 是 1, -2，它的 bias 是 1
+
+下面呢，它的 weight 是 -1, 1，它的 bias 是 0
+
+假設我們現在的輸入
+
+是 1 跟 -1
+
+那這兩個藍色的 Neuron 它的 output 是甚麼呢？
+
+這個做一下小學生會做的運算，你就可以得到答案
+
+1*1 + (-1)*(-2)，再加上 bias 1
+
+通過 sigmoid function 以後
+
+你得到的結果呢，就是 0.98
+
+那下面呢，你把 1*(-1)、(-1)*1 + 0
+
+再通過 sigmoid function 以後，你就得到 0.12
+
+接下來，假設這一個 structure 裡面的每一個 neuron
+
+它的 weight 跟 bias，我們都是知道的
+
+那我們就可以反覆進行剛才的運算
+
+1 跟 -1 通過這兩個 neuron，變成 0.98 跟 0.12
+
+再通過這兩個 neuron，變成 0.86 跟 0.11
+
+再通過這兩個 neuron，得到 0.62 跟 0.83
+
+所以，輸入 1 跟 -1
+
+經過一串很複雜的轉換以後呢
+
+就得到 0.62 跟 0.83
+
+那如果你輸入是 0 跟 0 的話
+
+你輸入 0 跟 0 的話，你得到的 output 就是
+
+經過一番一模一樣的運算，你得到的是 0.51, 0.85
+
+所以，一個 neural network 你就可以把它看作是
+
+一個 function
+
+如果一個 neural network 裡面的參數
+
+weight 跟 bias 我們都知道的話
+
+它就是一個 function
+
+它的 input 是一個 vector，它的 output 是另一個 vector
+
+舉例來說，我們剛才看到說 input 是 [1, -1]
+
+output 是 [0.62, 0.83]
+
+input 是 [0, 0]，output 是 [0.51, 0.85]
+
+所以，一個 network，如果我們已經把參數設上去的話
+
+它就是一個 function
+
+如果我們今天還不知道參數
+
+我只是定出了這個 network 的 structure
+
+我只是決定好說，這些 neuron 間
+
+我們要怎麼連接在一起
+
+這樣子的一個 network structure
+
+它其實就是 define 了一個 function set，對不對？
+
+我們可以給這個 network 設不同的參數
+
+它就變成不同的 function
+
+把這些可能的 function 通通集合起來
+
+我們就得到了一個 function set
+
+所以，一個 neural network 你還沒有認參數
+
+你只是把它架構架起來
+
+你決定這些 neuron 要怎麼連接
+
+你把連接的圖，畫出來的時候
+
+你其實就決定了一個 function set
+
+這跟我們之前做的東西都是一樣的
+
+我們之前也是做 Logistic Regression, Linear Regression
+
+我們都是也決定了一個 function set
+
+那這邊呢，我們也只是換一個方式，來決定 function set
+
+只是如果我們用 neural network 決定 function set 的時候
+
+你的 function set 是比較大的
+
+它包含了很多原來你做 Logistic Regression
+
+做 Linear Regression 所沒有辦法包含的 function
+
+那剛才講的是一個比較簡單的例子
 
 在這個例子裡面呢
 
-假如這個 function 是 sigmoid function
+我們把 neuron 分成一排一排的
 
-算出來是 0.98, 0.12
+然後說每一排的 neuron 都兩兩互相連接
 
-如果你可以算出這兩個 neuron 的 output 是
+藍色 neuron 的 output 都接給紅色
 
-0.98 跟 0.12 的話
+紅色的都接給綠色
 
-那這個 weight
+綠色後面沒有別人可以接了，
+所以它是整個 network 的輸出
 
-它做完偏微分以後
+藍色前面沒有其他人了，
+所以它就是整個 network 的輸入
 
-這個 weight 對
+那 in general 而言呢
 
-它的 activation function 的 input z 做完偏微分以後
+我們可以把 network 畫成這樣
 
-顯然就是 0.12，因為它前面接的 weight 就是 0.12
+你有好多好多排的 neuron
 
-這個 -1 也是 0.12
+你有第 1 排、第 2 排.......到第 L 排
 
-這個 -2 是 0.98，這個 2 是 0.98
+很多排 neuron，每一排 neuron 它裡面的 neuron 的數目
 
-這個也很直覺
+可能很多，比如 1000 個、2000 個阿，這個 scale
 
-所以，同樣的 process 你就反覆的在做
+那這邊每一顆球，代表一個 neuron
 
-你可以得到這兩個紅色 neuron 的 output 是 0.86, 0.11
+在 layer 和 layer 之間的 neuron，是兩兩互相連接的
 
-那你就可以秒反應說，這個
+layer 1 它的 neuron 的 output 會接給
 
-4 對 z 的偏微分就是 0.11
+每一個 layer 2 的 neuron
 
-所以，你要算出這個 neural network 裡面的
+那 layer 2 的 neuron 的 input 就是所有 layer 1 的 output
 
-每一個 weight
+就是所有 layer 1 的 output
 
-對它的 activation function 的 input z 的偏微分
+因為 layer 和 layer 間，所有的 neuron 都有兩兩連接
 
-你就把你的 input 丟進去
+所以它叫 Fully Connected 的 Network
 
-然後，計算每一個 neuron 的 output
+那因為現在傳遞的方向是從 1 到 2
 
-就結束了
+從 2 到 3，由後往前傳
 
-所以，這個步驟叫做 Forward pass
+所以它叫做 Feedforward Network
 
-它是非常容易理解的
+那整個 network 呢，需要一組
 
-再來，我們要講的是 Backward pass
+需要一個 input，這個 input 就是一個 vector
 
-也就是怎麼算 ∂C/∂z
+那對 layer 1 的每一個 neuron 來說
 
-這個你就不會覺得很困難了
+每一個 neuron，它的 input
 
-因為，這個 z 阿
+就是 input layer 的每一個 dimension
 
-它通過 activation function 以後得到 output
+就是 input layer 的每一個 dimension
 
-後面還有非常非常複雜的 process
+那最後第 L 的那些 neuron
 
-它才得到這個 C
+它後面沒有接其他東西了
 
-要經過非常複雜的 process 才能得到 C
+所以，它的 output 就是整個 network 的 output
 
-這個 ∂C/∂z 顯然是很複雜的
+假設第 L 排有 M 個 neuron 的話
 
-不過我們可以用 Chain rule 再把這一項做一下拆解
+它的 output 就是 y1. y2 到 y(下標 M)
 
-假設這個 activation function 是 sigmoid function
+這邊每一個 layer，它是有一些名字的
 
-我這邊就寫一個 σ(z)
+input 的地方，我們叫做 input layer
 
-z 通過 sigmoid function 得到 a
+嚴格說起來，input 其實不是一個 layer
 
-這個 neuron 的 output 是 a
+它跟其他 layer 不一樣，它不是由其他 neuron 所組成的
 
-那接下來會發生甚麼事呢？
+但是，我們也把它當作一個 layer 來看
 
-這個 a 會通過某一個 weight，乘上某一個 weight
+所以，叫它 input layer
 
-再加其他一大堆的 value，得到 z'
+output 的地方，我們叫它 output layer
 
-它是下一個 neuron activation function 的 input
+其餘的部分，就叫做 hidden layer
 
-這個 a 會再乘上另一個 weight，這邊寫成 w4
+那所謂的 deep 是什麼意思呢？
 
-再加上其他一大堆東西，得到 z"
+所謂的 deep 就是有很多 hidden layer
 
-後面這個 z' 跟 z"
+就叫做 deep
 
-之後可能還會發生很多很多的事情
+那有人就會問一個問題，說要幾個 hidden layer
 
-不過我們就先只考慮下一步會發生什麼事情
+才叫做 deep learning
 
-所以呢
+這個就很難說了
 
-我們知道說 ∂C/∂z
+有人會告訴你說，要 3 層以上才叫做 deep
 
-你可以寫成 ∂a/∂z * ∂C/∂a
+有人會告訴你說，要 8 層以上才叫做 deep
 
-那這個就沒有什麼問題，∂a 可以消掉
+所以就看每一個人的定義，都不一樣
 
-那 ∂a/∂z 是什麼呢？
+本來沒有 deep learning 這個詞的時候
 
-我們知道說，a = σ(z)
+大家都說：我在做 neural network
 
-那這個 ∂a/∂z 呢
+通常都只有一層，自從有 deep learning 這個詞以後
 
-其實就是這個 sigmoid function 的微分
+有一層的人，都說他在做 deep learning 這樣
 
-那 sigmoid function 長這個樣子
+所以，現在基本上只要是 neural network base 的方法呢
 
-長這個樣子，綠色這條線
+大家都會說是 deep learning 的方法
 
-那它的微分，你就算一下，長這個樣子
+那到底可以有幾層呢？
 
-長這樣子，我們之前已經看過很多次了
+在 2012 年的時候
 
-所以，∂a/∂z 也沒有問題
+參加 ImageNet 比賽得到冠軍的 AlexNet
 
-接下來的問題就是，∂C/∂a
+它有 8 層，它的錯誤率是 16.4 %
 
-應該長甚麼樣子呢？
+大家可能都知道說，它比第二名的好非常多
 
-它應該長甚麼樣子呢？
+第二名的 error rate 是 30%
 
-那我們就接下來看說，這個 a
+到 14 年的時候，VGG 有 19層
 
-∂a 跟 C 的關係是怎樣
+它的 error rate 降到 7%
 
-你知道 a 它會影響 z'
+GoogleNet 有 22 層，它的 error rate 降到 6.7%
 
-然後，z' 會影響 z
+但是，這個都還不算甚麼
 
-a 會影響 z"，z" 會影響 C
+Residual Network 152 層這樣
 
-a 透過 z' 跟 z" 去影響 C
+如果它跟 GoogleNet, VGG, AlexNet 比起來
 
-所以，∂C/∂a 你可以寫成
+它大概是長這個樣子
 
-∂z'/∂a * ∂C/∂z'
+它的 error rate 是 3.57%
 
-加上 ∂z"/∂a * ∂C/∂z"
+如果你看 Benchmark Corpus 的話，其實
 
-我們假設 a 後面，就是這個藍色 neuron 的下一個 layer
+它這個 performance 是比人在同一個 test 上做的還要好
 
-就是紅色的 neuron 只有兩個
+你可能會很懷疑說
 
-所以，這邊就只有兩項
+人怎麼可能會在影像辨識上輸給機器呢？
 
-這個 a 只會影響 z' 跟 z"
+因為那個 test 其實還滿難的
 
-如果這邊有 1000 個 neuron 的話
+它給你一張圖，一張狗的圖
 
-那這邊這個 Chain rule
+你光回答狗並不是正確答案，你要回答哈士奇這樣子
 
-你的 summation 就是 summation over 1000 項
+那個 test 其實還蠻難的，但其實為了要公平的比較
 
-這樣大家了解我的意思嗎？
+當時，在人跟機器比較的時候
 
-這邊呢，經過前面我們簡化上課的說明
+那些人是有事先看過 training data 的
 
-我們假設只有兩個 neuron，這邊只有兩項
+也就是說，你有先讓它訓練辨識不同狗的種類
 
-只有兩項，a 只會影響 z' 跟 z"
+不同花的種類、不同豬的種類
 
-接下來，∂z"/∂a
+只是經過訓練以後，它還是沒有機器那麼強就是了
 
-會算嗎？這個就是秒算，對不對？這個就是 w3
+那這個是跟 101 做一下比較
 
-z' 等於 a 乘上 w3，再加上一些有的沒的東西
+101 在這邊
 
-所以，這個 z' 對 a 做偏微分
+這個我們之後再講，那 Residual Network 呢
 
-根據這個式子，顯然就是 w3
+它不是一般的 Fully Connected Feedforward Network
 
-所以，同理，這個 z" 對 a 做偏微分
+如果你用一般 Fully Connected Feedforward Network
 
-得到的結果顯然就是 w4
+搞在這個地方，其實結果是會有問題的
 
-所以，這兩項算起來，也不是個問題
+它不是 overfitting，而是 train 都 train 不起來
 
-最後的問題就是，z" 對 C 的偏微分怎麼算呢？
+所以，你其實要特別的 structure
 
-這個 z" 對 C 的偏微分怎麼算呢？
+才能搞定這麼深的 network
 
-因為我們不知道
+這個我們之後再講
 
-z' 對 C 有什麼關係
+那 network 的運作呢
 
-z" 對 C 有什麼關係
+我們常常會把它用 Matrix Operation 來表示
 
-這後面還有發生很多很多的事情
+怎麼說呢，我們舉剛才的例子
 
-是很複雜的，所以我們搞不清楚後面會發生什麼事情
+假設第一個 layer 的兩個 neuron
 
-所以，我們一下子不知道這兩項怎麼算
+他們的 weight 分別是 1, -2, -1, 1
 
-不過沒關係，我們就假設我們知道
+那你可以把 1, -2, -1, 1 排成一個 matrix
 
-假設這兩項的值，我們已經 somehow 透過
+把這個 1, -2, -1, 1 排成一個 matrix
 
-某種方法把它算出來
+那當我們 input 1, -1 要做運算的時候
 
-我們透過一個等一下會講，但你還不知道怎麼做的方法
+我們就是把 1*1、(-1)*(-2)、1*(-1)、(-1)*1
 
-就已經把這兩項做出來了
+所以我們就可以把 1 跟 -1 當做一個 vector 排在這邊
 
-那把這兩項算出來以後
+當我們把這個 matrix 跟這個 vector
 
-把這兩項算出來以後呢
+做運算的時候，我們算 1*1 + (-2)*(-1)
 
-我們就可以把 ∂C/∂z
+就等於是做 1*1、(-1)*(-2)
 
-輕易的算出來
+當我們做 1*(-1)、(-1)*1 的時候
 
-把這兩項算出來以後
+就等於是做 1*(-1)、(-1)*1 這樣
 
-我們就可以算 ∂C/∂z
+接下來呢，有 bias 1 跟 0
 
-你會算 ∂C/∂z' 跟 ∂C/∂z"
+所以，我們要在後面把 bias 排成一個 vector
 
-你就會算 ∂C/∂z
+再把這個 vector 加上去
 
-然後，再把這些值
+這個結果，算出來就是 [4, -2]
 
-代到我們剛才看到的 ∂C/∂z 的式子裡面
+就是通過 activation function 之前的值，就是 4, -2
 
-就得到這樣一個式子，σ'(z) * [w3 * ∂C/∂z' + w4 * ∂C/∂z"]
+然後，通過這個 sigmoid function
 
-你就算出這樣一個式子，那這個式子
+然後在這個 neural network 的文件裡面
 
-還滿簡單的
+我們把這個 function 稱之為 activation function
 
-但是，我們會從另外一個觀點，來看待這個式子
+事實上，它不見得是 sigmoid function
 
-你可以想像說
+因為到現在，大家都換成別的 function
 
-現在有另外一個 neuron 
+如果你是從 Logistic Regression 想過來的話
 
-這個 neuron 並不在我們原來的 network 裡面
+你會覺得它是一個 sigmoid function，
+但現在已經較少用 sigmoid function
 
-有另外一個 neuron 
+假設我們這邊用的是 sigmoid function 的話呢
 
-我把它簡化成這個三角形
+我們就是把 4, -2 丟到 sigmoid function 裡面
 
-把它畫成三角形
+接下來算出來，就是 0.98, 0.12
 
-那這個 neuron 的 input，就是 ∂C/∂z' 跟 ∂C/∂z"
+所以，一個 neural network，一個 feedforward network
 
-那第一個 input ∂C/∂z'，就乘上 w3
+它的一個 layer 的運算，你從 1, -1 到 0.98, 0.12
 
-∂C/∂z" 它就乘上 w4
+你做的運算就是把 input 1 跟 -1
 
-再乘上 activation function， σ'(z)
+1 跟 -1 乘一個 matrix
 
-得到 output，就是 ∂C/∂z
+加上一個 bias 所成的 vector
 
-上面這個 neuron 所做的運算
+再通過一個 sigmoid function
 
-跟下面這個式子，是一模一樣的
+得到最後的結果
 
-我們只是把下面這個式子
+所以，以 general 來說
 
-把它畫出來，讓它看起來像是一個 neuron 一樣
+一個 neural network
 
-那這個 σ'(z) 阿
+假設我們說第一個 layer 的 weight
 
-這個 σ'(z) 其實是一個常數
+全部集合起來，當作一個 matrix, W^1
 
-對不對，它不是一個 function，它是一個constant
+這個 W^1 是一個 matrix
 
-因為，z 其實在計算 Forward pass 的時候
+把它的 bias 全部集合起來
 
-就被決定好了
+當作一個 vector, b^1
 
-z 是一個已經固定的值
+把第二個 matrix 的 weight 全部集合起來
 
-z 我們已經知道它是多少，所以
+當作 W^2
 
-在給定 z 的情況下
+把它的每一個 neural 的 bias 集合起來，當作 b^2
 
-這個 σ'(z)，它就是一個常數
+到第 L 個 layer，所有的 weight 集合起來，變成 W^L
 
-所以，這個 neuron
+bias 集合起來，變成 b^L
 
-跟我們之前看到的 sigmoid function 是不一樣的
+那你今天給它一個 input x 的時候
 
-它並不是把 input 通過一個 non-linear 的轉換
+output 的這個 y 要怎麼算出來呢？
 
-而是直接把 input 乘上一個 constant，σ'(z)
+我們假設我們把 x1, x2, 到 xN，接起來，變成一個 x
 
-就得到一個 output 這樣
+那這個 output 的 y 要怎麼把它算出來呢？
 
-所以，我把這個 neuron 畫成三角形的
+你就這樣算
 
-代表它跟我們之前看到的圓形 neuron
+x * W^1 + b^1
 
-的運作方式是不一樣的，它是直接乘上一個 constant
+再通過 activation function
 
-那你可能會問說，為甚麼是三角形呢
+然後，你就算出第二排這些 neuron 的 output
 
-因為我是電機系的，我覺得這是一個 op-amp 這樣子
+我們稱之為 a^1，你把 x * W^1 + b^1，就得到 a^1
 
-op-amp 就會乘上一個 constant，它是一個放大器這樣
+x * W^1 + b^1
 
-聽不懂就算了，這不太重要
+再通過 activation function 以後，就得到 a^1
 
-然後，這樣問題都解決了
+接下來呢，你做一樣的運算
 
-都解決了，對不對，我們現在最後的問題就只有
+把 a1 * W^2 + b^2
 
-怎麼算這兩項而已
+再通過 activation function 以後，就得到 a^2
 
-假設能夠算這兩項，問題也就都解決了
+然後，就這樣一層一層的做下去到最後一層
 
-那現在怎麼算這兩項呢？
+你把 a^(L-1) * W^L + b^L 通過 activation function 以後
 
-怎麼算這兩項呢？
+得到這個 network 的最終 output y
 
-我們現在假設兩個不同的 case
+所以，整個 neural network 的運算其實就是
 
-第一個 case 是，我們假設現在紅色的這兩個 neuron
+一連串 matrix 的 operation
 
-就已經是 output layer
+就是這個 function
 
-這兩個紅色 neuron 是在 output layer 裡面
+x 它的 input, output，x 跟 y 的關係
 
-它們的 output 就已經是整個 network 的 output 了
+x 跟 y 的關係，他們是怎麼樣的關係呢？
 
-這邊寫成 y1, y2
+你把 x * W^1 + b^1，再通過 activation function
 
-它的 output 就已經是整個 network 的 output 了
+再把這個 output 再乘上 W^2，加 b^2
 
-所以，今天你要算 ∂C/∂z'
+再通過 activation function，再通過 sigmoid function
 
-就很簡單，根據 Chain rule 算 ∂(y1)/∂z' * ∂C/∂(y1)
+最後，到乘上 W^L，加上 b^L
 
-∂(y1)/∂z' 沒什麼問題
+再通過這個 sigmoid function
 
-你只要知道這個 activation function 長甚麼樣子
+就得到最後的 y
 
-這項就輕而易舉地算出來了
+所以，一個 neural network
 
-∂C/∂(y1)，y1 對 C 有什麼影響，depend on 你的
+實際上做的事情就是一連串的
 
-你的 cost function 是怎麼定義的
+vector 乘上 matrix ，再加上 vector
 
-你的 output 跟 target 間是怎麼 evaluate 的
+就是一連串我們在線性代數就有學過的：矩陣運算
 
-你可以用 cross entropy，你可以用 mean square error
+那把這件事情寫成矩陣運算的好處就是
 
-你用不同的定義，這邊這項就不一樣，但總之
+你可以用 GPU 加速
 
-它是一個比較簡單的東西，你可以把它算出來
+實際上呢，現在一般在用 GPU 加速的時候
 
-那 ∂C/∂z"，這你也可以算，沒有甚麼問題
+這個 GPU 的加速並不是
 
-就是 ∂(y2)/∂z" * ∂C/∂(y2)
+真的有去對 neural network 做甚麼特化
 
-這兩項一樣都是可以秒算
+是說，現在有一些特別的技術有做特化
 
-所以，今天假設這個藍色的 neuron 後面
+但是，如果你 general 是買那種玩遊戲的顯卡的話
 
-它的下一個 layer 就已經是 output layer 了
+那它是沒有對這個 neural network 做甚麼特化
 
-這個藍色的 neuron，它在最後一個 hidden layer 裡面
+那你實際上拿來加速的方式是
 
-它後面就已經是 output layer 了
+當你需要算矩陣運算的時候
 
-那根據我們剛才所學的東西
+你就 call 一下 GPU，叫它幫你做矩陣運算
 
-你就結束了，你就可以把 w1 跟 w2 對 C 的偏微分算出來
+這會比你用 CPU 來算還要快
 
-所以，這個沒有甚麼問題
+所以，我們在寫 neural network 式子的時候
 
-那我們真正煩惱的問題是 case 2
+我們習慣把它寫成 matrix operation 的樣子
 
-假設現在紅色的 neuron 它並不是整個 network 的 output
+那裡面如果有需要用到矩陣運算的時候
 
-它後面還有其他東西的話，怎麼辦呢？
+就 call GPU 來做它
 
-那它後面的其他東西，可能長甚麼樣子呢
+那這整個 network，我們怎麼看待呢？
 
-它可能長這樣，就是 z' 再通過 activation function 得到 a'
+我們可以把它到 output layer 之前的部分阿
 
-再乘上另外一個 weight，w5
+到 output layer 之前的部分
 
-再加上一些其他的東西，得到 za
+看作是一個 feature 的 extractor
 
-然後，你再把 a' 乘上
+這個 feature extractor 就 replace 我們之前
 
-w6 再加上其他一大堆東西
+要手動做 feature engineering
 
-得到 zb，然後再丟進另外兩個
+做 feature transformation 這件事情
 
-activation function 裡面
+所以，你把一個 x input，通過很多很多 hidden layer
 
-那現在的問題是這樣
+在最後一個 hidden layer 的 output
 
-我們想要求 ∂C/∂z'
+每一個 neuron 的 output，x1, x2, 到 xK
 
-如果我們知道 ∂C/∂(za) 跟 ∂C/∂(zb)
+你就可以把它想成是一組新的 feature
 
-我們就可以計算 ∂C/∂z'
+那 output layer 做的事情呢？output layer 就是
 
-對嗎？
+一個 Multi-class 的 Classifier
 
-我們剛才已經有講過說，假設我們知道
+這個 Multi-class Classifier，它是拿前一個 layer 的 output
 
-∂C/∂z' 跟 ∂C/∂z"
+當作 feature
 
-我們就可以算前面一個 layer 的 ∂C/∂z
+這個 Multi-class Classifier，
+它用的 feature 不是直接從 x 抽出來的
 
-所以，按照一模一樣的式子
+它是經過很多個 hidden layer，做很複雜的轉換以後
 
-如果知道 ∂C/∂(za) 跟 ∂C/∂(zb)
+抽出一組特別好的 feature
 
-我們就可以算 ∂C/∂z'
+這組好的 feature 可能是能夠被 separable
 
-按照一模一樣的式子
+經過這一連串的轉換以後呢
 
-就是我們剛才算看到那個 op-amp 的式子
+它們可以被用一個簡單的 layer 的
 
-所以，你就把 ∂C/∂(za) 乘上 w5
+Multi-class Classifier 就把它分類好
 
-∂C/∂(zb) 乘上 w6，加起來再通過 op-amp
+那我們剛才其實有講過說
 
-乘上 σ'(z')
+Multi-class Classifier 它要通過一個 sigmoid function
 
-再乘上 op-amp 就得到這個 ∂C/∂z' 的 output
+而不要通過一個 Softmax function，對不對？
 
-那現在這個問題，就反覆地繼續下去
+要通過一個 Softmax function
 
-我們剛才說知道 z' 跟 z" 的偏微分就可以算 z
+因為我們把 output layer
 
-現在知道 za 跟 zb 的偏微分就可以算 z'
+也看作是一個 Multi-class Classifier
 
-但是，我們又不知道 za 跟 zb 的偏微分
+因為我們把 output layer 也看作是
+一個 Multi-class Classifier
 
-怎麼算，對不對？
+所以，我們最後一個 layer 也會加上 Softmax
 
-你不知道這兩項怎麼算
+一般你在做 neural network 的時候呢
 
-如果你會這兩項的話，你就把這一項算出來
+是會這樣做
 
-但問題就是，你不知道
+那舉一個不是寶可夢的例子
 
-那怎麼辦呢？
+不是寶可夢的例子，我之後會示範一下做這個例子
 
-我們就再往下一層去看
+就 input 一張 image，它是一張手寫的數字
 
-了解嗎？就是這個綠色的 neuron
+然後 output 說這個 input 的 image，它對應的是甚麼？
 
-如果它是 output layer 的話
+那在這個問題裡面，你的 input 是一張 image
 
-如果這個綠色的 neuron，它是 output layer 的話
+但對機器來說，一張 image 就是一個 vector
 
-要計算這兩個東西，就是秒算，沒有問題
+假設這是一個解析度 16*16 的 image
 
-假設它不是 output layer 的話
+那它有 256 個 pixel
 
-你就繼續走下去
+對 machine 來說，它就是一個 256 維的 vector
 
-再看下一個 layer
+那在這個 image 裡面呢
 
-它的 activation function input 對 C 的偏微分
+每一個 pixel 就對應到其中的 dimension
 
-那你就可以把這一項算出來
+所以，右上角這個 pixel 就對應到 x1
 
-你就可以把這兩項算出來，再把這一項算出來
+這個就對應到 x2，右下角的就對應到 x256
 
-你如果沒辦法算這兩項，他們不是 output layer 的話
+如果你可以說，有塗黑的地方就是 1
 
-你就再去推，下一個 layer 它的偏微分會是甚 麼樣子
+那沒有塗黑的地方，它對應的數字就是 0
 
-把這兩個東西推出來，然後再往前把這兩個東西推出來
+那 output 呢？
 
-那你可能會想說，這個方法聽起來還頗崩潰
+neural network 的 output，如果你用 Softmax 的話
 
-就是你每次要算一個微分的值
+那它的 output 代表了一個 
+probability distribution，對不對？
 
-你要一直往後走，走到 network 的 output
+所以，今天假設 output 是 10 維的話
 
-如果 network 有 10 層，那你從第一層開始往後展開
+就可以把這個 output 看成是
 
-感覺應該是一個很可怕的式子
+對應到每一個，你可以把這個 output 看成是
 
-但是實際上，並不是這樣子做的
+對應到每一個數字的機率
 
-實際上，你只要換一個方向
+y1，代表了 input 這張 image
 
-從 output layer 的 ∂C/∂z 開始算
+根據這個 neural network 判斷，它是屬於 1 的機率
 
-你就會發現說，它的運算量
+代表它是屬於 2 的機率，代表它是屬於 0 的機率
 
-跟原來的 network 的 Feedforward path
+那你就實際上讓 network 幫你算一下說
 
-其實是一樣的
+每一個 input 加上數字屬於 image 的機率是多少？
 
-假設我們現在有 6 個 neuron
+假設屬於數字 2 的機率最大是 0.7
 
-每一個 neuron，它的 activation function
+那你的 machine 就會 output 說
 
-input 分別是 z1, z2, z3 一直到 z6
+這張 image 它是屬於數字 2
 
-我們現在要計算這些 z 對 C 的偏微分
+那在這個 application 裡面，
+假設你要解這個手寫數字辨識的問題
 
-那本來呢，我們應該是想要知道 z1 的偏微分
+那你唯一需要的，就是一個 function
 
-你就要算 z3, z4 的偏微分
+這個 function input 是一個二維的 vector
 
-假如想知道 z3 的偏微分，你就要算 z5 跟 z6 的偏微分
+output 是一個 10 維的 vector
 
-想要知道 z4 的偏微分，你就要算 z5 跟 z6 的偏微分
+而這個 function 就是 neural network
 
-那你要先算出 z5, z6 的偏微分，你才能算出
+所以，你只要兜一個 neural network
 
-z3 的偏微分，z4 的偏微分
+你可以用簡單的 feedforward network 就好了
 
-你才能夠算出 z1 的偏微分，z2 的偏微分
+兜一個 neural network，
+它的 input 有 256維、是一張 image
 
-那如果我們今天是從
+它的 output 你特別設成 10 維
 
-z1, z2 的偏微分開始算
+這 10 維裡面，每一個 dimension
 
-那就沒有效率
+都對應到一個數字
 
-但是，如果你反過來先算 z5, z6 的偏微分的話
+如果你做這樣的設計，input 是 256 維
 
-這個 process，就突然之間變得有效率起來了
+output 固定是 10 維的話
 
-我們就先算 z5, z6 對 C 的偏微分
+那這一個 network，它其實就
 
-然後，算出這兩項以後
+代表了一個可以拿來做手寫數字的 function
 
-你就可以算出 z3, z4 對 C 的偏微分
+這個 function set 裡面呢
 
-然後，你就可以算出 z1, z2 對 C 的偏微分
+這個 network 的 structure 就 define 了一個 function set
 
-這樣大家懂嗎？講到這邊大家有問題嗎？
+這個 function set 裡面
 
-沒有哦，那這整件事情可以說
+每一個 function 都可以拿來做手寫數字辨識
 
-這兩個東西怎麼得到它的偏微分
+只是有些做出來結果比較好
 
-這兩個東西怎麼得到它的偏微分呢？
+有些做出來結果比較差
 
-我們剛才已經看過了，就是用一個 op-amp 來算
+那接下來你要做的事情就是
 
-這每一個 op-amp 它放大的倍率呢
+用 Gradient Descent 去找一組參數
 
-就是 σ'(z1), σ'(z2), σ'(z3), σ'(z4)
+去挑一個最適合拿來做手寫數字辨識的 function
 
-所以，你算出了
+那在這個 process 裡面呢
 
-你就先很快地計算 ∂C/∂(z5), ∂C/∂(z6)
+我們需要做一些 design
 
-然後，再把這一個偏微分的值，跟這個偏微分的值
+之前在做 Logistic Regression
 
-乘上一些 weight
+或是 Linear Regression 的時候
 
-乘上一些 weight
+我們對 model 的 structure 是沒有甚麼好設計的
 
-再通過 op-amp
+但是，對 neural network 來說
 
-你就得到這兩個偏微分的值
+我們現在唯一的 constraint 只有 input 要是 256 維
 
-再乘上一些 weight
+output 要是 10 維
 
-再乘上一些 weight
+但是中間要有幾個 hidden layer
 
-再通過一個 op-amp，就得到一些偏微分的值
+每一個 hidden layer 要有多少的 neuron
 
-就這樣，就計算完了
+是沒有限制的
 
-就計算完了，所以，你再算 Backpropagation 的時候
+你必須要自己去設計它
 
-你在這個步驟，叫做 Backward pass
+你必須自己去決定說，我要甚麼 layer
 
-你在做這個 Backward pass 的時候
+每個 layer 要有多少的 neuron
 
-你實際上的做法就是，建另外一個 neural network
+那決定 layer 的數目
 
-我們本來有一個正向的 neural network，裡面的
+和每一個 layer 的 neuron 數這件事情
 
-activation function 都是 sigmoid function
+就等於是決定了你的 function set 長甚麼樣子
 
-那現在，你在算 Backward pass 的時候
+你可以想像說，如果我今天決定了一個差的 function set
 
-你就是建一個反向的 neural network
+那裡面沒有包含任何好的 function
 
-反向的 neural network
+那你之後在找最好的 function 的時候，就好像是
 
-從右邊到左邊，反向的 neural network
+大海撈針，結果針不在海裡這樣
 
-這個反向的 neural network，它的 activation function 呢
+怎麼找都找不到一個好的 function
 
-你要先算完 Forward pass 以後
+所以，決定一個好的 function set
 
-你才算得出來，然後，接下來呢
+其實很關鍵，你就決定這個 network 的 structure
 
-這個反向的 neural network，它的 input 就是這兩項
+是很關鍵的
 
-這兩項
+講到這邊，總是會有人問我一個問題
 
-然後，其他部分就跟一般的 neural network 運算一樣
+假設我們今天讓 machine 來聽我的 talk
 
-你就做一個 Backward pass
+然後，叫它 predict 之後會有甚麼問題的話
 
-但是，其實就是做一個 neural network 的運算
+它一定可以預測接下來的問題
 
-你就可以把每一個 z 對 C 的偏微分
+那我們到底應該要怎麼決定 layer 的數目
 
-就都算出來了，這個就是 Backward pass
+還有每一個 layer 的 neuron 的數目呢
 
-所以，我們就 summarize 一下
+這個答案，就是我不知道這樣子
 
-Backpropagation 是怎麼做的
+這個問題很難，就好像問說怎麼成為寶可夢大師一樣
 
-首先，你做一個 Forward pass
+這只能夠憑著經驗和直覺這樣
 
-在做 Forward pass 的時候，你可以算出
+這個 network structure 要長甚麼樣子
 
-只要你知道每一個 activation function 的 output
+就是憑著直覺還有多方的常識阿
 
-那 activation function 的 output 就是
+然後，後續想辦法找一個最後的 network structure
 
-它所連接的 weight 的 ∂z/∂w
+找 network structure 這件事情，並沒有那麼容易
 
-那在 Backward pass 裡面，你要把
+它有時候是滿困難的
 
-原來的 neural network 的方向呢
+有時候甚至需要一些 domain knowledge
 
-倒過來，你把原來的 neural network 的方向倒過來
+所以，我覺得從非 deep learning 的方法
 
-那在這個倒過來的 neural network
+到 deep learning 的方法
 
-它的每一個三角形的 output 呢
+我並不認為machine learning 真的變得比較簡單
 
-就是 ∂C/∂z
+而是我們把一個問題轉化成另一個問題
 
-然後，把它們乘起來
+就本來不是 deep 的 model
 
-你就知道某一個 weight
+我們要得到好的結果
 
-對 w 的偏微分是什麼了
+你往往需要做 Feature Engineering
 
-就結束，這樣
+也就是做 Feature Transform，然後找一組好的 feature
 
-講到這邊，大家有沒有甚麼問題呢？
+但是，如果今天是做 deep learning 的時候
 
-就算你沒有聽懂這個東西
+你往往不需要找一個好的 feature
 
-其實，也沒有什麼關係啦
+比如說，做影像辨識的時候
+
+你可以直接把 pixel 丟進去
+
+過去做影像辨識的時候，你需要對影像抽一些 feature
+
+抽一些人定的 feature
+
+這件事情就是 Feature Transform
+
+但是有 deep learning 之後，你可以直接丟 pixel 硬做
+
+但是，今天 deep learning 製造了一個新的問題
+
+它所製造的新的問題就是，
+你需要去 design network 的 structure
+
+就你的問題變成本來抽 feature
+
+轉化成怎麼抽、怎麼 design network structure
+
+那我覺得 deep learning 是不是真的好用就 depend on
+
+你覺得哪一個問題比較容易
+
+我個人覺得如果是
+
+語音辨識或是影像辨識的話
+
+design network structure 可能比 
+Feature Engineering 容易
+
+因為，雖然說我們人工會看、會聽
+
+我們自己都做得嚇嚇叫
+
+但是，這件事情它太過潛意識了
+
+它離我們意識的層次太遠
+
+我們其實不知道
+
+我們無法意識到，我們到底是怎麼做語音辨識這件事情
+
+所以，對人來說你要抽一組好的 feature
+
+讓機器可以用很方便的用 linear 的方法做語音辨識
+
+這件事對人來說很難，因為
+根本不知道好的 feature 長甚麼樣子
+
+所以，還不如 design 一個 network structure
+
+或是嘗試各種 network structure
+
+讓 machine 自己去找出好的 feature
+
+這件事情反而變得比較容易
+
+我覺得對影像來說，也是一樣
+
+那對其他 case 來說，我覺得就是 case by case
+
+比如說，你有聽過一個說法是
+
+deep learning 在 NLP 上面
+
+覺得 performance 沒有那麼好
+
+有聽過這個說法的同學舉手一下
+
+好，沒關係，手放下
+
+好像沒有太多人聽過這個說法
+
+那這件事情是這樣
+
+如果你開語音辨識跟影像辨識的文件
+
+語音辨識跟影像辨識這兩個 community
+
+是最早開始用 deep learning 的
+
+一用下去，進步量就非常驚人
+
+比如說，電視的錯誤率相對下降了 20% 以上
+
+那如果是 NLP 的話
+
+你就會覺得說，它的進步量
+
+似乎沒有那麼驚人
+
+甚至很多 NLP 的人，現在仍然認為說 
+deep learning 不見得那麼 work
+
+那我覺得這個，我自己的猜想是
+
+這個原因就是，人在做 NLP 這件事情
+
+文字處理來說，人是比較強的
+
+比如說，叫你說
+
+叫你設計一個 rule detect 說
+
+一篇 document 它是正面的情緒，還是負面的情緒
+
+你可以說我就列表
+
+列一些正面情緒的詞彙跟負面情緒的詞彙
+
+然後看這個 document 裡面，
+正面情緒的詞彙出現百分之多少
+
+你可能就可以得到一個不錯的結果
+
+所以，NLP 這個 task
+
+對人來說，你比較容易設計 rule
+
+所以，你設計的那些 ad-hoc 的 rule
+
+我好像可以給你一個還不錯的結果
+
+這就是為甚麼 deep learning 相較於 NLP 傳統的方法
+
+覺得進步沒有那麼地顯著
+
+但它其實還是有一些進步的
+
+只是(覺得沒有)其他的領域
+
+沒有語音和影像處理看起來那麼地顯著
+
+但還是有進步的
+
+那我覺得就長久而言呢
+
+因為文字處理其實也是很困難的問題
+
+你沒有很多幽微的資訊，可能是人自己也不知道的
+
+所以，就長久而言呢
+
+deep learning，讓 machine 自己去學這件事情
+
+還是可以佔到一些優勢
+
+只是一下子，眼下看起來進步沒有那麼顯著
+
+它跟傳統的方法比起來的差異就沒有那麼驚人
+
+但是還是有進步的
+
+這是我一些想法
+
+那再來就是有人會問說
+
+能不能夠自動學 network 的 structure
+
+其實是可以的，你可以去問余天立老師
+
+就是在基因演算法那邊，有很多的 technique
+
+是可以讓 machine 自動的去找出 network structure
+
+不過這些方法，目前還沒有非常的普及
+
+你看到那些非常驚人的應用
+
+比如說，AlphaGo 什麼的阿
+
+都不是用這些方法所做出來的
+
+那還有一個常問的問題就是
+
+我們能不能自己去設計 network 的 structure
+
+我可不可以不要 fully connected
+
+我可不可以說，第一個連到第三個，第二個連到第四個
+
+就自己亂接，可以
+
+一個特殊的接法就是 Convolutional Neural Network
+
+這個我們下一堂課再講
+
+那接下來，第二步
+
+第二步跟第三步真的很快，我們等一下就秒講這樣子
+
+第二步是甚麼呢？
+
+要定義一個 function 的好壞
+
+在 Neural Network 裡面
+
+怎麼決定一組參數它的好壞呢？
+
+就假設給定一組參數
+
+我要做手寫數字辨識
+
+所以，我有一張 image，跟它的 label
+
+然後，把這張 image 呢，這個 label 告訴我們說
+
+因為你現在是一個 Multiclass classification 的問題
+
+所以，今天這個 label 1，告訴我們說
+
+你現在的 target 是一個 vector
+
+你現在的 target 是一個 10 維的 vector
+
+只有在第一維，對應到數字 1 的地方
+
+它值是 1，其他呢，都是 0
+
+那你就 input 這張 image 的 pixel
+
+然後，通過這個 neural network 以後呢
+
+你會得到一個 output
+
+那這個 output，我們就稱之為 y
+
+我把我們的 target，稱之為 y\head
+
+接下來你要做的事情就是
+
+計算這個 y 跟 y\head 之間的 cross entropy
+
+就跟我們在做  Multiclass classification 的時候
+
+是一模一樣的
+
+我們就計算 y 跟 y\head 之間的 cross entropy
+
+然後，接下來我們就是要調整 network 的參數
+
+去讓這個 cross entropy 越小越好
+
+當然你整個 training data 裡面，
+不會只有一筆 data，你有一大堆的 data
+
+你有第一筆 data
+
+那它所算出來的 cross entropy 是 C^1
+
+第二筆 data 算出來是 C^2
+
+到第 N 筆 data 算出來是 C^N
+
+那你會把所有 data 的 cross entropy 全部 sum 起來
+
+得到一個 total loss，L
+
+然後，你接下來要做的事情就是
+
+在 function set 裡面，找一個 function
+
+它可以 minimize 這個 total loss
+
+或者是找一組 network 的 parameter
+
+現在寫成 θ*
+
+它可以 minimize 這個 total loss
+
+怎麼解這個問題？
+
+怎麼找一個 θ* minimize 這個 total loss 呢？
+
+你用的方法就是 Gradient Descent
+
+Gradient Descent 大家已經太熟了，沒有甚麼好講的
+
+實際上，在 deep learning 裡面用 Gradient Descent
+
+跟 Linear Regression 那邊沒有甚麼差別，就一模一樣
+
+所以，你要做的事情，只是 function 變複雜而已
+
+其他東西都是一樣的
+
+也就是說
+
+你的 θ 裡面是一大堆的參數
+
+一大堆的 weight 跟一大堆的 bias
+
+你先 random 找一個初始值
+
+random 給每一個數字一個初始值
+
+接下來呢，去計算一下它的 Gradient
+
+計算每一個參數，對你 total loss 的偏微分
+
+那把這些偏微分全部集合起來呢
+
+叫做 Gradient
+
+有了這些偏微分以後，你就可以更新你的參數
+
+你就把所有的參數，都減掉一個 learning rate
+
+這邊寫成 μ，乘上偏微分的值
+
+你就得到一組新的參數
+
+這個 process 就反覆進行下去
+
+你有了新的參數，再計算一下它的 Gradient
+
+然後，再根據你的 Gradient
+
+再更新你的參數，你就得到一組新的參數
+
+按照這個 process，繼續下去
+
+這個都是我們講過的東西
+
+你就可以找到一組好的參數
+
+你就做完 neural network 的 training 了
+
+所以，其實就這樣子啦
+
+deep learning 的 training 就這樣子
+
+就算是最潮的 AlphaGo
+
+也是用 Gradient Descent train 的啦！
+
+所以，大家可能會想像說
+
+如果是 deep learning 的話
+
+machine 的 learning 應該是這樣子
+
+其實上，我們知道說
+
+Gradient Descent 就是玩世紀帝國，所以其實是這個樣子
+
+然後，希望你不要覺得太失望
+
+然後，你可能會問說，那這個 Gradient Descent
+
+的 function 式子長甚麼樣子呢？
+
+之前我們都手把手的把那個算式算出來給大家看
+
+但是，在 neural network 裡面
+
+因為 function 比較複雜
+
+所以，如果我們要手把手的算出來給大家看
+
+是比較難，需要花一些時間
+
+其實，在現代這個時代
+
+我還記得幾年前，在做 deep learning 很痛苦
+
+因為你要自己 implement Backpropagation
+
+那現在呢，你應該已經沒有人
+自己 implement Backpropagation 了
+
+因為有太多太多太多的 toolkit
+
+可以幫你算 Backpropagation
+
+那在作業三，我們要做 deep learning，為了容許你用
+
+這些 toolkit
+
+所以，你就算不會算這個微分
+
+Backpropagation 就是算這個微分的一個比較有效的方式
+
+因為參數非常多嘛
+
+你有 million的參數
+
+你沒有辦法為每個 million 的參數
+都算微分，這太花時間了
+
+Backpropagation 是一個比較有效率的算這個微分的方式
+
+如果你想要更知道詳情的話
+
+我之前的 deep learning 課呢
+
+內容是有錄影的，你可以聽一下這個上課的內容
+
+如果你不想知道的話呢，其實也沒什麼關係
+
+我聽過一個傳聞是說
+
+就是說有某個公司，它在應徵 deep learning 的人
+
+我就問他說，你們要應徵 deep learning 的人，
+會問他什麼問題
+
+他說，我問她說如何算微分
+
+75%、號稱是 deep learning 專家的人，其實不會算微分
+
+所以，大家已經太習慣用 toolkit 了
+
+也不太會算微分了
+
+那 toolkit 很多啦，這邊就列一些出來，給大家參考
+
+那最後，在請助教講作業二之前
+
+我們有一個最後的問題
+
+為甚麼我們要 deep learning？
+
+你可能直覺地說這個答案很簡單啊
+
+因為越 deep，performance 就越好
+
+這個是一個很早年的實驗
+
+這個是 2011 年，Interspeech 裡面的某一篇 paper
+
+他做的是 word error rate
+
+word error rate 是越小越好，你會發現
+
+1 個 hidden layer
+
+每個 hidden layer，2k 個 neuron，word error rate 是24.2
+
+那越來越 deep 以後
+
+它的 performance，error rate 就越來越低
+
+但是，如果你稍微有一點 machine learning 的常識的話
+
+這個結果並沒有讓你太 surprise 阿，因為
+
+本來，model 越多的 parameter
+
+它 cover 的 function set 就越大
+
+它的 bias 就越小，對不對？
+
+你今天如果有越多的 training data
+
+你有夠多的 training data 去控制它的 variance
+
+一個複雜的 model，一個參數比較多的 model
+
+它 performance 比較好，是很正常的阿
+
+那變 deep 有甚麼特別了不起的地方？
+
+有一個理論是這樣告訴我們
+
+這個理論是這樣說的
+
+任何連續的 function
+
+假設任何連續的 function，
+它的 input 是一個 N 維的 vector
+
+它 output 是一個 M 維的 vector
+
+它都可以用一個 hidden layer 的 neural network 來表示
+
+只要你這個 hidden layer 的 neuron 夠多
+
+它可以表示成任何的 function
+
+那既然一個 hidden layer 的 neural network
+
+它可以表示成任何 function
+
+而我們在做 machine learning 的時候，
+我們需要的東西就只是一個 function 而已
+
+既然 hidden layer 就可以表示任何 function
+
+那做 deep 的意義何在呢？
+
+沒有甚麼特別的意義阿
+
+所以有人說，deep learning 就只是一個噱頭而已
+
+就是做 deep 感覺比較潮
+
+如果你只是把它變寬，變成 fat neural network
+
+那感覺就太虛弱了
+
+所以它沒有辦法引起大家的注意
+
+所以，我們要做 deep learning
+
+真的是這樣嗎？這個我們在往後的 lecture
+
+再來告訴大家
+
+最後就是列一些 reference 阿
+
+如果你對 deep learning 很有興趣的話，你可以先看一下
+
+那還有我上學期講 deep learning 的錄影呢
+
+在這邊也找的到
+
+那另外呢，我有一個 6 小時的 tutorial 的 slide
+
+那你在這個連結上，也可以找到
+
+這個 tutorial ，我 11 月還會在新竹再講一次
+
+這或許是我人生中最後一次講這個 tutorial
+
+千萬不要來聽，因為
+
+為甚麼呢？因為在 tutorial 講的東西
+
+在未來的課程裡面，都會涵蓋，它就只是一個 subset 而已
+
+那接下來來我們就先休息 5 分鐘，
+然後趕快就助教來換場一下
 
 臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心

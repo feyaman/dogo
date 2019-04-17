@@ -2,1197 +2,1138 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-接下來我們要來講這個 Deep Auto-encoder
+接下來，我們要講的是 Neighbor Embedding
 
-那什麽是 Auto-encoder 呢？
+我們在這個作業，最後一個作業的投影片裡面啊
 
-Auto-encoder 的想法是這樣
+助教有提到一個東西呢
 
-我們首先去找一個 encoder
+叫做 t-SNE
 
-那這個 encoder 你可以 input 一個東西
+t-SNE 我相信你在很多不同的場合也常常聽到
 
-比如說我們現在這邊要做的是影像辨識的話
+但是如果有人問你說，
 
-你要做是跟影像有關的東西的話
+t-SNE 是什麼的時候
 
-就 input 一張，假設我們要做 MNIST 的話
+大家往往都答不出來
 
-就 input 一張 digit 他是 784 維的 vector
+現在我們要來講一下 t-SNE 是什麼
 
-那接下來呢，這一個 encoder 他可能就是一個 neural network
+那 t-SNE 的 “ＮＥ” 
+其實就是 Neighbor Embedding 的縮寫
 
-他的 output 呢，就是一個 code
+那我們現在要做的事情呢
 
-這個 code 通常是遠比 784 維還要小的
+其實就是我們之前講過的降維
 
-所以他會有類似壓縮的效果
+只是我們要做的事情是「非線性」的降維
 
-這個 code 代表了原來 input 這張 image
+我們想要做到的事情是說
 
-的某種 compact，某種精簡的有效的 representation
+我們知道說 Data Point
 
-但是現在問題是這樣，我們現在做的是 unsupervised learning
+它可能是在高維空間裡面的一個 Manifold
 
-你可以找到一大堆的 image
+也就是說， Data Point 的分佈
+它其實是分佈在一個低維的空間裡面
 
-當作這個 NN encoder 的 input
+只是被扭曲了塞到一個高維空間裡面
 
-但是我們沒有任何的 output
+那，講到 Manifold 的時候
 
-並不知道一個 image，如果把它變成一個 code
+常常舉的例子就是這個「地球」這樣子
 
-這個 code 到底應該要長什麼樣子
+地球的表面就是一個 Manifold
 
-那你要 learn 一個 network 你要有 input output
+他是一個二維的平面
 
-只有 input 你沒辦法 learn 他
+但是被塞到了一個三維的空間裡面
 
-那沒有關係，我們先想說我們要做另外一件事情
+那，在一個這樣子的情況下呢
 
-我們想要 learn 一個 decoder
+在一個 Manifold 裡面呢
 
-所謂 decoder 他做的事情是說
+只有，這個，很近的距離的點
 
-input 一個 vector 他就通過這個 decoder
+在很近的距離的情況下
 
-他也是個 NN，他的 output 就是一張 image
+Euclidean distance 才會成立
 
-input 給他一個 code，他 output
+如果今天距離很遠的時候
 
-就根據這個 code 裡面的 information
+這個，歐式幾何他就不一定成立
 
-output 就是一張 image
+也就是說，假如我們在這個 S 形的空間裡面
 
-接下來呢，你也沒辦法 train NN 的 decoder
+取某一個點放在這邊
 
-你也沒辦法 train 他，因為你只有 network 的 output
+那我們比較，我們用 Euclidean distance 比較
 
-你沒有他的 input
+這個點
 
-這兩個 network，encoder 和 decoder，單獨一個人你都無法 train 它
+跟這個點之間的距離
 
-但是，我們可以把它接起來
+比較他跟他之間的距離
+和他跟他之間的距離
 
-然後一起 train
+或許這件事情是 make sense 的
 
-也就是說，我們接一個 neural network
+他跟他比較不像
+他跟他比較像
 
-input 一個 image，中間變成 code
+但是，如果今天是距離比較遠的時候
 
-再把 code 通過 decoder 變成原來的 image
+你要比較，這個點
 
-你就可以把這個 encoder 和 decoder 一起學
+跟這個點的相似程度
 
-那你就可以同時把 encoder 和 decoder 學出來了
+跟這個點跟這個點的相似的程度
 
-我們剛才在 PCA 裡面其實看過非常類似的概念
+你在高維的空間中
 
-我們來看一下，先從剛才講過的 PCA 開始講起
+直接算他們的 Euclidean distance
 
-我們剛才講過說
+就變得不 make sense 了
 
-PCA 實際上他在做的事情是這樣，input 一張 image x
+因為，如果根據 Euclidean distance
 
-那在剛才我們的例子裡面，我們會把 x 減掉
+他跟他比較近，他跟他比較遠
 
-他的平均 x bar 當作 input
+但是，實際上呢
 
-但這個減掉 x bar 並不總是
+很有可能，他跟他是比較近的
 
-這邊我們把他省略掉
+他跟他是比較像的
 
-把他省略掉並不會太奇怪，因為通常你在做 NN 的時候
+他跟他是比較不像
 
-你拿到 data 起手式你就先做 normalize
+所以， Manifold Learning 要做的事情
 
-先把它變成 mean 是零，variance 是一
+是把 S 形的這塊東西展開
 
-所以你的 data 通常 mean 其實就是零了
+把塞在高維空間裡面的低維空間「攤平」
 
-所以你就不用再減掉 mean
+攤平的好處就是
 
-你把 x 乘上一個 weight，通過 NN 的一個 layer
+現在，如果我們把這個低維空間攤平以後
 
-得到你的 component 的 weight，這邊寫成 c
+我們做降維
 
-那這個 component 的 weight 再乘上一個 matrix W 的 transpose
+然後，把這個塞在高維空間裡面的 Manifold 攤平以後
 
-得到 x 的 hat
+那我們就可以在這個 Manifold 上面
 
-這個 x 的 hat 是根據這些 component 的 reconstruction
+用 Euclidean distance來
 
-根據這些 component 的 weight
+我們就可以在這個平面上用 Euclidean distance
 
-component 就放在這個 weight 裡面
+在降維以後，我們就可以用 Euclidean distance
 
-根據 component 的 weight 和 component 做 reconstruction 的結果
+來計算點和點之間的距離
 
-我們說，在 PCA 裡面
+這會對接下來如果你要做 clustering
 
-我們要做的事情就是 minimize input
+或者是，你要做接下來的 supervised learning
 
-跟 reconstruction 的結果
+都是會有幫助的
 
-我們要讓 x 跟 x hat
+那類似方法有很多
 
-他的 Euclidean distance 越近越好
+那我們今天就很快的介紹幾種方法
 
-然後 x 跟 x hat 他們越接近越好
+在最後，講一下t-SNE
 
-這個是 PCA 做的事，如果把它當成 neural network 來看的話
+那有個方法叫做 Locally Linear Embedding
 
-那input 的 x 就是 input layer
+這個方法意思是說
 
-output 的 x hat 就是 output layer
+在原來的空間裡面
+你的點的分佈是長這個樣子
 
-中間 component 的 weight
+那有某一個點，叫做 xi
 
-就是 hidden layer，在 PCA 裡面他是 linear
+然後我們先選出這個 xi 的 neighbor
 
-那中間這個 hidden layer 我們通常又叫他
+然後我們叫做 xj
 
-bottleneck layer
+那接下來呢，我們要找 xi 跟 xj的關係
 
-為什麼叫 bottleneck layer 呢？
+那 xi 跟 xj 的關係，我們寫做 “wij”
 
-因為你這個 code 的數目
+wij 代表 xi 和 xj 的關係
 
-因為你現在就是要做 dimension reduction
+這個 wij 是怎麼找出來的呢？
 
-所以你這 component 的數目
+wij 是這個樣子
 
-通常會比你的 input 的 dimension 還要小得多
+我們假設說
 
-這樣才會達到 dimension reduction 的效果
+每一個 xi，都可以用它的 neighbor
 
-如果把它當作一個 layer 來看的話
+做 linear combination 以後
 
-他是個特別窄的 layer
+組合而成
 
-所以我們叫他 bottleneck layer，他就是一個瓶頸的意思
+這個 wij 就是
 
-前面這個部分就是在做 encode
+拿 j 去組合 i 的時候
 
-你把 input 變成一組 code
+wij 就是拿 xj 去組合 xi 的時候的 
+linear combination 的 weight
 
-後面這個部份就是在做 decode
+那要找這組 wij 怎麼做呢
 
-你如果把 component 的 weight 想成 code 的話
+也就是說，我們現在要找一組 wij
 
-後面這件事就是把 code 變回原來的 image
+這組 wij 對 xi 的所有 neighbor xj 
+做 weighted sum的時候
 
-hidden layer 的 output，就是我們要找的那些code
+他可以跟 xi 越接近越好
 
-那 PCA 是這樣做的
+或者是 xi 減掉
 
-你其實也可用 gradient decent 來做 PCA
+summation over 所有的 j
+wij 乘以 xj
 
-PCA 只有一個 hidden layer
+他的 two norm 是越接近越好的
 
-你就可以想說，要不要把它變更多 hidden layer
+xi 跟 xj 的 linear combination 他們是越接近越好
 
-當然可以把它變更多 hidden layer
+然後 summation over 所有的 data point i
 
-你就兜一個很深的 neural network，它有很多很多層
+然後，接下來我們就要做 dimension reduction
 
-然後在這個很多很多層的 hidden layer 裡面
+把原來所有的 xi 跟 xj 轉成 zi 和 zj
 
-你 input 一個 x
+但是，現在這邊的原則就是
 
-他最後得到的 output 是 x\head
+從 xi 跟 xj 轉成 zi 跟 zj
 
-你會希望 training 的 target，希望這個 x 跟 x\head
+他們中間的關係 "wij"，是不變的
+
+這個東西，就是那個
+
+白居易的長恨歌裡面講的這句話這樣子
+
+我想那句話叫什麼
+
+這句話是出自長恨歌的結尾，它是
+
+臨別殷勤重寄詞，詞中有誓兩心知。
+七月七日長生殿，夜半無人私語時。
+
+在天願作比翼鳥，在地願為連理枝。
+天長地久有時盡，此恨綿綿無絕期。
+
+並不是我國文特好，謝謝～
+
+你不要誤會可能是我國文特別強，我其實沒有很強
+
+為什麼我會背，其實我可以從頭背到尾，為什麼呢？
+
+因為小時候我不知道犯了什麼錯，被老師懲罰背長恨歌
+
+然後我就整首背起來了
+
+你小時候背的東西，到長大其實不會忘
+
+這個是什麼意思呢？所謂的
+
+在天就是 xi 跟 xj，在原來的 space 上面
+
+比翼鳥就是 wij
+
+在地就是把 xi 跟 xj transform 到另外一個 space
+
+就是 zi 跟 zj
+
+連理枝就是比翼鳥就等於連理枝
+
+所以他們關係還是 Wij
+
+所以 LLE 它做的事情是這樣的
+
+首先 wij 在原來的 space 上面找完以後
+
+就 fix 住它，不要去動它
+
+接下來，你為每一個 xi 跟 xj
+
+找另外一個 vector
+
+我們現在要做 dimension reduction
+
+所以你新找的 vector 要比原本的 dimension 還要小
+
+原本 100 維，降維後要比較小，10 維、2維之類的
+
+zi 跟 zj 是另外的 vector
+
+那我們要找這個
+
+zi 跟 zj 它可以 minimize 什麼呢
+
+它可以 minimize 下面這個 function
+
+也就是說原來這個 xi 
+它可以做 linear combination 產生 x
+
+原來這些 xj 可以做 linear combination 產生 xi
+
+這些 zj 也可以用同樣的 linear combination產生 zi
+
+這些 zj 也可以用同樣的 linear combination 產生 zi
+
+我們就是要找這組 z 可以滿足 wij 給我們的 constraint
+
+所以，現在在這個式子裡面
+
+wij 變成是已知的
+
+但是我們要找一組 z，讓 zj 透過 wij
+
+做 weighted sum 以後，它可以跟 zi 越接近越好
+
+zj 用這組 weight 做 linear combination 後，它可以跟 zi 越接近越好
+
+然後 summation over 所有的 datapoint
+
+那這個 LLE 你要注意一下，其實它並沒有一個
+
+明確的 function
+
+告訴你說我們怎麼做 dimension reduction
+
+不像我們在做 Auto-encoder 的時候
+
+你 learn 出一個 encoder 的 network
+
+input 一個新的 datapoint，然後可以找到它 dimension 的結果
+
+今天在 LLE 裡面
+
+你並不會找到一個很明確的 function，沒有一個 function 告訴我們說
+
+怎麼從 x 變到 z
+
+z 就是完全憑空找出來的
+
+其實如果你用 LLE 這種方法
+
+如果用 LLE 或其他類似的方法會有一個好處
+
+就算是你原來這個 xi、xj 你不知道
+
+你只知道 wij
+
+你不知道 xi、xj 要用什麼 vector 來描述它
+
+你只知道他們的關係
+
+你其實也可以用 LLE 這種方法
+
+那 LLE 呢，你其實需要好好的調一下你的 neighbor 選幾個
+
+你 neighbor 選的數目要剛剛好才會得到好的結果
+
+那這邊，是從原始的 paper 裡面截出來的圖
+
+原始的 paper 它的題目實在是太潮了
+
+他是 “Think Globally, Fit Locally” 這樣子
+
+太精彩了，很好的一個題目
+
+然後，它調了不同的 K
+
+如果你今天 K 太小
+
+你得出來的結果會不太好
+
+K 太大，得到的結果也不太好
+
+為什麼 K 太大得到的結果不太好呢？
+
+因為我們之前的假設
+
+就是每一個這個 Euclidean distance
+
+只在很近的距離之內，可以被這樣想
+
+所以，這個點和點之間的
+
+data point 和 data point 之間的關係
+
+在 transform前後可以被 keep 住
+
+只有在距離很近的時候
+
+才能夠成立
+
+當你 K 選很大的時候
+
+你會考慮一些距離很遠的點
+
+你會考慮一些 transform 以後
+
+relation 沒有辦法 keep 住的點
+
+有一些關係太弱了，transform 以後沒有辦法 keep 住
+
+那它不是這個比翼鳥或連理枝的關係
+
+它太弱了，無法 keep 住
+
+但是你不應該把它考慮進來
+
+所以你的 K，要選一個適當的值
+
+那另外一個方法叫 Laplacian Eigenmap
+
+它的想法是這樣子
+
+我們之前有說
+
+我們之前在講這個 Semi-supervised learning 的時候
+
+我們有講過 smoothness assumption
+
+我們有說，如果你想要比較這個點跟這個點之間的距離
+
+只算它的 Euclidean distance 是不足夠的
+
+你要看的是它們在這個 high density 的 region 
+之間的 distance
+
+如果兩個點之間
+
+它們有 high density 的 connection
+
+那它們才是真正的接近
+
+這件事情
+
+你可以用一個 graph 來描述這件事情
+
+也就是說你把你的 data point
+
+construct 成一個 graph
+
+你算你的 data point 兩兩之間的相似度
+
+如果相似度超過一個 thereshold
+
+就把它們 connect 起來
+
+而建一個 graph 的方法有很多
+
+有很多不同的方法
+
+總之，你就把比較近的點
+
+把它們連起來變成一個 graph
+
+那你把點變成 graph 以後
+
+你考慮這個 smoothness 的距離
+
+就可以被這個 graph 上面的 connection 來 approximate
+
+那我們之前在講 Semi-supervised learning 的時候
+
+我們是這樣說的
+
+如果今天 x1 跟  x2 在 high density 的 region 上面
+
+它們是相近的
+
+那它們的 label
+
+y1\head 和 y2\head，很有可能是一樣的
+
+雖然說 Semi-supervised learning 的時候
+
+我們可以這麼做
+
+我們有一項是考慮有 label 的 data 的項
+
+有另外一項是跟 labeled data 沒有關係的
+
+我們只可以利用這個 unlabeled 的 data
+
+那這一項的作用
+
+它是要考慮說我們現在得到的 label 是不是 smooth 的
+
+它的作用很像一個 regularization 的 term
+
+那這個 S 這一項啊
+
+這個 S 這一項啊
+
+它等於 yi 減 yj 的這個
+
+它跟 yi 跟 yj 的這個距離
+
+然後乘上 wi, j
+
+也就是說，那個 wi, j 是什麼呢
+
+wi, j 是說，如果今天兩個 data point xi 跟 xj
+
+他們在圖上是相連的
+
+那 wi, j 就是他們的相似成度
+
+如果在圖上是沒有相連的
+
+他就是 0
+
+然後我們說
+
+如果今天wi 跟 wj 他們很相近的話
+
+那 wi, j 就有一個很大的值
+
+就是希望yi 跟 yj 越接近越好
+
+反之如果 wi, j 是 0
+
+那 yi 跟 yj 要是什麼值都可以
+
+那這個 S
+
+就是evaluate 說，你現在得到的 label 有多麽的 smooth
+
+那麼還說
+
+這個 S 可以寫成一個 y 的 vector 乘上 L 再乘上 y
+
+這個 L 就是 graph 的 laplacian
+
+L 等於 E 減 W
+
+這個大家回去 check 一下之前的投影片就知道了
+
+那同樣的道理可以被 apply 在完全
+unsupervised 的 test 上面
+
+我們可以說
+
+如果 x1 跟 x2 在 high density 的 region 他們是 close 的
+
+那我們就會希望， z1 跟 z2 他們也是相近的
+
+所以我們可以一樣把剛才那個
+smoothness 的式子寫出來
+
+我們可以寫說
+
+我這邊寫平方可能是比較不好啦
+
+我這邊應該寫  Euclidean distance 比較好
+
+或者寫他的這個 two norm distance 比較好
+
+因為我只是從前面投影片 copy 過來
+
+只是把 y 改成 z 而已
+
+就忘了把它改過來
+
+好沒關係，那今天這個把 x1 跟 x2 變成 z1 跟 z2 以後
+
+你的這個 z1 跟 z2 應該是長什麼樣子呢
+
+你今天應該是這樣子
+
+如果今天 xi 跟 xj
+
+如果這個 i 跟 j 的這兩個 datapoint 他們之間的 wi, j 很像
+
+那 zi 跟 zj 做完 dimension reduction 以後他們的距離就很近
+
+反之呢，如果他們的 wi, j 很小
+
+那他們的距離要怎樣就都可以
+
+你覺得，這樣 ok 嗎？
+
+我們就找一個 zi 跟 zj minimize 這個 S 的值
+
+你不覺得這麼做是有問題的嗎
+
+給大家五秒鐘想想看，這個問題出在哪裡
+
+其實，這個問題是這樣子
+
+你不需要告訴我 wi, j 是什麼
+
+我一秒就可以告訴你說
+
+要 minimize x 的時候，我應該選什麼值
+
+心算就可以得到了
+
+選什麼值呢？
+
+我把所有的 zi 跟 zj 通通設一樣的值就好了
+
+結束
+
+把所有 zi 跟 zj 我通通都設一樣的值，比如說通通都設0
+
+那 S 就等於 0
+
+這個問題就結束了
+
+所以，光是有這個式子是不夠的
+
+那你可能說剛剛在 Semi-supervised learning 的時候
+你怎麼不講這句話呢
+
+之前在 Semi-supervised learning 的時候
+
+我們還有 supervised learning，"supervise" 那個 labeled data給我們的那一項
+
+所以，如果你把所有的 y，所有的 label 都設成一樣的
+
+那你在 supervise 那一項，你得到的 lost 就會很大
+
+那我們要同時 balance supervise 那一項
+跟 semi-supervise 那一項
+
+我們要同時 balance supervise 那一項的 cost 
+跟 regularization 的 term
+
+所以你不會選擇讓所有的 y 通通都是一樣的
+
+但在這邊少了 supervise 的東西
+
+所以變成選擇所有的 z 都是一樣
+
+反而是一個最好的 solution
+
+所以，這件事情是行不通的
+
+怎麼辦呢？
+
+你要給你的 z 一些 constraint
+
+什麼樣的 constraint 呢？
+
+會給的 constraint 是這樣
+
+如果今天 z 他降維以後的空間是 M 維的空間
+
+是 M 維的空間，比方說 M 是 2 之類的
+
+那你不會希望說
+
+你的 z 他還分佈在一個比 M 還要小的 dimension 裡面
+
+因為我們現在要做的事情
+
+是希望把高維空間中塞進去的低維空間展開
+
+那我們不希望說我們展開以後
+
+其實展開的結果他在一個更低維的空間裡面
+
+所以，今天假如你的 z 的 dimension 是 M 的話
+
+你會希望你找出來的那些點
+
+假設現在總共有 N 個點
+
+z1 到 zN
+
+他們做 span 以後，會等於 RM
+
+也就是說 z，他不是活在一個比 M 維更低維的空間裡面
+
+他就會佔據整個 M 維的空間這樣子
+
+其實，如果你要解這個式子的話
+
+你解一解就會發現說
+
+你解出來的這個 z 跟我們前面看到的那個
+graph laplacian L 是有關係的
+
+他其實就是 graph laplacian 的 eigenvector
+
+對應到比較小的 eigenvalue 的那些 eigenvector
+
+這個大家再自己 check 一下文件就好
+
+所以他叫做 Laplacian Eigenmap
+
+因為我們找的是那個 laplacian matrix 的 eigenvector
+
+如果你今天先找出 z 以後
+
+你再去做 cluster
+
+你先找出 z，再用 K-means 做 clustering 的話
+
+這一招有一個很潮的名字，叫做 spectral clustering
+
+那接下來呢，我們就要講 t-SNE
+
+那 t-SNE 他是 T-distributed Stochastic Neighbor Embedding 的縮寫
+
+那 t-SNE 他解決什麼樣的問題呢
+
+前面那些問題啊，有一個最大的問題就是
+
+他只假設相近的點應該要是接近的
+
+但他們沒有假設說，不相近的點沒有要接近
+
+他沒有假設說，不相近的點要分開
+
+所以比如說你用 LLE 在 MNIST 上
+
+你會遇到這樣的情形
+
+他確實會把不同的點呢
+
+他確實會把，
+這個不同的顏色代表不同的 digit 不同的 class，
+
+他確實會把不同的 class都塞在一起
+
+然後他確實會把同個 class 的點都聚集在一起
+
+但他沒有防止說不同 class 的點不要疊成一團
+
+如果他們都疊成一團的時候
+
+沒有這個顏色
+
+這些點還是擠在一起，你還是沒有辦法分開
+
+這是另外一個例子
+
+做在這個 COIL-20上面
+
+COIL 是一個 image 的 corpus
+
+他裡面的 image 就是某一個圖
+
+比如說一個汽車、一個玩具車
+
+然後把它轉一圈，然後拍很多張不同的照片這樣子
+
+這邊同樣的顏色代表同一個 object
+
+你會發現說，它找到一些圈圈
+
+這個圈圈代表什麼意思呢？
+
+這個圈圈代表，同一個 object 在做旋轉的時候
+
+它每一張圖都很像
+
+但是，旋轉的時候每一張圖都很像
+
+但是你看一個東西的正面和側面，他卻是非常不一樣
+
+所以，這個圈圈就顯示你把某一張圖做旋轉以後
+
+你所得到
+
+在做 dimension reduction 以後
+
+你所得到的結果
+
+但是一樣
+
+你會發現說，不同的 object 其實他們是擠成一團的
+
+沒有辦法分開
+
+所以如果做 t-SNE的話，做 t-SNE 是怎樣呢？
+
+做 t-SNE，我們一樣是要做降維
+
+把原來的 data point x
+
+變成比較 low dimension 的 vector z
+
+那在原來的 x 這個 space 上面
+
+我們會計算所有的點的 pair，xi 和 xj 之間的 similarity
+
+這裡先寫成 S(xi, xj)
+
+接下來，會做一個 normalization
+
+我們會計算一個 P(xj | xi)
+
+這個 P(xj | xi)，他是從 xi 跟 xj 的 similarity 來的
+
+我們等下會說這個 similarity 要怎麼算
+
+這個 P(xj | xi)，在分子的地方是 xi 跟 xj 的 similarity
+
+然後分母的地方
+
+就是 summation over 除了 xi 以外，所有其他的點
+
+和 xi 之間所算出來的距離
+
+所以你會發現說
+
+xi 對其他所有的 data point
+
+它所算出來的這個 P(xj | xi)
+
+它的 summation 應該要是 1
+
+另外假設我們今天已經找出了一個 low dimension 的 representation 就是 zi 跟 zj 的話
+
+我們已經把 x 變成 z 的話
+
+那我們也可以計算 zi 和 zj 之間的 similarity
+
+這邊 similarity 我們寫成 S'
+
+那一樣你可以計算一個 Q( zj | zi)
+
+他的分子的地方就是 S'( zi, zj)
+
+分母的地方就是 summation over zi
+跟所有 database 裡面的 data point zk 之間的距離
+
+那今天有做這個 normalization 其實感覺是必要的
+
+因為如果你又做這個 normalization 的話
+
+因為你不知道在高維空間中算出來的距離
+
+S(xi, xj) 跟 S’(zi, zj)，它們的 scale 是不是一樣的
+
+如果，你今天有做這個 normalization
+
+那你最後就可以把他們都變成機率
+
+那這個時候他們值都會介於 0 到 1 之間
+
+他們的 scale 會是一樣的
+
+那接下來我們要做的事情就是
+
+我們現在還不知道 zi 跟 zj 他們的值到底是多少
+
+這是我們要被找出來的
+
+那麼希望找一組 zi 跟 zj
+
+它可以讓這一個 distribution 跟這一個 distribution
 
 越接近越好
 
-training 的方法 完全沒有什麼特別的
+我們要讓原來在這個
 
-就是 back propagation
+根據 similarity 在 S 這個原來的 space 算出來 distribution
 
-就跟我們之前在 neural network 的時候講的呢
+跟在這個 dimension reduction 以後的 space 算出來的 distribution
 
-是完全一模一樣的東西
+越接近越好
 
-那中間你會有個特別窄的 layer
+怎麼衡量兩個 distribution 之間的相似度呢？
 
-這個特別窄的 layer 他有特別少的 neural
+可以很直覺的衡量兩個 distribution 之間的相似度的方法
 
-那些 neural 的 output，這個 layer 的 output
+就是我們之前看到的 KL divergence
 
-就代表了一組 code
+所以，我們今天要做的事情
 
-那從 input 到 bottleneck layer 的部分就是 encoder
+就是找一組 z
 
-那從 bottleneck layer 的 output 到最後的 x\head
+它可以做到這個
 
-到最後整個 network 的 output 就是你的 decoder
+xi 的這個 distribution，跟 xi 對其他 point 的 distribution
 
-所以你把 input 做 encode 變 bottleneck layer 的output
+跟 zi 對其他 point 的 distribution
 
-再把 bottleneck layer 的 output，做decode 變成原來的 image
+這兩個 distribution 之間的 KL divergence 越小越好
 
-這個就是 decode
+summation over 所有的 data point
 
-這個 deep 的 auto encoder
+然後你要使得這一項，它的值越小越好
 
-最早是出現在 06 年的 Hinton  的 science 的 paper
+然後，我把這個值就寫在這邊
 
-那個時候呢
+這件事情要怎麼做呢？
 
-其實 deep auto-encoder 沒有那麼好 train
+要怎麼做
 
-你有可能 train 一 train 以後就壞掉了
+其實這件事情，實際上並沒有很困難
 
-那個時候需要用 RBM
+實際上你就是用 Gradient descent 做的
 
-做 layer wise 的 initialization，然後才可能
+你想想看，假設你知道這個 similarity 的 matrix
 
-把 deep auto-encoder train 得比較好一點
+他這個式子長什麼樣子，然後這個式子長什麼樣子
 
-如果是按照我們剛才在 PCA 裡面看到的
+那你把這些式子代進去，你把這些式子代進去
 
-這個從 input 到第一個 hidden layer 的 weight w1
+然後，接下來你只要對 z 做微分，然後做 Gradient Descent
 
-好像應該要跟最後一個 hidden layer 的 output
+就搞定這個問題，就結束了
 
-跟 output layer 中間的 weight 互為 transpose
+那今天有一個問題就是你在做 t-SNE 的時候
 
-這個 layer 是 weight w1，這個 layer 好像應該是 w1 transpose
+他會計算所有 data point 之間的 similarity
 
-這個是 w2，這個好像應該是 w2 transpose
+所以它的運算量有點大，所以 t-SNE 有點麻煩
 
-你在 training 的時候，你可以做到這件事情
+如果 data point 比較多的時候，你這電腦會跑不動
 
-你可以把這邊的 weight，跟這邊的 weight tight 起來
+一個常見的做法是你會先做降維
 
-讓他們在做 training 的時候永遠保持他們的值是一樣的
+比如說，你原來的 dimension 很大
 
-你可以做到這件事情，做這件事的好處呢
+你不會直接從很高的 dimension 直接做 t-SNE
 
-是你現在 auto-encoder 的參數
+因為你這樣子計算 similarity 的時間太長
 
-就少一半，比較不會有 overfitting 的情形
+你通常會先做，用比較快的方法比如說 PCA
 
-但這件事情並不是必要的，沒有什麼理由說
+先用 PCA 做降維，比如說，先降到 50 維
 
-這邊的 weight，跟這邊的 weight，一定要互為 transpose
+然後再用 t-SNE 從 50 維降到 2 維
 
-現在常見的作法就是兜個 neural network
+這個是比較常見的做法
 
-然後用 back propagation 直接 train 下去
+那其實像我們今天講的這些方法啊
 
-管他 train 出來的 weight 是什麼，就是你得到的結果
+你會發現說
 
-那這邊是 Hinton 06年的 Nature 的 paper
+比如說，像 t-SNE，如果你給他一個新的 data point
 
-Science paper 的上面呢
+它是沒辦法做的，對不對
 
-截出一些，那時候看起來，相當驚人的結果
+他只能夠，你給他一大群
 
-現在是覺得還好，因為現在誰都
+已經先給他一大堆 x，他幫你把每一個 x 的 z 都找出來
 
-順手就可以 reproduce 這些結果
+但你找完這些 z 以後
 
-那時候是覺得相當驚人
+再給他一個新的 x
 
-那這是這樣子的，如果我們今天，這是原來的 image
+你要重新跑一遍這一整套演算法，很麻煩
 
-那在 MNIST 上面是長這個樣子
+所以，一般你不會
 
-如果你做 PCA
+一般 t-SNE 的作用比較不是用在這種 training testing 的這種 base 上面
 
-把他從 784 維降到 30 維
+通常比較常用的做法是
 
-然後再從 30 維 reconstruct 回 784 維
+拿來做 visualization
 
-那你得到的 image 是這個樣子
+如果你已經有一大堆的 x，他是 high dimensional 的
 
-你可以看出說，他是比較模糊的
+那你想要 visualize 他們在二維空間的分佈上是什麼樣子
 
-他是有一點霧霧的感覺
+你用 t-SNE
 
-那如果你今天是用 deep auto-encoder 的話
+那 t-SNE 往往可以給你不錯的結果
 
-在 Hinton 的 paper 裡他是這麼做的
+那 t-SNE 現在可能是最多人使用的一種選擇
 
-把 784 維，先擴展成 1000 維
+好那我們再來要講 t-SNE 一個非常有趣的地方
 
-再把 1000 維降到 500 維再降到 250 維再降到 30 維
+就是他的這個 similarity 的選擇是非常的神妙的
 
-你很難知道說為什麼他設計成這樣子
+我們在這個原來的 data point 的 space 上面
 
-然後再把 30 維變成 250 維再變成 500 維 1000 維
+你的 similarity 的選擇
 
-然後再把他解回來
+它是選擇 RBF 的 function
 
-你會發現說，如果你今天用的是 deep auto-encoder 的話呢
+就選擇說，我們要讓 xi，
 
-他的結果就看起來非常的好
+我們這個 evaluate similarity 的方式
 
-那如果你今天，不是把它降到 30 維，而是把他降到 2 維的話
+是計算 xi 跟 xj 的 Euclidean distance
 
-把它降到 2 維再去 visualize 他的話
+然後取一個負號，再取 exponential
 
-你會發現，如果你是做 PCA 的話
+那我們之前有說如果你要在 graph 上算 similarity 的話
 
-在這二維的平面上，所有的 digit 是被
+用這種方法比較好
 
-混在一起，這邊不同顏色就代表了不同的數字
+因為它可以確保說只有非常相近的點才有值
 
-如果今天是用 PCA 把它變成二維
+那 exponential 他掉得非常快
 
-所有的數字他是混在一起
+所以只要距離一拉開，similarity 就會變得很小
 
-如果你是用 deep auto-encoder 的話，你會發現說
+那在 t-SNE之前有一個方法叫做 SNE
 
-這些數字是分開的
+就把前面的 t 拿掉
 
-你可以輕易地看到說，不同的數字會變一群一群
+SNE 就是一個很直覺的想法
 
-現在你其實可以很輕易的 reproduce 這樣的結果
+在 data point 原來的 space 上用這個 evaluation 的 measure
 
-我後來又做一個無聊的東西不過沒看到什麼特別的東西
+當然在新的 space 上你用同樣的 measure 就好啦
 
-就是把寶可夢的 data 又做了一下
+選不同 measure，呃，你直覺就選一樣的 measure 嘛
 
-用一個 hidden layer 的 auto-encoder，硬做了一下
+那 t-SNE 神妙的地方就是
 
-但是沒有看到什麼特別的東西
+他在你 dimension reduction 以後的 space
 
-那這個 auto-encoder 呢
+他選的 measure 跟原來的 space 是不一樣的
 
-也可以把它用在文字處理上
+他在 dimension reduction 以後選的 space
 
-如果把它用在文字處理上像是怎樣呢
+是這個 t-distribution 的其中一種
 
-比如說我們會想要把一篇文章
+t-distribution 裡面有參數你可以調他
 
-壓成一個 vector，壓成一個code
+可以產生很多種不同的 distribution
 
-那為什麼我們會想把一篇文章壓成一個 code 呢？
+t-distribution 的其中⼀一種
 
-舉例來說假設我們現在要做文字的搜尋
+他是 1 除以 1 加 Euclidean distance 的平⽅
 
-假設我們現在要做文字的搜尋
+那你可能問說，為什麼要這樣做呢
 
-那在文字搜尋裡面有一招，你可能都聽過叫 vector space model
+我可以提供⼀個很直覺的理由
 
-那這個 vector space model 他非常單純，他就是說
+假設橫軸代表了在原來 space 上的 Euclidean distance
 
-我們現在把每一篇文章都表示成空間中的一個 vector
+或者是
 
-都是空間中的一個點
+做 dimension reduction 以後的 Euclidean distance
 
-圖上每一個藍色的圈圈就是一篇文章
+那這個紅⾊這條線，是這⼀項
 
-那接下來呢
+藍色這條線，是這⼀項
 
-我們也把，假設使用者輸入一個查詢的詞彙
+紅色這條線是 RBF function
 
-那我們把查詢的詞彙也變成空間中的一個點
+藍色這條線是 t-distribution
 
-接下來就是計算這個輸入的查詢詞彙
+你會發現說呢
 
-跟每一篇 document 之間的 inner product
+如果原來在這個點跟這個點
 
-或是 cosine similarity 等等
+之後做 Dimension reduction 以後
 
-cosine similarity 會有 normalize 的效果
+要怎麼才能維持它原來的 space 呢?
 
-可能會得到比較好的結果
+那你就把它變成這個樣⼦
 
-如果距離最近 cosine similarity 的結果最大
+它就可以維持它原來的 space
 
-你就會 retrieve 這些 document
+如果你要維持他們原來之間的距離
 
-比如說你輸入紅色的 query
+如果你今天要維持他們原來的機率的話
 
-可能會 retrieve 這篇  document 跟這篇 document
+要維持原來他們之間相對的關係的話
 
-因為他跟紅色這個 query 的 cosine similarity 是比較大
+那你就把他變成這樣
 
-這個模型要 work，depend on 你現在把一個 document
+那你會發現說
 
-變成 vector 表示的好還是不好
+如果本來距離比較近，他們的影響是比較⼩的
 
-假設你今天做的是
+如果本來就已經有一段距離
 
-怎麼把一個 document 變成一個 vector呢
+那從原來的這個 distribution 變到 t-distribution 以後
 
-最 trivial 的方法叫做 bag-of-word
+他會被拉得很遠
 
-這個 bag-of-word 的想法是說
+t-distribution 他的尾巴特別長
 
-我們現在就開一個 vector
+所以如果你本來距離比較遠的話
 
-這個 vector 的 size 就是
+變到 t-distribution 以後，他會變得更遠
 
-lexicon 的 size，就是 lexicon 的 size
+也就是說，原來在高維空間裡面
 
-假設今天世界上有十萬個詞彙
+如果距離很近
 
-這個 vector 的 size 就是十萬維
+那做完 transform 以後他還是很近
 
-假設現在有一篇 document 他只有一個句子就是 this is an apple
+如果原來就已經有一段距離了，有⼀個 gap
 
-那這篇 document 如果把他表示成一個 vector 的話
+那做完 transform 以後他就會被拉得很遠
 
-就是在 this 那維是一，is 那維是一
+所以你會發現說 t-SNE，他畫出來的圖往往長得像這樣
 
-an 那維是一，apple 那維是一，其他都是 0
+他會把你的 data point 聚集成一群、一群、一群
 
-就是這樣子，沒什麼特別好講
+因為你的 data point 之間本來只要有一個 gap
 
-那有時候你想把它做得更好，你會把它乘上 inverse document frequency
+做完 t-SNE 以後，它就會把 gap 強化，gap 就會變得特別明顯
 
-你每一維不只會用詞彙在 document 出現的次數
+所以這是 t-SNE 做在 MNIST 上面的結果
 
-你會再乘上一個 weight，代表那個詞彙的重要性
+那其實這個不是直接做在 MNIST 的 pixel 上⾯
 
-那這個重要性你可以用不同的方法衡量他
+直接做在 pixel 上面的 performance 看起來沒有這麼好
 
-比如說用 inverse document frequency 來衡量
+這是先對 pixel 做 PCA 降維以後，再做在 MNIST 上⾯
 
-舉例來說，is 它可能在每個 document 都有出現，所以重要性很低
+那不同顏色代表的是不同的數字
 
-那 1 就會乘上比較小的值
+那你會發現，不同的數字會變成一群一群的
 
-apple 只有在某些 document 出現，重要性比較高，所以乘上比較高的值，等等
+那 t-SNE 在 COIL-20 上的結果，其實還蠻驚人的
 
-但是用這個模型他很 weak
+這邊的每一個圈圈就代表一個 object，他只是轉了一圈以後的結果
 
-他沒辦法考慮任何 semantic 相關的東西
+你會發現這邊有一些被扭曲的圈
 
-他沒辦法考慮任何語意相關的東西
+這扭曲的圈圈是什麼意思呢？
 
-比如說，他不知道台灣大學的指的就是台大
+那是因為有⼀些東西，比如說杯⼦
 
-他不知道 apple 跟 orange 都是水果，他沒辦法知道這些事情
+他的這個面長這樣
 
-對他來說每一個詞彙都是 independent
+它轉 180 度過來以後，他還是長得一模⼀樣
 
-對他來說 apple 跟 pen，apple 跟 an，apple 跟 is 就是不同詞彙
+所以你把那個杯子轉 360 度轉一圈的時候
 
-他們中間是完全沒有任何相關性
+你就會發現說，它在中間某一個地方是很像的 image
 
-那我們可以用 auto-encoder 讓語意這件事情被考慮進來
+所以，你會看到說這邊有很多看起來很像 8 的符號
 
-舉例來說，你 learn 一個 auto-encoder
+那這邊這很多條線
 
-他的 input 就是一個 document
+其實好像是說，有 4 部都是⼩汽⾞
 
-或是 query 就是一段文字
+4 部小汽車看起來是蠻像的
 
-這個在 Hinton science paper 上面是有實驗的
+所以這邊有四條線是被 align 在一起的
 
-他只有用比較小的 lexicon size，只有 2000 個詞彙
+這邊有一個從網路上找到的 t-SNE 動畫
 
-一個 document 就把它變成一個 vector
+他長得是這個樣⼦
 
-把這個 vector 通過一個 encoder，把他壓成二維
+你看，因為他是用 gradient descent train 的
 
-那在 Hinton 的 paper 上你會看到結果是這個樣子
+所以你會看到，隨著 iteration 的 process
 
-我記得他做的是 20 Newsgroups 的那個 corpus
+點會被分得越來越開
 
-在這個 corpus 裡面 ，document 會標示說他是屬於哪一類
+然後不同的點之間呢
 
-那這邊不同顏色的點呢
+這其實不是做在 MNIST 上，是做在另外⼀個手寫數字辨識的 corpus 上⾯
 
-每一個點代表一個 document，不同顏色就代表說，這篇 document 屬於哪一類
+你會發現說不同的 digit 之間，他是會被分得很開的
 
-那其實我們在作業四就是要做類似的事情
+那 t-SNE 的地方呢，我們就講到這邊
 
-希望你可以得到一樣漂亮的圖
-
-你會發現同一類的 document，就都集中在一起，散佈像一朵花一樣
-
-所以如果你今天要做搜尋的時候
-
-今天輸入一個詞彙、查詢詞
-
-那就把 query 也通過這個 encoder，把他變成一個二維的 vector
-
-假設那個 query 落在這邊，你就可以知道說
-
-這個 query 是跟 energy marketing
-
-跟 energy market 有關的
-
-就把這邊的 document retrieve 出來
-
-那這個 auto-encoder 在這邊看起來結果是相當驚人
-
-如果你用 LSA 的話，你得不到類似的結果
-
-如果你用 LSA 的話你會發現說
-
-我們剛剛有講 LSA
-
-就是建一個 matrix，然後你可以找每個詞彙
-
-跟每一個 document 它背後 latent 的 vector
-
-一樣假設我們用 LSA，然後每個 document
-
-用二維的 latent vector 來表示他
-
-那你看到的結果看起來像是，像是這個樣子
-
-Auto-encoder 也可以用在 image 的搜尋上面
-
-你可以用在以圖找圖上面
-
-那怎麼做以圖找圖呢，最簡單的方式就是
-
-你就拿一張，假設這是你要找的對象
-
-假設這是你 image 的 query
-
-你去計算這個 image 的 query，跟其他你的 database 裡面的 image
-
-他的相似程度，比如說你可以算他們在 pixel 上面的相似程度
-
-然後，你再看說最像的幾張就是要 retrieve 的結果
-
-如果你只是這麼做的話呢，你其實得不到太好的結果
-
-假設這是你的 query，這個是 Michael Jackson
-
-如果你拿這張 image
-
-去跟其他 database 的 images 算相似度的話
-
-你找出來最像的會是這幾張
-
-你會發現 Michael Jackson 跟這個馬蹄鐵是很像的
-
-這個是很像，說實在也是很像
-
-所以如果只是這麼做，在 pixel wise 上做比較
-
-你找不到好的結果的
-
-那怎麼辦，你要用
-
-你可以用 deep auto-encoder 把每一張 image 變成一個 code
-
-然後在 code 上面再去做搜尋
-
-而且因為今天做這件事情是 unsupervised
-
-learn 一個 auto-encoder 是 unsupervised，所以你要 collect 多少 data 都行
-
-你要 collect 很多很多的 data，要 collect 多少 data都行
-
-train 這種 auto-encoder 的 data 是永遠不缺的
-
-不像你 train supervised learning 很缺 data，做 unsupervised learning 是不缺 data
-
-那現在怎麼把它變成一個 code 呢
-
-這也是從 Hinton paper 上來的，input 一個 32*32 image
-
-每一個 pixel 用 RGB 表示，所以 32*32*3
-
-然後把這個 image 變成 8192 維，再變成 4096
-
-再變 2048 維，1024 維，到256 維
-
-也就是說這張 image 用 256 維的 vector 來描述他
-
-你再把這個 code 通過另一個 decoder
-
-它的形狀跟這個一樣，只是反過來的
-
-再變回原來的 image
-
-你得到 reconstruction 的結果會是這樣
-
-他是可以被 construct 回來的
-
-如果你不是在 pixel 上算相似度
-
-而是在這種 code 上面算相似度的話
-
-你就會得到比較好的結果
-
-比如來說，如果是用 Michael Jackson 做 input
-
-你找到的都是人臉
-
-雖然這些 images 在 pixel level 上看起來是不像的
-
-但是你透過很多 hidden layer ，把它轉成 code 的時候
-
-在 256 維的空間上，他們是很像的
-
-看起來是像的，原來是不像的
-
-比如說，這是黑頭髮，這是金頭髮
-
-看起來不是很像，但通過很多轉換以後
-
-可能，在那個 256 維裡面，有一個 dimension 就代表人臉
-
-所以他們都知道說，這些 images 都對應到人臉那個 class
-
-auto-encoder 在過去有一個
-
-很好的 application 是可以用在 pre-training 上面
-
-我們都知道說，在 train 一個 neural network 的時候
-
-你有時候在煩惱怎麼做參數的 initialization
-
-有沒有一些方法讓你找到一組比較好的 initialization
-
-這種找比較好的 initialization 方法，就叫做 pre-training
-
-那你可以用 auto-encoder 來做 pre-training
-
-怎麼做呢，假設我現在要做，比如說
-
-MNIST 的 recognition
-
-我可以兜個 network 他input是 784 維
-
-第一個 hidden layer 1000 維，第二個 hidden layer 1000 維，然後 500 到 10 維
-
-我在做 pre-train 的時候，我就先 train 一個 auto-encoder
-
-這個 auto-encoder 他是這樣子
-
-他 input 784 維，然後中間有個 1000 維的 vector
-
-然後再把它變回 784 維
-
-那我希望 input 跟 output 越接近越好
-
-那在做這件事，其實你需要稍微小心一點
-
-因為我們一般在做 auto-encoder 的時候
-
-你會希望你的 code 比 dimension  還要小
-
-那如果比 dimension 還要大會遇到什麼問題呢
-
-你有可能會遇到說他就不 learn 了
-
-他要 reconstruct 他就只要把 784 維
-
-放到這 1000 維裡面去，然後再解回來，就結束了
-
-他為啥都沒 learn 到，learn 一個接近 identity 的 matrix
-
-所以你要很小心，如果你今天發現你的 hidden layer 是比 input 還要大的時候
-
-code 是比 input 還要大的時候，要加一個很強的regularization
-
-在這 1000 維上，所謂很強的 regularization 是說
-
-你可以對這 1000 維的 output 做
-
-L1 的 regularization
-
-你會希望說，這 1000 維的 output 是 sparse
-
-這 1000 維裡面可能只有某幾維是可以有值的，其他維都必須要是零
-
-這樣你就可以避免，auto-encoder 直接把 input 硬背起來，再輸出的問題
-
-總之如果你的 code 是比 input 還要大的，你要注意這種問題
-
-我們現在先 learn 一個 auto-encoder，learn 好以後
-
-我們把從 784 維到 1000 維的這個 weight w1
-
-把它保留下來然後 fit 住
-
-接下來你就把所有 database 裡面的 digit 通通變成 1000 維的 vector
-
-接下來，你再 learn 另一個 auto-encoder
-
-他把 1000 維的 vector 變成 1000 維的 code
-
-再把 1000 維的 code 轉回 1000 維的 vector
-
-你再 learn 一個這樣的 auto-encoder
-
-他會讓 input 跟 output 越接近越好
-
-然後你再把 w2 保存下來
-
-接下來你 fix 住 w2 的值，再 learn 第三個 auto-encoder
-
-第三個 auto-encoder input 1000 維，code 500維， output 1000 維
-
-learn 好這個 auto-encoder，得到他的 weight w3，再把 w3 保留下來
-
-這個 w1 w2 w3 就等於是你在 learn 你整個 neural network 的時候的 initialization
-
-然後你最後再 random initialize 最後 500 到 100 的 weight
-
-再用 back propagation 去調一遍，我們稱之為 fine tune
-
-因為 w1 w2 w3 都已經是很好的 weight 了
-
-我們只是微調他，所以把它叫做 fine tune
-
-用 back propagation 把 w1 到 w4 的值調一下
-
-你把他的值調一下，就可以 learn 好一個 neural network
-
-這招 pre-training 在過去呢
-
-如果你要 learn 一個很 deep 的 neural network 可能是很需要的
-
-不過現在基本上 network 不用 pre-training
-
-現在 training 技術進步以後，不用 pretraining 也 train 得起來
-
-但 pre-training 有個妙用就是
-
-如果你今天有很多 unlabeled data 只有少量 labeled data
-
-你可以用大量的 unlabeled data 去把 w1 w2 w3
-
-先 learn 好，先 initialize 好
-
-那最後的 labeled data 就只需要稍微調整 weight 就好
-
-所以 pre-training 這招在你有大量 unlabeled data 的時候還是有用的
-
-有個辦法可以讓 auto-encoder 做得更好，叫做 de-noising auto-encoder
-
-把 reference 列在下面給大家參考
-
-他的概念其實很簡單，你把原來的 input x
-
-加上一些 noise 變成 x'
-
-然後你把 x' encode 以後變成 code c
-
-再把 c decode 回來變成 y
-
-但是要注意一下，我們現在的 y
-
-本來在做 auto-encoder 是讓 input 跟 output 越接近越好
-
-但現在 de-noising auto-encoder 你是要讓 output
-
-跟原來的 input，再加 noise 之前的 input 越接近越好
-
-如果你有做這件事，learn 出來的結果會比較 robust
-
-直覺解釋就是 encoder 現在不只 learn 到 encode 這件事
-
-他還可以 learn 到把雜訊濾掉這件事
-
-那還有另一招叫 constrictive auto-encoder
-
-這邊就沒有要細講，那 constrictive  auto-encoder 他做的事情是這樣
-
-他會希望說，我們在 learn 這個 code 的時候
-
-我們加上一個 constraint
-
-這個 constraint 是說，當 input 有變化的時候對這個 code 的影響是被 minimize 的
-
-這件事其實很像 de-noising auto-encoder 只是從不同角度來看
-
-de-noising auto-encoder 是說，我加了 noise 以後，還要 reconstruct 回原來沒有 noise 的結果
-
-那 constrictive auto-encoder 是說
-
-我們希望說，當 input 變了，也就是加了 noise 以後
-
-對這個 code 的影響是小的
-
-他們做的事其實蠻類似的
-
-那其實還有很多 non-linear dimension reduction 的方法
-
-比如說 Restricted Boltzmann machine
-
-我們這邊就沒有打算講 Restricted Boltzmann machine
-
-Restricted Boltzmann machine 看起來很像 neural network，但其實不是，
-
-有些人就用 neural network 來想，但文獻你怎麼看都看一頭霧水，因為他就不是 neural network
-
-還有一個東西叫 deep belief  network
-
-deep belief  network 聽起來很像一個 deep neural network
-
-這要問一下大家意見，你覺得 deep belief  network 跟 deep neural network 是一樣的東西嗎
-
-你覺得是一樣東西的同學請舉手
-
-你覺得是不一樣東西的請舉手
-
-大家都知道說他是不一樣的東西，這是很正確的概念
-
-他們只是名字像而已
-
-看 paper 架構，乍看下你會覺得是不是一樣的東西
-
-但實際上他們是不一樣的東西
-
-這個 deep belief  network 跟前面的 Restricted Boltzmann machine
-
-他們是 graph co-model
-
-他們只是看起來很像 neural network
-
-你把它的概念直接套在 neural network上 ，你讀文獻會卡到不行
-
-但我們還沒有打算要講這個 graph co-model
-
-這個部分沒辦法細講，就留一些 reference 給大家參考
-
-那接下來我們講一下 CNN 的 auto-encoder
-
-如果我們今天要處理的對象是 image 的話，我們都知道你會用 CNN
-
-那在 CNN 處理 image 的時候
-
-你會有一些 convolution layers，pooling layers
-
-用 convolution 和 pooling 交替，然後
-
-讓 image 變得越來越小，最後去做 flatten
-
-那今天如果是做 Auto-encoder 的話
-
-你不只要有個 encoder，還要有個 decoder
-
-如果 encoder 的部分是做  convolution 再做pooling，convolution 再做pooling
-
-理論上 decoder 應該就是做跟 encode 相反的事情
-
-decode 的時候你應該就是做
-
-就是你做這些 process 得到的 code 再做反過來的事情
-
-本來有 pooling 就做 unpooling，本來有 convolution 就做 deconvolution
-
-但是這個 unpooling 跟 deconvolution 到底是什麼呢
-
-那 training 的 criteria 就一樣，就是讓 input  和 output 越接近越好
-
-但是這個 convolution 跟 deconvolution 他們是什麼呢
-
-那我們現在來看一下這個 unpooling 的部分
-
-我們知道在做 pooling 的時候你就是
-
-現在得到一個 4X4 的 matrix
-
-接下來把 matrix 裡面的 pixel 分組，四個一組
-
-接下來從每一組裡面挑一個最大的
-
-比如說，在這個例子裡面，你挑了這個東西
-
-然後你的 image 就變成原來的四分之一
-
-但是如果今天做的事情，如果你今天要做的是 unpooling
-
-pooling 是這麼做，但如果你要等一下要做 unpooling
-
-你要做另一件事，要先記得說我剛剛在做 pooling 是從哪裡取值
-
-我在這個地址是從左上角，這四個方塊從左上角取值
-
-所以這邊就是白的
-
-這四個是從右下角取值，所以右下角就留下紀錄
-
-從這個地方取值，這邊有個紀錄，你要記得是從哪裡取值
-
-接下來如果你要做 unpooling 的時候
-
-你要把原來比較小的 matrix 擴大
-
-比如說原來做 pooling，原來比較大的 matrix 變成四分之一
-
-現在要把比較小的 matrix 變成原來的四倍
-
-那怎麼做呢
-這個時候你之前紀錄的 pooling 的位子就可以派上用場
-
-之前記得說你在 pooling 的時候是從左上角 pool 值
-
-那現在你在做 unpooling 的時候就把值放到左上角，其他補零
-
-記得在這裡取值，就把這個值放到右下角其他都補零
-
-這裡取值，就把值放到這裡其他補零
-
-這裡取值，就把值放到這邊其他補零
-
-這就是 unpooling 的其中一種方式
-
-所以做完 unpooling 以後本來一張比較小的 image 會變得比較大
-
-原來14X14 的 image 會變成 28X28 的 image
-
-你會發現它就是把原來 14*14 的 image 做一下擴散
-
-有些藍色的地方就是補零
-
-每一個原來在 14*14 image 裡面的值
-
-擴散到 28*28 裡面，他都會加上三個零
-
-其實這不是 unpooling 唯一的做法，他在 Keras 裡面作法是不一樣的
-
-就我所知 Keras 裡面的做法
-
-他是直接 repeat 那些 value
-
-也就是說不用去記你之前 pooling 的位子
-
-你就直接把這個值複製四份，就行了
-
-就我所知 Keras 裡面是這麼做
-
-接下來比較難理解的地方叫做 Deconvolution
-
-原來 convolution 已經很難懂了，deconvolution 到底是什麼呢
-
-大家很難搞清楚他是什麼
-
-事實上 deconvolution 就是 convolution
-
-這樣大家知道我的意思嗎？如果你看 Keras 的 code，作業三不是有個連結教你怎麼做 auto-encoder
-
-不知道怎麼回事，大家都好像沒有做一樣
-
-你會發現你看那個 code，根本就沒有什麼 deconvolution 這種東西
-
-他就是做 convolution，他在做 decode 的地方再做 convolution
-
-這是怎麼一回事，我們不是本來應該是做一個 convolution 的相反
-
-叫做 deconvolution 嗎，怎麼又是在做 convolution
-
-其實 deconvolution 就是 convolution 我們來解釋一下
-
-所以有人說 deconvolution 名字取的不好會讓大家困惑
-
-我們舉一維的 convolution
-
-我們平常做 image 是做二維的，但那個圖有點累，我們取一維的當做例子
-
-一維的 convolution 是怎樣呢，我們假設 input 有五個 dimension
-
-然後我們的 filter size 是三
-
-那我們就把 input 的這三個 value 分別乘上紅色藍色綠色的 weight，得到一個 output
-
-再把這個 filter shift 一格，把這三個 value 分別乘上紅色藍色綠色的 weight 得到下一個 output
-
-再 shift 一格，乘上紅色藍色綠色的 weight 再得到一個 output
-
-這是 convolution，deconvolution 應該是怎樣呢
-
-你的想像可能會是這樣子，deconvolution 就是 convolution 的相反
-
-所以本來是三個值變成一個值
-
-在做 deconvolution 的時候，就應該是一個值變三個值
-
-然後發現這邊動畫有一個錯，這個圈圈不應該出現，請忽視他
-
-所以你現在應該是一個值變成三個值，所以怎麼做呢
-
-你的想像是這樣，一個值分別乘上紅色綠色藍色的 weight 變成三個值
-
-這個值也乘上紅色綠色藍色的 weight 變成三個值
-
-但是他已經有在這邊貢獻一些值了，他也要在這邊貢獻一些值怎麼辦呢
-
-就加起來，他產生三個值，他也產生三個值，重疊的地方加起來
-
-然後，他也產生三個值，重疊的地方加起來
-
-但事實上這件事情等同於，你看看我這麼說對不對
-
-等同於是在做 convolution，為什麼呢
-
-他等同於是把，我們 input 就是三個 value
-
-然後我們會做這個
-
-把它做 padding，在旁邊補零
-
-接下來我們一樣做 convolution
-
-做 convolution 的時候三個 input 乘上綠色藍色紅色的 weight 得到一個值
-
-三個 input 乘上綠色藍色紅色的 weight 得到一個值，以此類推
-
-你會發現說，這個框框裡面做的事情，跟這個框框裡面做的事情是一模一樣的
-
-怎麼說呢，我們檢查中間這個值，他是三個 value 加起來
-
-這三個 value 分別是他乘上綠色，他乘上藍色，他乘上紅色再加起來
-
-那這邊這個 value 的值也是他乘上綠色，他乘上藍色，他乘上紅色再加起來
-
-所以這件事情跟這件事情是一樣的
-
-你檢查這邊的1 2 3 4 5，5 個值
-
-跟這邊的 1 2 3 4 5，5 個值，他們是一樣的
-
-如果你把 deconvolution 跟 convolution 做比較，他們不同點在哪裡？
-
-不同點是在他們的 weight 是相反
-
-他這邊是紅藍綠，這邊是綠藍紅，正好是相反
-
-但他做的 operation 一樣也就是 convolution 這件事
-
-所以你把這個 input 做 *** ，再做 convolution其實就等於是 deconvolution
-
-你會發現在 Karas 裡面，你根本就不需要再另外寫一個 deconvolution 的 layer
-
-你直接 call 一個 convolution 的 layer 就可以了
-
-我本來想要講 sequence 的 auto-encoder
-
-不過可以等到 RNN 的時候再講
-
-我們知道說，剛才我們看到的 auto-encoder 他的 input
-
-通通都是 fix-length 的 vector，但很多東西
-
-有很多東西你本質上不該把他表示成 vector，比如說語音
-
-一段聲音訊號有長有短他不是一個 vector
-
-一段文章有長有短他不是一個 vector
-
-你雖然可以用 bag-of-word 把它變成一個 vector
-
-但這個方法你會失去詞彙和詞彙間的前後關係
-
-所以我們剛才已經講了 dimension reduction
-
-我們剛都是用 encoder 來把原來的 image 變成小的 dimension
-
-但是我們同時也 train 一個 decoder 不是嗎
-
-那個 decoder 其實是有妙用的，你可以拿 decoder 來產生新的 image
-
-也就是說我們把 learn 好的 decoder 拿出來
-
-然後給他一個 random 的 input number，他的 output 希望就是一張圖
-
-這件事可以做到嗎，其實這件事做起來相當容易
-
-我就胡亂拿MNIST 來秒 train 一下
-
-然後我把每一張圖，784 維的 image 通過一個 hidden layer 然後 project 到二維
-
-再把二維通過一個 hidden layer 解回原來的 image
-
-那在 encoder 的部分，那個二維的 vector 畫出來長這樣
-
-跟 Hinton 那個圖其實是有些像
-
-那不同顏色的點代表不同數字，畫出來是這個樣子
-
-接下來我在紅色這個框框裡面
-
-等間隔的去 sample 一個二維的 vector 出來
-
-然後把那個二維的 vector 丟到 NN decoder 裡面
-
-然後叫他 output 一個 image 出來
-
-這些二維的 vector 不見得是某個 image compress 以後的結果
-
-他不見得原來有對應的 image，他就是某個二維的 vector
-
-然後丟到 decoder 裡面，看看他可以產生什麼
-
-你會發現我們在紅色框框內等距離的做 sample
-
-得到的結果就是這樣
-
-你就可以發現很多有趣的現象
-
-從下到上，感覺是圓圈然後慢慢的就垮了
-
-這邊本來是不知道是四還是九，然後變八
-
-然後越來越細，變成 1
-
-最後不知道為什麼變成 2，還蠻有趣的
-
-你會發現這邊感覺比較差，為什麼呢
-
-因為在這邊其實是沒有 image
-
-你在 input image 的時候其實不會對到這邊
-
-這個區域的 vector sample 出來，通過 decoder 他解回來不是 image
-
-他看起來是一個有點怪怪的東西
-
-有人可能會說，你怎麼知道要 sample 在這個地方
-
-因為我必須要先觀察一下二維 vector 的分佈
-
-才能知道哪邊是有值的
-
-才知道從那個地方 sample 出來比較有可能是一個 image
-
-如果我 sample 在這個地方，我相信我得到東西看起來就不像是 image 了
-
-可是這樣你要先分析二維的 code 感覺有點麻煩
-
-那怎麼辦，怎麼確保說，在我們希望的 region 裡面都是 image
-
-有個很簡單的做法就是在你的 code 上面加 regularization
-
-在你的 code 直接加上 L2 的 regularization，讓所有的 code 都比較接近零
-
-接下來就在零附近 sample
-
-比較有可能你 sample 出來的 vector 都可以對應到數字
-
-所以我就做這樣的事情，我在 train 的時候加上 L2 的 regularization 在 code 上面
-
-train 出來你的 code 都會集中在接近零的地方
-
-他就會以零為核心，然後分佈在接近零的地方
-
-接下來我就以零為中心，然後等距的在這個紅框內 sample image
-
-sample 出來就這個樣子
-
-從這邊你就可以觀察到很多有趣的現象，你會發現說
-
-他的這個 dimension 跟這個 dimension 是有意義的
-
-從左到右橫軸代表的是有沒有圈圈
-
-本來是很圓的圈圈， 然後接下來就慢慢變成一
-
-那如果是縱的呢，我覺得本來是正的，然後慢慢就倒過來
-
-這邊也是本來是正的，然後往下面慢慢就倒過來
-
-所以你可以不只是做 encode，還可以用 code 來畫
-
-這個 image 並不是從原來 image database sample 出來的，他是 machine 自己畫出來的
-
-臺灣大學人工智慧中心
-科技部人工智慧技術暨全幅健康照護聯合研究中心
+臺灣大學⼈⼯智慧中心
+科技部⼈工智慧技術暨全幅健康照護聯合研究中⼼
 http://aintu.tw

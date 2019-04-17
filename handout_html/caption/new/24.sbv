@@ -2,1447 +2,1196 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-好，接下來我要來講一下 Generation 的 model
+接下來我們要來講這個 Deep Auto-encoder
 
-有關 Generation 的 model
+那什麽是 Auto-encoder 呢？
 
-你可以看一些很好的 reference
+Auto-encoder 的想法是這樣
 
-這個是 OpenAI 寫的一篇科普的文章
+我們首先去找一個 encoder
 
-那我把它列在這一邊
+那這個 encoder 你可以 input 一個東西
 
-在這篇文章裡面呢
+比如說我們現在這邊要做的是影像辨識的話
 
-它開頭是引用費曼的話
+你要做是跟影像有關的東西的話
 
-這句話，來歷是什麼呢？
+就 input 一張，假設我們要做 MNIST 的話
 
-據說是，費曼過世以後
+就 input 一張 digit 他是 784 維的 vector
 
-有人去他的辦公室，拍一下他的黑板
+那接下來呢，這一個 encoder 他可能就是一個 neural network
 
-他在黑板上留下了這一句話
+他的 output 呢，就是一個 code
 
-這個是他辦公室的黑板
+這個 code 通常是遠比 784 維還要小的
 
-這一句話寫在左上角 ，他說
+所以他會有類似壓縮的效果
 
-What I cannot create, I do not understand.
+這個 code 代表了原來 input 這張 image
 
-所以，如果一個東西
+的某種 compact，某種精簡的有效的 representation
 
-他沒有辦法，他不知道怎麼產生它的話
+但是現在問題是這樣，我們現在做的是 unsupervised learning
 
-他就不算是真的完全理解
+你可以找到一大堆的 image
 
-所以，對 machine 來說 ，或許也是一樣
+當作這個 NN encoder 的 input
 
-比如說 ，現在 machine 在影像處理上
+但是我們沒有任何的 output
 
-machine 可以做到分類
+並不知道一個 image，如果把它變成一個 code
 
-你可以讓他見識貓和狗的不同
+這個 code 到底應該要長什麼樣子
 
-但他或許並不真的了解
+那你要 learn 一個 network 你要有 input output
 
-貓是什麼， 或許它並不真的了解狗是什麼
+只有 input 你沒辦法 learn 他
 
-也許在未來，有一天
+那沒有關係，我們先想說我們要做另外一件事情
 
-machine 它可以自己畫出一隻貓的時候
+我們想要 learn 一個 decoder
 
-它對於貓這個東西的概念
+所謂 decoder 他做的事情是說
 
-或許就不一樣了
+input 一個 vector 他就通過這個 decoder
 
-而這個是現在一個非常熱門的主題
+他也是個 NN，他的 output 就是一張 image
 
-有很多相關的研究
+input 給他一個 code，他 output
 
-我們就來稍微講一下
+就根據這個 code 裡面的 information
 
-我們稍微來 overview 一下
+output 就是一張 image
 
-相關的研究
+接下來呢，你也沒辦法 train NN 的 decoder
 
-在這些研究裡面
+你也沒辦法 train 他，因為你只有 network 的 output
 
-大概可以分成 3 個方法
+你沒有他的 input
 
-這邊分別是 PixelRNN
+這兩個 network，encoder 和 decoder，單獨一個人你都無法 train 它
 
-VAE (Variational Autoencoder)
+但是，我們可以把它接起來
 
-和 Generative Adversarial Network (GAN)
+然後一起 train
 
-那這些方法呢，其實都非常的新
+也就是說，我們接一個 neural network
 
-其中最舊的是 VAE
+input 一個 image，中間變成 code
 
-VAE 是 2013 年提出來的
+再把 code 通過 decoder 變成原來的 image
 
-像 GAN 是 2014 年提出來
+你就可以把這個 encoder 和 decoder 一起學
 
-它提出來還不到兩年
+那你就可以同時把 encoder 和 decoder 學出來了
 
-你知道，我們一般在上課的時候
+我們剛才在 PCA 裡面其實看過非常類似的概念
 
-尤其是在必修課裡面
+我們來看一下，先從剛才講過的 PCA 開始講起
 
-你聽到的每一個東西往往都是，比如說
+我們剛才講過說
 
-50 年前，100 年前 propose 出來的
+PCA 實際上他在做的事情是這樣，input 一張 image x
 
-但是在 machine learning，這邊這個領域裡面
+那在剛才我們的例子裡面，我們會把 x 減掉
 
-它的變化是非常非常快速的
+他的平均 x bar 當作 input
 
-所以，有很多很多
+但這個減掉 x bar 並不總是
 
-未來可能會成為非常經典的方法
+這邊我們把他省略掉
 
-它是這幾年，才不斷地推陳出新
+把他省略掉並不會太奇怪，因為通常你在做 NN 的時候
 
-所以，我試著在課程裡面
+你拿到 data 起手式你就先做 normalize
 
-cover 一些比較新的技術
+先把它變成 mean 是零，variance 是一
 
-讓大家知道說
+所以你的 data 通常 mean 其實就是零了
 
-這個領域它的變化，是非常非常快的
+所以你就不用再減掉 mean
 
-那我們先來講一下 PixelRNN
+你把 x 乘上一個 weight，通過 NN 的一個 layer
 
-我們今天就先講一下這些方法
+得到你的 component 的 weight，這邊寫成 c
 
-大概是怎麼運作的
+那這個 component 的 weight 再乘上一個 matrix W 的 transpose
 
-然後下一次，再細講它的原理
+得到 x 的 hat
 
-我們來講一下 ，這個 Pixel RNN
+這個 x 的 hat 是根據這些 component 的 reconstruction
 
-雖然我還沒有講過 RNN 是什麼
+根據這些 component 的 weight
 
-但我相信這個方法，你是可以聽得懂的
+component 就放在這個 weight 裡面
 
-因為它非常的，非常的直覺
+根據 component 的 weight 和 component 做 reconstruction 的結果
 
-非常的直覺
+我們說，在 PCA 裡面
 
-假設我們今天要產生一個
+我們要做的事情就是 minimize input
 
-我們今天的目標是要讓 machine 自己畫一張圖出來
+跟 reconstruction 的結果
 
-比如說，我們今天要讓 machine 畫出一個
+我們要讓 x 跟 x hat
 
-解析度是 3*3，有 9 個 pixel 的 image
+他的 Euclidean distance 越近越好
 
-怎麼做呢？
+然後 x 跟 x hat 他們越接近越好
 
-我們讓 machine 每一次畫一個 pixel
+這個是 PCA 做的事，如果把它當成 neural network 來看的話
 
-它每一次就點一個點
+那input 的 x 就是 input layer
 
-點完 9 個點，就畫出一張圖了
+output 的 x hat 就是 output layer
 
-那怎麼做呢？
+中間 component 的 weight
 
-假設我們先隨機給它第一個
+就是 hidden layer，在 PCA 裡面他是 linear
 
-隨機給這個 image ，塗一個紅色的 pixel
+那中間這個 hidden layer 我們通常又叫他
 
-接下來呢，你就 learn 一個 model
+bottleneck layer
 
-它 input ，就是已經在圖上的紅色 pixel
+為什麼叫 bottleneck layer 呢？
 
-它的 output，就是接下來 
+因為你這個 code 的數目
 
-要吐出什麼顏色的 pixel
+因為你現在就是要做 dimension reduction
 
-假設，它吐出藍色的 pixel
+所以你這 component 的數目
 
-那就把藍色的 pixel 再擺到 image 上面
+通常會比你的 input 的 dimension 還要小得多
 
-那你說，怎麼描述一個 pixel 呢？
+這樣才會達到 dimension reduction 的效果
 
-一個 pixel 不就是 RGB 三個顏色所構成的嗎？
+如果把它當作一個 layer 來看的話
 
-所以，一個 pixel 就是一個三維的 vector
+他是個特別窄的 layer
 
-所以，你就是 learn 一個 neural network
+所以我們叫他 bottleneck layer，他就是一個瓶頸的意思
 
-它可以吃一個三維的 vector
+前面這個部分就是在做 encode
 
-然後，output 另外一個 3 維的 vector
+你把 input 變成一組 code
 
-這個 3 維的 vector，3個值
+後面這個部份就是在做 decode
 
-就代表了，這個 pixel 的 RGB 3 個值
+你如果把 component 的 weight 想成 code 的話
 
-你要把這個 neural network 的 output
+後面這件事就是把 code 變回原來的 image
 
-轉成一個顏色，然後，把它塗上去就結束了
+hidden layer 的 output，就是我們要找的那些code
 
-接下來，這個圖上有兩個點
+那 PCA 是這樣做的
 
-那你就再用同一個 model
+你其實也可用 gradient decent 來做 PCA
 
-它 input 紅色和藍色的 pixel
+PCA 只有一個 hidden layer
 
-接下來，它就 output 下一個 pixel
+你就可以想說，要不要把它變更多 hidden layer
 
-比如說，它是淺藍色的 pixel
+當然可以把它變更多 hidden layer
 
-那這邊呢，你可能會有個問題就是
+你就兜一個很深的 neural network，它有很多很多層
 
-neural network 不是  input 一個 pixel length  的 vector
+然後在這個很多很多層的 hidden layer 裡面
 
-output 另外一個 pixel length 的 vector 嗎？
+你 input 一個 x
 
-比如說，你 input 3 維
+他最後得到的 output 是 x\head
 
-它就固定只能 input 3 維
-
-你怎麼 input 一個 pixel
-
-又用同一個 network，input 2個 pixel 呢？
-
-這個就是 RNN 可以處理的地方
-
-RNN 它可以處理 variable length 的 input
-
-因為我們還沒有講過 RNN
-
-如果，你覺得你無法理解
-
-怎麼處理一個 variable length 的 pixel 的話
-
-那你就想像說
-
-還沒有 pixel 的地方，我就補零
-
-就想像說，我這一邊空白的地方
-
-我其實是，就是補一個白色的 pixel 而已
-
-那接下來呢
-
-你給它紅色、藍色跟淺藍色的 pixel
-
-接下來，它吐出一個灰色的 pixel
-
-那你就再把灰色的 pixel 放到圖上
-
-接下來，重複剛才的步驟，給它這 4 個 pixel
-
-然後，把下一個 pixel 再補上去
-
-那你就把 9 個 pixel 都補完 
-
-就畫完一張圖了
-
-那要 train 這種 network 很簡單
-
-它完全就是 unsupervised
-
-你不需要任何的 label ，你想在作業 3 裡面
-
-你要知道某一些 image，它的 label 是什麼
-
-你才能夠 train 一個 image 的 classifier
-
-這一邊不用，你就收集一大堆的 image
-
-然後，machine 就會知道說
-
-看到第一個 pixel 是這個顏色
-
-第二個 pixel 應該是甚麼
-
-看到第一個和第二個 pixel 這個顏色
-
-第三個應該是甚麼
-
-看到1, 2, 3 個pixel
-
-第四個 pixel 應該是甚麼
-
-這個就叫 PixelRNN
-
-你可能想說，這招這麼簡單
-
-它會 work 嗎？
-
-也讓我蠻驚奇的
-
-它其實是 work 的
-
-而且在不同的 generate image 的方法裡面
-
-現在，就我所知
-
-應該是 PixelRNN 它產生的圖
-
-是最清晰的
-
-其他的方法產生的圖
-
-沒有辦法像 PixelRNN 這麼清晰
-
-這個是，DeepMind paper 的一個例子
-
-這個是真實的 image，就是一隻狗
-
-如果我們現在把這一隻狗的下半身
-
-遮掉，把下半身遮掉
-
-接下來，我們就要讓 machine
-
-去 predict 說，given 這些 pixel
-
-接下來這隻狗的下半身
-
-應該要長什麼樣子
-
-machine 把狗的下半身畫出來
-
-那 machine 畫出了這樣子的狗
-
-還有這樣子的狗
-
-還有這樣子的狗
-
-有看起來看像猩猩的狗
-
-還有看起來像雞的狗這樣
-
-然後，這個方法
-
-其實也可以被用在
-
-不只是影像上
-
-它也可以被用在語音上
-
-非常著名的例子呢
-
-就是 WaveNet
-
-我們知道 WaveNet 可以做語音合成
-
-但是 WaveNet 到底是怎麼做的呢？
-
-其實，它的概念非常簡單
-
-就是 input 一大堆的
-
-這邊底下的每一個 node
-
-藍色的圈圈，代表的就是 wave form
-
-wave form 大家知道嗎？就是
-
-反正，你就把聲音取進來
-
-然後，直接去取樣
-
-然後看它的 amplitude
-
-等於完全不用做任何 feature transform
-
-通通都不要，這邊每一個藍色的點
-
-就是聲音訊號上面的一個 sample
-
-好，那今天就是這樣
-
-我們等這個動畫跑完
-
-給定前面一段的聲音訊號
-
-然後，predict下一個 sample 的結果
-
-然後把它放下來，再 predict 下一個 sample
-
-再放下來，再 predict 下一個 sample
-
-再放下來 ，就這樣
-
-然後接下來就是
-
-硬 train 下去，就結束了
-
-然後，你就可以合出一段聲音
-
-這個是在語音上的應用
-
-在影像上也有應用
-
-在 影像上，你也可以做一樣的事情
-
-只要讓 machine 看過很多的 video
-
-然後，它就可以 predict 說
-
-給它一段 video，接下來會發生甚麼事情
-
-比如說， 在 Google 的 demo 裡面
-
-它會 DEMO 說
-
-它的那些影像都是機器人手背上的影像
-
-它在機器人手背上裝了一個攝影機
-
-所以，它可以錄說
-
-機器人的手背看到的影像
-
-你就可以看到說
-
-影像的前半段是
-
-機械人的手伸向一塊抹布
-
-然後，影像的後半段
-
-就是機器人把抹布拿起來
-
-把抹布拿起來的那一些影像
-
-是機器自己腦補的結果
-
-並不存在於現實生活中
-
-機器自己 predict 接下來會發生什麼事情
-
-那如果你想要練習
-
-這個 generation 的話
-
-一個最簡單的 application，當然是做 MNIST
-
-不過做 MNIST，我覺得有一點虛弱
-
-generate digit 有點虛弱，而且那個有點簡單
-
-所以，我 create 另外一個 task
-
-如果你想要練習 generative model 的話
-
-你可以用這個 task
-
-這一個 task 是 Pokémon Creation
-
-這邊，我們有 792 張寶可夢的小圖
-
-我們要讓 machine 看過這些小圖以後
-
-它自己產生新的寶可夢出來，這一邊的口號就是
-
-用創造代替捕抓這樣
-
-過去我們是抓寶可夢
-
-在野外抓寶可夢
-
-像我們在實驗室裡面
-
-是你創造新的寶可夢出來
-
-image 的 source 是來自於 Pokémon 的 Wiki
-
-我看了一下它的 copyright
-
-它的 image 都可以任意使用
-
-和變造的，所以應該是沒有版權的問題
-
-原來的 image 是 40*40 的 pixel
-
-其實，我覺得 40*40 有點稍微太大
-
-所以，我把它 cut 小一點
-
-只取了中間的部分
-
-中心的部分，變成 20*20 的 image
-
-那看起來大概像是這樣子
-
-這個是喵喵
-
-這個是，我也不知道它是什麼
-
-我只知道它好像跟果然翁在一起
-
-其實，我沒有把動畫仔細看完
-
-反正就是這些，你可以
-
-雖然說，影像的解析度沒有很高
-
-但是，還是可以很清楚的看到說，它就是寶可夢
-
-那這邊有一些 tips
-
-因為，我其實自己實際做了一下
-
-我覺得有一些 tips
-
-首先，就是你可能很直覺的覺得說
-
-一個 image、一個 pixel 應該就是用一個三維的 vector
-
-用三個數字來描述它
-
-每一個數字代表了 RGB
-
-比如說，這樣的 pixel
-
-你可能就用 3 個 vector
-
-你可能用三個數值
-
-50，150 和 100 來描述它
-
-但是，我覺得實際上這樣做以後呢
-
-我發現這樣做，結果感覺不是太好
-
-那我覺得，原因是因為
-
-你用這樣做，你產生的圖
-
-都很灰，看起來都灰灰髒髒的
-
-我覺得一個原因是因為
-
-如果你要產生非常鮮明的顏色的話
-
-非常鮮明的顏色往往是
-
-某一個RGB 裡面的某一個 value 特別高
-
-其他都接近零
-
-像灰色，就是三個 RGB 的 value 都差不多
-
-就是灰色
-
-所以，如果你要這個
-
-那它產生非常鮮明的顏色的話
-
-你這三個值，要差得夠大才行
-
-但是，你在 learn 的時候
-
-你往往沒有辦法真的讓，比如說
-
-G 是 0、B 是 0
-
-你往往做不到這一件事
-
-尤其，你今天如果是 output
-
-你 output 把 0 到 255
-
-normalize 到 0 到 1 之間的話
-
-output 你用 sigmoid function 的話
-
-sigmoid function 的值，通常都落在 0.5 左右
-
-通常都落在中間，它很難落在這種極端的值
-
-所以，它產生的值
-
-都是 RGB 3 個值差不多
-
-所以，你看起來每一張圖，看起來都是灰色，
-
-棕色，這感覺不太好看
-
-所以，我就稍微做了一下前處理
-
-怎麼做前處理呢？
-
-我把每一個 pixel
-
-都用一個 1-of-N encoding 的 vector 來表示
-
-但是 1-of-N encoding 裡面
-
-每一個 dimension
-
-就代表了一個顏色
-
-也就是說每一個 pixel
-
-都是用一個 vector來表示
-
-這個 vector 的每一個 dimension
-
-比如說，第一個 dimension 就代表黃色
-
-第二個 dimension 就代表藍色
-
-第三個 dimension 就代表綠色
-
-第四個 dimension 就代表黑色，等等
-
-也就是說，不讓它產生 RGB
-
-去合成顏色
-
-而是直接讓它產生一個顏色
-
-所以，比如說
-
-這個顏色進來， 這個綠色進來
-
-那它就是這一維是 1
-
-然後其他是 0
-
-所以，一個 pixel，我們用這個方式來描述它
-
-但是，這邊會有一個問題就是
-
-你可能的顏色太多了
-
-RGB 每一個都有 255 種可能
-
-256種可能
-
-256 的 3 次方
-
-有太多可能的顏色
-
-怎麼辦呢？
-
-我先做 clustering
-
-把同樣接近的顏色 cluster 在一起
-
-也就是說
-
-這個綠，跟這個綠，跟這個綠
-
-它們算是同一個顏色
-
-都用上面這個綠來表示它
-
-那我就把在 corpus 裡面
-
-出現次數比較少的這個顏色
-
-跟出現次數比較多的顏色呢
-
-把它合併起來
-
-所以，我們得到了 167 個不同的顏色
-
-那我 release 了這個 corpus
-
-大家可以任意使用
-
-這個 corpus 是這個樣子
-
-原來 image 在這一邊，然後，我裁過的結果在這邊
-
-那我這邊就直接存 pixel
-
-所以你也不用做 preprocessing 了，都幫你做好了
-
-在這個 data 裡面
-
-每一個 row，就代表了一張 image
-
-然後，每一個數字，就代表了一個顏色
-
-就代表了一個顏色
-
-那怎麼知道每個數字代表什麼顏色呢？
-
-它的 mapping 在這一邊
-
-比如說，0，它的 RGB 就都是 255, 255, 255
-
-所以，0 代表白色
-
-然後，比如說，這一邊
-
-這個 2，2 代表三個都是49, 49, 49
-
-這個其實是一個灰色，等等 
-
-那我等一下就做這個 PixelRNN 的實驗
-
-我發現，其實，你可能會懷疑說只有 700 多張圖
-
-你 train 得起來嗎？
-
-我 train 得起來，是 train 得起來
-
-但問題就是，你可以得出什麼正常的好的結果嗎？
-
-我發現驚人的就是
-
-其實是可以的
-
-然後，我沒有花太多時間調參數
-
-我就用了一個一層的 LSTM
-
-還有 512 個 cell
-
-你不知道 LSTM 是什麼也沒有關係
-
-反正，就是 learn 一個很簡單的 model
-
-做出來的結果，就還算尚可
-
-我相信，你認真調一下參數
-
-一定可以做得比我好的，好的更多
-
-這個是實驗的結果
-
-首先要強調的是
-
-我特意留了 3 張寶可夢
-
-是 machine 沒有看過的
-
-你在 training data 裡面
-
-是沒有這三張寶可夢
-
-接下來，我給 machine 看這個寶可夢的前半部
-
-把剩下的半部，把它蓋起來
-
-只給 machine 看前半部
-
-然後，讓它 predict 這個寶可夢應該長什麼樣子
-
-這個，你覺得它是什麼呢？
-
-它看起來像是個兔子
-
-紅色的兔子
-
-然後，把它的下半身 generate 出來
-
-它長這樣
-
-它原來是有穿吊帶褲的兔子
-
-但它其實是長這樣子
-
-那你覺得這隻是什麼呢？
-
-這一隻是甚麼？
-
-感覺像是鐵甲蛹之類的東西
-
-那 machine generate 出來結果是這個樣子
-
-它是一個長的綠毛蟲
-
-它是一個長的綠毛蟲
-
-這個還有一個尾巴，這樣
-
-它是一個綠毛蟲
-
-但實際上，它是一隻蜥蜴
-
-然後，這個呢，這個是什麼？
-
-這個是什麼，這個 machine generate 出來
-
-它覺得是一個類似狗或是狐狸的東西
-
-它的臉很長
-
-然後，這個是它的腳
-
-這個是它的腳
-
-machine還是要配色，你看
-
-你看本來
-
-本來這一邊它是沒有很多深紫色
-
-但是到腳這邊，幫它塗一下深紫色這樣
-
-我覺得還蠻強的，還蠻強的
-
-但實際上，它其實是長這個樣子
-
-如果，我們今天給它看
-
-只有 25% 的圖 ，它會得到什麼
-
-只給它看一個耳朵
-
-它會覺得接下來是什麼
-
-它產生這個臘腸兔這個樣子
-
-臘腸兔
-
-而且其實，我覺得 machine 還算蠻強的
-
-你看它有手
-
-它有手，它都把手畫出來
-
-臘腸的兔，嘴巴跟眼睛，這個樣子
-
-我覺得還蠻強的
-
-這個給它看一個角
-
-它會覺得是甚麼呢？
-
-它覺得是鐵甲蛹這樣
-
-類似鐵甲蛹，看起來像右邊
-
-自己產生了一個，看起來很不爽的眼睛
-
-鼻子，嘴巴這樣
-
-這個，給它看上面一點點
-
-也不知道是什麼東西
-
-然後，它判斷出來，它覺得是這個樣子
-
-你看它產生一個臉
-
-它產生一個兔子的臉，這個是它的耳朵
-
-這個是眼睛
-
-這個是眼睛，想要翻白眼
-
-然後，這個是它的鼻子
-
-它產生一個臉
-
-所以，我就覺得還蠻強的
-
-而且，我覺得在做這種 task
-
-有一個難點就是，你很難 evaluate 這個 task
-
-因為，所謂創造這件事情
-
-是無法 evaluate 的
-
-你不能說，我覺得這個臘腸兔也很合理
-
-我覺得搞不好還比這個蛞蝓更合理一點
-
-就是說，它建得出來，並不一定要跟光圈一樣
-
-它建出來的結果跟光圈不一樣
-
-並不代表說，它畫的是錯的
-
-所以，像這種 task
-
-是很難被，很難被 evaluate 的
-
-這是現在做這種
-
-generation 的一個難點
-
-剛才，是有給 machine 一個開頭
-
-然後讓它畫下去
-
-接下來，你就什麼都不給他
-
-讓它從頭開始畫
-
-但是，如果你只是什麼都不給它
-
-讓它從頭開始畫的話
-
-它可能每一張 image 都是一樣的
-
-所以你要故意加一些 random
-
-也就是說，它在 predict 下一個 pixel 的時候
-
-不見得是選機率最高的，那個 pixel
-
-它會有一定的機率，選一個
-
-機率比較低的顏色出來
-
-畫在圖上面，這樣它每一次畫的圖
-
-都才會有點不一樣
-
-那其實蠻多都是不知道是在做什麼的圖
-
-比如說，像這個我都不知道在做什麼
-
-這個看起來像是鳥的嘴巴
-
-那，這個也許，也許是兩個眼睛
-
-我也不知道它在畫什麼
-
-這個是，看起來像是個兔子，像是個兔子
-
-難道這個是它的臉嗎
-
-難道這個是它戴了一個頭盔
-
-我也不知道它在畫甚麼
-
-有一些，我覺得比較清楚
-
-像這個，我覺得它是一隻飛鳥
-
-這是它的手
-
-這個是一個大嘴鳥
-
-這是它的嘴巴這樣
-
-這個是一隻比較慘的鴕鳥
-
-它是一個戴綠帽的駝鳥
-
-然後，這個是地鼠
-
-這個畫得還不錯，它還有配色
-
-淺藍色配白色，這是個地鼠
-
-它是有眼睛的
-
-這個也是另外一隻比較大隻的地鼠
-
-它頭上有一些藍藍紅紅的
-
-它是比較大隻的地鼠
-
-然後，這個是，我們胡亂給它取個名字
-
-叫做岩漿模糊好了
-
-它下面是岩漿，上面是雲
-
-叫岩漿雲模糊好了
-
-它上面，這個是有眼睛
-
-不要小看它，它是有眼睛的，兩個眼睛都點出來了
-
-這個是飛行骷髏
-
-它也是有眼睛的
-
-我發現這個 model 還蠻強的
-
-它還蠻喜歡點眼睛出來
-
-然後，還有其他方法
-
-細節我們或許下次再講
-
-我們可以稍微看一下它的結果
-
-這個東西那叫做 Variational Autoencoder
-
-那我們之前，已經有講過說
-
-已經有講過 Auto-encoder
-
-我們之前講過 Auto-encoder
-
-那我們之前在講 Auto-encoder 的時候
-
-我們說，你現在呢
-
-Auto-encoder 的 training criteria
-
-就是 input 一張 image
-
-通過 encoder 就變成一個 code
-
-再通過 decoder 把 image 解回來
-
-那你希望 input 跟 output
+你會希望 training 的 target，希望這個 x 跟 x\head
 
 越接近越好
 
-希望 input 跟 output 越接近越好
+training 的方法 完全沒有什麼特別的
 
-那你 learn 完這個 Auto-encoder 以後
+就是 back propagation
 
-你其實就可以把這 decoder 拿出來
+就跟我們之前在 neural network 的時候講的呢
 
-你就把 decoder 拿出來
+是完全一模一樣的東西
 
-然後，你再給它 input 一個
+那中間你會有個特別窄的 layer
 
-random 的東西
+這個特別窄的 layer 他有特別少的 neural
 
-你再給它 input 一個
+那些 neural 的 output，這個 layer 的 output
 
-你 generate 一個 random 的 vector
+就代表了一組 code
 
-把這個 random vector 當作是 一個 code
+那從 input 到 bottleneck layer 的部分就是 encoder
 
-你這個 code 10 維
+那從 bottleneck layer 的 output 到最後的 x\head
 
-你就 generate 一個 10 維的 vector
+到最後整個 network 的 output 就是你的 decoder
 
-然後，希望丟到這個 decoder 裡面
+所以你把 input 做 encode 變 bottleneck layer 的output
 
-它 output ，就可以是一張完整的 image
+再把 bottleneck layer 的 output，做decode 變成原來的 image
 
-但，實際上這麼做呢
+這個就是 decode
 
-你得到的 performance 通常不一定很好
+這個 deep 的 auto encoder
 
-你要用一個方法叫做
+最早是出現在 06 年的 Hinton  的 science 的 paper
 
-Variation Autoencoder ，VAE
+那個時候呢
 
-你得到的結果會比較好
+其實 deep auto-encoder 沒有那麼好 train
 
-這個 VAE 怎麼做呢？
+你有可能 train 一 train 以後就壞掉了
 
-它的結構跟 Auto-encoder 非常像
+那個時候需要用 RBM
 
-它只是在中間加了一些神妙的小 trick
+做 layer wise 的 initialization，然後才可能
 
-為什麼要加神妙的小 trick
+把 deep auto-encoder train 得比較好一點
 
-或許我們下一次再講
+如果是按照我們剛才在 PCA 裡面看到的
 
-這個神妙的小 trick 是什麼
+這個從 input 到第一個 hidden layer 的 weight w1
 
-它說，input一個 encoder
+好像應該要跟最後一個 hidden layer 的 output
 
-然後，這 encoder 跟 decoder 的部分維持原狀
+跟 output layer 中間的 weight 互為 transpose
 
-維持原狀不動
+這個 layer 是 weight w1，這個 layer 好像應該是 w1 transpose
 
-但是，現在在 encoder 的地方
+這個是 w2，這個好像應該是 w2 transpose
 
-我們不是直接 output code
+你在 training 的時候，你可以做到這件事情
 
-我們先 output 兩個 vector
+你可以把這邊的 weight，跟這邊的 weight tight 起來
 
-我們先 output 兩個 vector
+讓他們在做 training 的時候永遠保持他們的值是一樣的
 
-假設你的 code
+你可以做到這件事情，做這件事的好處呢
 
-你打算要做的 code 是三維的話
+是你現在 auto-encoder 的參數
 
-那你 output 的這兩個 vector 呢
+就少一半，比較不會有 overfitting 的情形
 
-也都是 3 維
+但這件事情並不是必要的，沒有什麼理由說
 
-這個 vector 是 m1, m2, m3
+這邊的 weight，跟這邊的 weight，一定要互為 transpose
 
-這個 vector 是 σ1, σ2, σ3
+現在常見的作法就是兜個 neural network
 
-接下來，你用 normal distribution
+然後用 back propagation 直接 train 下去
 
-去 generate 另外一個也是 3 維的 vector
+管他 train 出來的 weight 是什麼，就是你得到的結果
 
-它的 3 維分別是 e1, e2, e3
+那這邊是 Hinton 06年的 Nature 的 paper
 
-接下來，你把 σ1, σ2, σ3 取 exponential
+Science paper 的上面呢
 
-跟 e1, e2, e3 相乘
+截出一些，那時候看起來，相當驚人的結果
 
-跟 e1, e2, e3 相乘
+現在是覺得還好，因為現在誰都
 
-然後，把它跟 m1, m2, m3 加起來
+順手就可以 reproduce 這些結果
 
-你得到這個 c1, c2, c3
+那時候是覺得相當驚人
 
-這個東西呢，才是你的 code
+那這是這樣子的，如果我們今天，這是原來的 image
 
-這邊每一個 c 呢
+那在 MNIST 上面是長這個樣子
 
-這個 ci = exp(σi) * ei + mi
+如果你做 PCA
 
-然後，丟到 decoder 裡面
+把他從 784 維降到 30 維
 
-希望說 decode 能夠 minimize reconstruction error
+然後再從 30 維 reconstruct 回 784 維
 
-你希望你的 decoder 可以 minimize
+那你得到的 image 是這個樣子
 
-reconstruction error
+你可以看出說，他是比較模糊的
 
-但是，光只有這麼做是不夠的
+他是有一點霧霧的感覺
 
-它還有第二項
+那如果你今天是用 deep auto-encoder 的話
 
-這一項是說
+在 Hinton 的 paper 裡他是這麼做的
 
-這一項非常的神妙
+把 784 維，先擴展成 1000 維
 
-我們之後再解釋
+再把 1000 維降到 500 維再降到 250 維再降到 30 維
 
-這一項是怎麼樣啊
+你很難知道說為什麼他設計成這樣子
 
-你看，覺得很怪
+然後再把 30 維變成 250 維再變成 500 維 1000 維
 
-這一項是，我們把它的三個 dimension 加起來
+然後再把他解回來
 
-然後我們要去 minimize：1 + σi - (mi)^2 - exp(σi)
+你會發現說，如果你今天用的是 deep auto-encoder 的話呢
 
-有這麼一項
+他的結果就看起來非常的好
 
-minimize reconstruction error
+那如果你今天，不是把它降到 30 維，而是把他降到 2 維的話
 
-同時 minimize 這一項
+把它降到 2 維再去 visualize 他的話
 
-那你用 VAE 做出來結果怎麼樣呢？
+你會發現，如果你是做 PCA 的話
 
-這個是 OpenAI 做的結果
+在這二維的平面上，所有的 digit 是被
 
-他們是做在 Cifar-10 上面
+混在一起，這邊不同顏色就代表了不同的數字
 
-那你會發現說，其實用 VAE 得到的圖呢
+如果今天是用 PCA 把它變成二維
 
-它是不太清楚的
+所有的數字他是混在一起
 
-它是不太清楚的
+如果你是用 deep auto-encoder 的話，你會發現說
 
-這些圖你都
+這些數字是分開的
 
-你看得出來，好像想要畫點什麼
+你可以輕易地看到說，不同的數字會變一群一群
 
-但是你又搞不清楚，它到底在畫什麼
+現在你其實可以很輕易的 reproduce 這樣的結果
 
-但是用 VAE 跟剛才的 PixelRNN 有什麼不一樣的地方呢
+我後來又做一個無聊的東西不過沒看到什麼特別的東西
 
-用 VAE 的話
+就是把寶可夢的 data 又做了一下
 
-你可以做以下的事情
+用一個 hidden layer 的 auto-encoder，硬做了一下
 
-你可以 control 你要 generate 的 image，理論上
+但是沒有看到什麼特別的東西
 
-你可以 control 你要 generate 的 image
+那這個 auto-encoder 呢
 
-什麼意思呢？
+也可以把它用在文字處理上
 
-假設，我們現在把 VAE 用在 Pokémon creation 上面
+如果把它用在文字處理上像是怎樣呢
 
-那我們 training 的時候
+比如說我們會想要把一篇文章
 
-就是 input 一個 Pokémon
+壓成一個 vector，壓成一個code
 
-然後 reconstruct 一樣的 Pokémon
+那為什麼我們會想把一篇文章壓成一個 code 呢？
 
-然後 learn 出來這個 code
+舉例來說假設我們現在要做文字的搜尋
 
-然後 learn 出來這個 code
+假設我們現在要做文字的搜尋
 
-我們就設 10 維
+那在文字搜尋裡面有一招，你可能都聽過叫 vector space model
 
-learn 好 這一個 Pokémon 的 VAE 以後
+那這個 vector space model 他非常單純，他就是說
 
-我們就把 decoder 的部分拿出來
+我們現在把每一篇文章都表示成空間中的一個 vector
 
-因為，現在我們有一個 decoder
+都是空間中的一個點
 
-你可以 input 一個 vector
+圖上每一個藍色的圈圈就是一篇文章
 
-所以，你在 input 的 時候，你可以這樣做
+那接下來呢
 
-你可以說，我現在有 10 維的 vector
+我們也把，假設使用者輸入一個查詢的詞彙
 
-我固定其中 8 維
+那我們把查詢的詞彙也變成空間中的一個點
 
-只選其中的 2 維出來
+接下來就是計算這個輸入的查詢詞彙
 
-然後，在這兩維的 dimension 上面
+跟每一篇 document 之間的 inner product
 
-我灑不同的點
+或是 cosine similarity 等等
 
-我灑不同的點
+cosine similarity 會有 normalize 的效果
 
-然後，我們把每一點都丟到 decoder 裡面
+可能會得到比較好的結果
 
-看它合出來的 image 長什麼樣子
+如果距離最近 cosine similarity 的結果最大
 
-那如果我們做這一件事情的話
+你就會 retrieve 這些 document
 
-如果我們灑不同的點的話
+比如說你輸入紅色的 query
 
-你就可以看到說
+可能會 retrieve 這篇  document 跟這篇 document
 
-這個 code 的每一個 dimension
+因為他跟紅色這個 query 的 cosine similarity 是比較大
 
-分別代表什麼意思
+這個模型要 work，depend on 你現在把一個 document
 
-如果，我們可以解讀說
+變成 vector 表示的好還是不好
 
-code 的每一個 dimension 代表什麼意思
+假設你今天做的是
 
-以後我們就可以把那個 code
+怎麼把一個 document 變成一個 vector呢
 
-當作像是一個拉桿一樣
+最 trivial 的方法叫做 bag-of-word
 
-每一個 dimension 當作一個拉桿一樣
+這個 bag-of-word 的想法是說
 
-你可以調整它
+我們現在就開一個 vector
 
-你就可以產生不同的寶可夢
+這個 vector 的 size 就是
 
-理想上是這樣子
+lexicon 的 size，就是 lexicon 的 size
 
-那我們用 VAE 產生出來的結果是這個樣子
+假設今天世界上有十萬個詞彙
 
-你可能覺得沒有很好
+這個 vector 的 size 就是十萬維
 
-首先，你都看不出來每一隻是什麼
+假設現在有一篇 document 他只有一個句子就是 this is an apple
 
-沒錯， 用 VAE 做出來就是這個樣子
+那這篇 document 如果把他表示成一個 vector 的話
 
-那這兩個 dimension
+就是在 this 那維是一，is 那維是一
 
-分別是移動了
+an 那維是一，apple 那維是一，其他都是 0
 
-變化了兩個這個 code 的 兩個 dimension 以後的結果
+就是這樣子，沒什麼特別好講
 
-但是，你從這個
+那有時候你想把它做得更好，你會把它乘上 inverse document frequency
 
-你從這個變化，你可以看得出來說
+你每一維不只會用詞彙在 document 出現的次數
 
-每一個 dimension 其實或許它真的是有些含意的
+你會再乘上一個 weight，代表那個詞彙的重要性
 
-比如說，如果我們看這一個變化
+那這個重要性你可以用不同的方法衡量他
 
-這個變化
+比如說用 inverse document frequency 來衡量
 
-它本來是看起來像是一個站著的東西
+舉例來說，is 它可能在每個 document 都有出現，所以重要性很低
 
-然後，它後來就逐漸倒下來，逐漸倒下來
+那 1 就會乘上比較小的值
 
-演化，變成類似魚的東西
+apple 只有在某些 document 出現，重要性比較高，所以乘上比較高的值，等等
 
-然後，後來就塌下來
+但是用這個模型他很 weak
 
-塌下來，變成一個趴在地上的東西
+他沒辦法考慮任何 semantic 相關的東西
 
-如果你從左邊到右邊
+他沒辦法考慮任何語意相關的東西
 
-你就會發它站的越來越直
+比如說，他不知道台灣大學的指的就是台大
 
-它本來是，感覺是有點前傾的
+他不知道 apple 跟 orange 都是水果，他沒辦法知道這些事情
 
-越往右它就站得越來越直，它頭上會出現一個帽子
+對他來說每一個詞彙都是 independent
 
-站得越來越直
+對他來說 apple 跟 pen，apple 跟 an，apple 跟 is 就是不同詞彙
 
-所以，你可以從這樣的 dimension 變化發現說
+他們中間是完全沒有任何相關性
 
-它確實是有學到一些東西
+那我們可以用 auto-encoder 讓語意這件事情被考慮進來
 
-如果我們可以讓圖產生更清楚的話
+舉例來說，你 learn 一個 auto-encoder
 
-我們就可以控制這兩個 dimension
+他的 input 就是一個 document
 
-就可以產生不同的寶可夢
+或是 query 就是一段文字
 
-這邊是某兩個 dimension
+這個在 Hinton science paper 上面是有實驗的
 
-這邊是另外兩個 dimension 的結果
+他只有用比較小的 lexicon size，只有 2000 個詞彙
 
-這邊，這個的例子可能又更清楚一點
+一個 document 就把它變成一個 vector
 
-從右邊到左邊，本來是一個類倉鼠的樣子
+把這個 vector 通過一個 encoder，把他壓成二維
 
-後來就慢慢倒下來，倒下、倒下，然後變成一團布這樣
+那在 Hinton 的 paper 上你會看到結果是這個樣子
 
-如果你看直的話
+我記得他做的是 20 Newsgroups 的那個 corpus
 
-看直的話，它本來是一個倉鼠的樣子
+在這個 corpus 裡面 ，document 會標示說他是屬於哪一類
 
-倉鼠的樣子，從上面往下
+那這邊不同顏色的點呢
 
-你就會發現說，首先它的腳，越來越長
+每一個點代表一個 document，不同顏色就代表說，這篇 document 屬於哪一類
 
-你就看到寶可夢的演化
+那其實我們在作業四就是要做類似的事情
 
-它本來腳很短，後來越來越長、越來越長
+希望你可以得到一樣漂亮的圖
 
-後來變成有一隻很長的腳，看起來就變成像是鳥
+你會發現同一類的 document，就都集中在一起，散佈像一朵花一樣
 
-後來就變成有兩隻很長的腳
+所以如果你今天要做搜尋的時候
 
-後來又變成說，其實它是有四隻腳
+今天輸入一個詞彙、查詢詞
 
-看起來像似哺乳類的動物
+那就把 query 也通過這個 encoder，把他變成一個二維的 vector
 
-這是它的演化
+假設那個 query 落在這邊，你就可以知道說
 
-如果你看它的尾巴的話
+這個 query 是跟 energy marketing
 
-本來尾巴很短
+跟 energy market 有關的
 
-後來尾巴也越來越長
+就把這邊的 document retrieve 出來
 
-尾巴越來越長
+那這個 auto-encoder 在這邊看起來結果是相當驚人
 
-如果你看它的頭的話
+如果你用 LSA 的話，你得不到類似的結果
 
-本來耳朵很短
+如果你用 LSA 的話你會發現說
 
-後來耳朵越來越長
+我們剛剛有講 LSA
 
-看起來就像是，長出了角一樣
+就是建一個 matrix，然後你可以找每個詞彙
 
-就可以看到說，隨著 input 的 code 的不同
+跟每一個 document 它背後 latent 的 vector
 
-你就可以產生不同的寶可夢
+一樣假設我們用 LSA，然後每個 document
 
-但是，在這麼多圖裡面
+用二維的 latent vector 來表示他
 
-你會發現都沒有清楚的，都沒看起來像樣的
+那你看到的結果看起來像是，像是這個樣子
 
-那我先找到一個像樣的
+Auto-encoder 也可以用在 image 的搜尋上面
 
-就是在這一邊，這樣
+你可以用在以圖找圖上面
 
-我找到一個，這一邊這一隻
+那怎麼做以圖找圖呢，最簡單的方式就是
 
-我想原來的寶可夢裡面應該是沒有這一隻
+你就拿一張，假設這是你要找的對象
 
-我看了，我翻了一下圖鑑
+假設這是你 image 的 query
 
-但是沒有很仔細翻，我覺得應該是沒有這一隻
+你去計算這個 image 的 query，跟其他你的 database 裡面的 image
 
-它產生出來是這樣
+他的相似程度，比如說你可以算他們在 pixel 上面的相似程度
 
-看起來，它的頭像是一個海馬
+然後，你再看說最像的幾張就是要 retrieve 的結果
 
-然後它的尾巴，就叫做鱷魚
+如果你只是這麼做的話呢，你其實得不到太好的結果
 
-我們就胡亂叫它鱷魚海馬
+假設這是你的 query，這個是 Michael Jackson
 
-然後，有人說可以用 VAE  來寫詩
+如果你拿這張 image
 
-怎麼用 VAE 來寫詩呢？
+去跟其他 database 的 images 算相似度的話
 
-這個做法是這樣子的
+你找出來最像的會是這幾張
 
-本來這個 VAE 的 Auto-encoder
+你會發現 Michael Jackson 跟這個馬蹄鐵是很像的
 
-input 是一個 image，output 也是一個 image
+這個是很像，說實在也是很像
 
-現在只是把 input 跟 output 改掉
+所以如果只是這麼做，在 pixel wise 上做比較
 
-改成 input 一個 sentence
+你找不到好的結果的
 
-output 也是一個 sentence
+那怎麼辦，你要用
 
-不過，如果你要 input 處理 sentence 的 input
+你可以用 deep auto-encoder 把每一張 image 變成一個 code
 
-產生 sentence 的 output
+然後在 code 上面再去做搜尋
 
-這邊你需要用 RNN 才能夠做到
+而且因為今天做這件事情是 unsupervised
 
-不過，這個我們之後再講
+learn 一個 auto-encoder 是 unsupervised，所以你要 collect 多少 data 都行
 
-那怎麼讓 machine 寫詩呢？
+你要 collect 很多很多的 data，要 collect 多少 data都行
 
-這一邊的作法是這樣
+train 這種 auto-encoder 的 data 是永遠不缺的
 
-你先胡亂選兩個句子
+不像你 train supervised learning 很缺 data，做 unsupervised learning 是不缺 data
 
-先胡亂選兩個句子
+那現在怎麼把它變成一個 code 呢
 
-一個句子是 I went to  the store to  buy some groceries.
+這也是從 Hinton paper 上來的，input 一個 32*32 image
 
-第二個句子是 "don't worry about it," she said.
+每一個 pixel 用 RGB 表示，所以 32*32*3
 
-接下來，你通過這個 encoder
+然後把這個 image 變成 8192 維，再變成 4096
 
-這兩個句子，都找出它的 code
+再變 2048 維，1024 維，到256 維
 
-都找出它的 code
+也就是說這張 image 用 256 維的 vector 來描述他
 
-所以，這兩個句子就變成
+你再把這個 code 通過另一個 decoder
 
-在 code space 上面的兩個點
+它的形狀跟這個一樣，只是反過來的
 
-接下來呢，你把這兩個點相連
+再變回原來的 image
 
-然後，中間等間隔的取一些點
+你得到 reconstruction 的結果會是這樣
 
-再把中間等間隔取的點呢
+他是可以被 construct 回來的
 
-你就把這個 code 丟到 decode 裡面，再還原出去
+如果你不是在 pixel 上算相似度
 
-所以，把這一個點稍微偏一點以後
+而是在這種 code 上面算相似度的話
 
-把 I went to  the store to buy some groceries.
+你就會得到比較好的結果
 
-稍微偏一點以後
+比如來說，如果是用 Michael Jackson 做 input
 
-你得到的句子就是
+你找到的都是人臉
 
-I store to buy some groceries.
+雖然這些 images 在 pixel level 上看起來是不像的
 
-再偏一點以後
+但是你透過很多 hidden layer ，把它轉成 code 的時候
 
-你就得到 I were to  buy any groceries.
+在 256 維的空間上，他們是很像的
 
-就這樣一直下來，一直下來
+看起來是像的，原來是不像的
 
-到這一邊呢
+比如說，這是黑頭髮，這是金頭髮
 
-變成 "come with me," she said
+看起來不是很像，但通過很多轉換以後
 
-然後 "talk to  me," she said.
+可能，在那個 256 維裡面，有一個 dimension 就代表人臉
 
-然後變成 "don't worry about it," she said.
+所以他們都知道說，這些 images 都對應到人臉那個 class
 
-你可能會說，這個算是寫詩嗎？
+auto-encoder 在過去有一個
 
-這個是這樣
+很好的 application 是可以用在 pre-training 上面
 
-如果你仔細看他的 paper 的話
+我們都知道說，在 train 一個 neural network 的時候
 
-他的 paper 裡面沒有提到寫詩這一件事情
+你有時候在煩惱怎麼做參數的 initialization
 
-在這個 blog 裡面說是
+有沒有一些方法讓你找到一組比較好的 initialization
 
-說是這樣子是在寫詩就是了'
+這種找比較好的 initialization 方法，就叫做 pre-training
 
-我不知道這個 blog 是誰寫的
+那你可以用 auto-encoder 來做 pre-training
 
-大概就是這個樣子
+怎麼做呢，假設我現在要做，比如說
 
-那 GAN 的部分
+MNIST 的 recognition
 
-我們就下一次再講
+我可以兜個 network 他input是 784 維
 
-我們先就休息10 分鐘，等一下來講一下 final
+第一個 hidden layer 1000 維，第二個 hidden layer 1000 維，然後 500 到 10 維
+
+我在做 pre-train 的時候，我就先 train 一個 auto-encoder
+
+這個 auto-encoder 他是這樣子
+
+他 input 784 維，然後中間有個 1000 維的 vector
+
+然後再把它變回 784 維
+
+那我希望 input 跟 output 越接近越好
+
+那在做這件事，其實你需要稍微小心一點
+
+因為我們一般在做 auto-encoder 的時候
+
+你會希望你的 code 比 dimension  還要小
+
+那如果比 dimension 還要大會遇到什麼問題呢
+
+你有可能會遇到說他就不 learn 了
+
+他要 reconstruct 他就只要把 784 維
+
+放到這 1000 維裡面去，然後再解回來，就結束了
+
+他為啥都沒 learn 到，learn 一個接近 identity 的 matrix
+
+所以你要很小心，如果你今天發現你的 hidden layer 是比 input 還要大的時候
+
+code 是比 input 還要大的時候，要加一個很強的regularization
+
+在這 1000 維上，所謂很強的 regularization 是說
+
+你可以對這 1000 維的 output 做
+
+L1 的 regularization
+
+你會希望說，這 1000 維的 output 是 sparse
+
+這 1000 維裡面可能只有某幾維是可以有值的，其他維都必須要是零
+
+這樣你就可以避免，auto-encoder 直接把 input 硬背起來，再輸出的問題
+
+總之如果你的 code 是比 input 還要大的，你要注意這種問題
+
+我們現在先 learn 一個 auto-encoder，learn 好以後
+
+我們把從 784 維到 1000 維的這個 weight w1
+
+把它保留下來然後 fit 住
+
+接下來你就把所有 database 裡面的 digit 通通變成 1000 維的 vector
+
+接下來，你再 learn 另一個 auto-encoder
+
+他把 1000 維的 vector 變成 1000 維的 code
+
+再把 1000 維的 code 轉回 1000 維的 vector
+
+你再 learn 一個這樣的 auto-encoder
+
+他會讓 input 跟 output 越接近越好
+
+然後你再把 w2 保存下來
+
+接下來你 fix 住 w2 的值，再 learn 第三個 auto-encoder
+
+第三個 auto-encoder input 1000 維，code 500維， output 1000 維
+
+learn 好這個 auto-encoder，得到他的 weight w3，再把 w3 保留下來
+
+這個 w1 w2 w3 就等於是你在 learn 你整個 neural network 的時候的 initialization
+
+然後你最後再 random initialize 最後 500 到 100 的 weight
+
+再用 back propagation 去調一遍，我們稱之為 fine tune
+
+因為 w1 w2 w3 都已經是很好的 weight 了
+
+我們只是微調他，所以把它叫做 fine tune
+
+用 back propagation 把 w1 到 w4 的值調一下
+
+你把他的值調一下，就可以 learn 好一個 neural network
+
+這招 pre-training 在過去呢
+
+如果你要 learn 一個很 deep 的 neural network 可能是很需要的
+
+不過現在基本上 network 不用 pre-training
+
+現在 training 技術進步以後，不用 pretraining 也 train 得起來
+
+但 pre-training 有個妙用就是
+
+如果你今天有很多 unlabeled data 只有少量 labeled data
+
+你可以用大量的 unlabeled data 去把 w1 w2 w3
+
+先 learn 好，先 initialize 好
+
+那最後的 labeled data 就只需要稍微調整 weight 就好
+
+所以 pre-training 這招在你有大量 unlabeled data 的時候還是有用的
+
+有個辦法可以讓 auto-encoder 做得更好，叫做 de-noising auto-encoder
+
+把 reference 列在下面給大家參考
+
+他的概念其實很簡單，你把原來的 input x
+
+加上一些 noise 變成 x'
+
+然後你把 x' encode 以後變成 code c
+
+再把 c decode 回來變成 y
+
+但是要注意一下，我們現在的 y
+
+本來在做 auto-encoder 是讓 input 跟 output 越接近越好
+
+但現在 de-noising auto-encoder 你是要讓 output
+
+跟原來的 input，再加 noise 之前的 input 越接近越好
+
+如果你有做這件事，learn 出來的結果會比較 robust
+
+直覺解釋就是 encoder 現在不只 learn 到 encode 這件事
+
+他還可以 learn 到把雜訊濾掉這件事
+
+那還有另一招叫 constrictive auto-encoder
+
+這邊就沒有要細講，那 constrictive  auto-encoder 他做的事情是這樣
+
+他會希望說，我們在 learn 這個 code 的時候
+
+我們加上一個 constraint
+
+這個 constraint 是說，當 input 有變化的時候對這個 code 的影響是被 minimize 的
+
+這件事其實很像 de-noising auto-encoder 只是從不同角度來看
+
+de-noising auto-encoder 是說，我加了 noise 以後，還要 reconstruct 回原來沒有 noise 的結果
+
+那 constrictive auto-encoder 是說
+
+我們希望說，當 input 變了，也就是加了 noise 以後
+
+對這個 code 的影響是小的
+
+他們做的事其實蠻類似的
+
+那其實還有很多 non-linear dimension reduction 的方法
+
+比如說 Restricted Boltzmann machine
+
+我們這邊就沒有打算講 Restricted Boltzmann machine
+
+Restricted Boltzmann machine 看起來很像 neural network，但其實不是，
+
+有些人就用 neural network 來想，但文獻你怎麼看都看一頭霧水，因為他就不是 neural network
+
+還有一個東西叫 deep belief  network
+
+deep belief  network 聽起來很像一個 deep neural network
+
+這要問一下大家意見，你覺得 deep belief  network 跟 deep neural network 是一樣的東西嗎
+
+你覺得是一樣東西的同學請舉手
+
+你覺得是不一樣東西的請舉手
+
+大家都知道說他是不一樣的東西，這是很正確的概念
+
+他們只是名字像而已
+
+看 paper 架構，乍看下你會覺得是不是一樣的東西
+
+但實際上他們是不一樣的東西
+
+這個 deep belief  network 跟前面的 Restricted Boltzmann machine
+
+他們是 graph co-model
+
+他們只是看起來很像 neural network
+
+你把它的概念直接套在 neural network上 ，你讀文獻會卡到不行
+
+但我們還沒有打算要講這個 graph co-model
+
+這個部分沒辦法細講，就留一些 reference 給大家參考
+
+那接下來我們講一下 CNN 的 auto-encoder
+
+如果我們今天要處理的對象是 image 的話，我們都知道你會用 CNN
+
+那在 CNN 處理 image 的時候
+
+你會有一些 convolution layers，pooling layers
+
+用 convolution 和 pooling 交替，然後
+
+讓 image 變得越來越小，最後去做 flatten
+
+那今天如果是做 Auto-encoder 的話
+
+你不只要有個 encoder，還要有個 decoder
+
+如果 encoder 的部分是做  convolution 再做pooling，convolution 再做pooling
+
+理論上 decoder 應該就是做跟 encode 相反的事情
+
+decode 的時候你應該就是做
+
+就是你做這些 process 得到的 code 再做反過來的事情
+
+本來有 pooling 就做 unpooling，本來有 convolution 就做 deconvolution
+
+但是這個 unpooling 跟 deconvolution 到底是什麼呢
+
+那 training 的 criteria 就一樣，就是讓 input  和 output 越接近越好
+
+但是這個 convolution 跟 deconvolution 他們是什麼呢
+
+那我們現在來看一下這個 unpooling 的部分
+
+我們知道在做 pooling 的時候你就是
+
+現在得到一個 4X4 的 matrix
+
+接下來把 matrix 裡面的 pixel 分組，四個一組
+
+接下來從每一組裡面挑一個最大的
+
+比如說，在這個例子裡面，你挑了這個東西
+
+然後你的 image 就變成原來的四分之一
+
+但是如果今天做的事情，如果你今天要做的是 unpooling
+
+pooling 是這麼做，但如果你要等一下要做 unpooling
+
+你要做另一件事，要先記得說我剛剛在做 pooling 是從哪裡取值
+
+我在這個地址是從左上角，這四個方塊從左上角取值
+
+所以這邊就是白的
+
+這四個是從右下角取值，所以右下角就留下紀錄
+
+從這個地方取值，這邊有個紀錄，你要記得是從哪裡取值
+
+接下來如果你要做 unpooling 的時候
+
+你要把原來比較小的 matrix 擴大
+
+比如說原來做 pooling，原來比較大的 matrix 變成四分之一
+
+現在要把比較小的 matrix 變成原來的四倍
+
+那怎麼做呢
+這個時候你之前紀錄的 pooling 的位子就可以派上用場
+
+之前記得說你在 pooling 的時候是從左上角 pool 值
+
+那現在你在做 unpooling 的時候就把值放到左上角，其他補零
+
+記得在這裡取值，就把這個值放到右下角其他都補零
+
+這裡取值，就把值放到這裡其他補零
+
+這裡取值，就把值放到這邊其他補零
+
+這就是 unpooling 的其中一種方式
+
+所以做完 unpooling 以後本來一張比較小的 image 會變得比較大
+
+原來14X14 的 image 會變成 28X28 的 image
+
+你會發現它就是把原來 14*14 的 image 做一下擴散
+
+有些藍色的地方就是補零
+
+每一個原來在 14*14 image 裡面的值
+
+擴散到 28*28 裡面，他都會加上三個零
+
+其實這不是 unpooling 唯一的做法，他在 Keras 裡面作法是不一樣的
+
+就我所知 Keras 裡面的做法
+
+他是直接 repeat 那些 value
+
+也就是說不用去記你之前 pooling 的位子
+
+你就直接把這個值複製四份，就行了
+
+就我所知 Keras 裡面是這麼做
+
+接下來比較難理解的地方叫做 Deconvolution
+
+原來 convolution 已經很難懂了，deconvolution 到底是什麼呢
+
+大家很難搞清楚他是什麼
+
+事實上 deconvolution 就是 convolution
+
+這樣大家知道我的意思嗎？如果你看 Keras 的 code，作業三不是有個連結教你怎麼做 auto-encoder
+
+不知道怎麼回事，大家都好像沒有做一樣
+
+你會發現你看那個 code，根本就沒有什麼 deconvolution 這種東西
+
+他就是做 convolution，他在做 decode 的地方再做 convolution
+
+這是怎麼一回事，我們不是本來應該是做一個 convolution 的相反
+
+叫做 deconvolution 嗎，怎麼又是在做 convolution
+
+其實 deconvolution 就是 convolution 我們來解釋一下
+
+所以有人說 deconvolution 名字取的不好會讓大家困惑
+
+我們舉一維的 convolution
+
+我們平常做 image 是做二維的，但那個圖有點累，我們取一維的當做例子
+
+一維的 convolution 是怎樣呢，我們假設 input 有五個 dimension
+
+然後我們的 filter size 是三
+
+那我們就把 input 的這三個 value 分別乘上紅色藍色綠色的 weight，得到一個 output
+
+再把這個 filter shift 一格，把這三個 value 分別乘上紅色藍色綠色的 weight 得到下一個 output
+
+再 shift 一格，乘上紅色藍色綠色的 weight 再得到一個 output
+
+這是 convolution，deconvolution 應該是怎樣呢
+
+你的想像可能會是這樣子，deconvolution 就是 convolution 的相反
+
+所以本來是三個值變成一個值
+
+在做 deconvolution 的時候，就應該是一個值變三個值
+
+然後發現這邊動畫有一個錯，這個圈圈不應該出現，請忽視他
+
+所以你現在應該是一個值變成三個值，所以怎麼做呢
+
+你的想像是這樣，一個值分別乘上紅色綠色藍色的 weight 變成三個值
+
+這個值也乘上紅色綠色藍色的 weight 變成三個值
+
+但是他已經有在這邊貢獻一些值了，他也要在這邊貢獻一些值怎麼辦呢
+
+就加起來，他產生三個值，他也產生三個值，重疊的地方加起來
+
+然後，他也產生三個值，重疊的地方加起來
+
+但事實上這件事情等同於，你看看我這麼說對不對
+
+等同於是在做 convolution，為什麼呢
+
+他等同於是把，我們 input 就是三個 value
+
+然後我們會做這個
+
+把它做 padding，在旁邊補零
+
+接下來我們一樣做 convolution
+
+做 convolution 的時候三個 input 乘上綠色藍色紅色的 weight 得到一個值
+
+三個 input 乘上綠色藍色紅色的 weight 得到一個值，以此類推
+
+你會發現說，這個框框裡面做的事情，跟這個框框裡面做的事情是一模一樣的
+
+怎麼說呢，我們檢查中間這個值，他是三個 value 加起來
+
+這三個 value 分別是他乘上綠色，他乘上藍色，他乘上紅色再加起來
+
+那這邊這個 value 的值也是他乘上綠色，他乘上藍色，他乘上紅色再加起來
+
+所以這件事情跟這件事情是一樣的
+
+你檢查這邊的1 2 3 4 5，5 個值
+
+跟這邊的 1 2 3 4 5，5 個值，他們是一樣的
+
+如果你把 deconvolution 跟 convolution 做比較，他們不同點在哪裡？
+
+不同點是在他們的 weight 是相反
+
+他這邊是紅藍綠，這邊是綠藍紅，正好是相反
+
+但他做的 operation 一樣也就是 convolution 這件事
+
+所以你把這個 input 做 *** ，再做 convolution其實就等於是 deconvolution
+
+你會發現在 Karas 裡面，你根本就不需要再另外寫一個 deconvolution 的 layer
+
+你直接 call 一個 convolution 的 layer 就可以了
+
+我本來想要講 sequence 的 auto-encoder
+
+不過可以等到 RNN 的時候再講
+
+我們知道說，剛才我們看到的 auto-encoder 他的 input
+
+通通都是 fix-length 的 vector，但很多東西
+
+有很多東西你本質上不該把他表示成 vector，比如說語音
+
+一段聲音訊號有長有短他不是一個 vector
+
+一段文章有長有短他不是一個 vector
+
+你雖然可以用 bag-of-word 把它變成一個 vector
+
+但這個方法你會失去詞彙和詞彙間的前後關係
+
+所以我們剛才已經講了 dimension reduction
+
+我們剛都是用 encoder 來把原來的 image 變成小的 dimension
+
+但是我們同時也 train 一個 decoder 不是嗎
+
+那個 decoder 其實是有妙用的，你可以拿 decoder 來產生新的 image
+
+也就是說我們把 learn 好的 decoder 拿出來
+
+然後給他一個 random 的 input number，他的 output 希望就是一張圖
+
+這件事可以做到嗎，其實這件事做起來相當容易
+
+我就胡亂拿MNIST 來秒 train 一下
+
+然後我把每一張圖，784 維的 image 通過一個 hidden layer 然後 project 到二維
+
+再把二維通過一個 hidden layer 解回原來的 image
+
+那在 encoder 的部分，那個二維的 vector 畫出來長這樣
+
+跟 Hinton 那個圖其實是有些像
+
+那不同顏色的點代表不同數字，畫出來是這個樣子
+
+接下來我在紅色這個框框裡面
+
+等間隔的去 sample 一個二維的 vector 出來
+
+然後把那個二維的 vector 丟到 NN decoder 裡面
+
+然後叫他 output 一個 image 出來
+
+這些二維的 vector 不見得是某個 image compress 以後的結果
+
+他不見得原來有對應的 image，他就是某個二維的 vector
+
+然後丟到 decoder 裡面，看看他可以產生什麼
+
+你會發現我們在紅色框框內等距離的做 sample
+
+得到的結果就是這樣
+
+你就可以發現很多有趣的現象
+
+從下到上，感覺是圓圈然後慢慢的就垮了
+
+這邊本來是不知道是四還是九，然後變八
+
+然後越來越細，變成 1
+
+最後不知道為什麼變成 2，還蠻有趣的
+
+你會發現這邊感覺比較差，為什麼呢
+
+因為在這邊其實是沒有 image
+
+你在 input image 的時候其實不會對到這邊
+
+這個區域的 vector sample 出來，通過 decoder 他解回來不是 image
+
+他看起來是一個有點怪怪的東西
+
+有人可能會說，你怎麼知道要 sample 在這個地方
+
+因為我必須要先觀察一下二維 vector 的分佈
+
+才能知道哪邊是有值的
+
+才知道從那個地方 sample 出來比較有可能是一個 image
+
+如果我 sample 在這個地方，我相信我得到東西看起來就不像是 image 了
+
+可是這樣你要先分析二維的 code 感覺有點麻煩
+
+那怎麼辦，怎麼確保說，在我們希望的 region 裡面都是 image
+
+有個很簡單的做法就是在你的 code 上面加 regularization
+
+在你的 code 直接加上 L2 的 regularization，讓所有的 code 都比較接近零
+
+接下來就在零附近 sample
+
+比較有可能你 sample 出來的 vector 都可以對應到數字
+
+所以我就做這樣的事情，我在 train 的時候加上 L2 的 regularization 在 code 上面
+
+train 出來你的 code 都會集中在接近零的地方
+
+他就會以零為核心，然後分佈在接近零的地方
+
+接下來我就以零為中心，然後等距的在這個紅框內 sample image
+
+sample 出來就這個樣子
+
+從這邊你就可以觀察到很多有趣的現象，你會發現說
+
+他的這個 dimension 跟這個 dimension 是有意義的
+
+從左到右橫軸代表的是有沒有圈圈
+
+本來是很圓的圈圈， 然後接下來就慢慢變成一
+
+那如果是縱的呢，我覺得本來是正的，然後慢慢就倒過來
+
+這邊也是本來是正的，然後往下面慢慢就倒過來
+
+所以你可以不只是做 encode，還可以用 code 來畫
+
+這個 image 並不是從原來 image database sample 出來的，他是 machine 自己畫出來的
 
 臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心

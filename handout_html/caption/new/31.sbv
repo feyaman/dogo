@@ -2,1775 +2,2675 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-Reinforcement Learning 其實是一個很大的題目
+接下來要講 ensemble
 
-所以在下面加了一個 subtitle : 學一些皮毛
+那 ensemble 這種方法其實就是團隊合作
 
-剩下時間我們就講一些皮毛
+好幾個模型一起上的方法
 
-那這年頭講到 Deep Reinforcement Learning
+在做 ensemble 的時候通常狀況是這樣
 
-大家就會覺得說很興奮，為什麼呢？
+有一打的 classifier，假設現在要做分類的問題
 
-因為，在 15 年 2 月的時候
+f1(x), f2(x), f3(x)
 
-Kreeger 先生在Nature 上面發了一篇
+你想把這一把的 classifier
 
-用 Reinforcement Learning 的方法
+集合起來讓他們發揮原來
 
-來玩 Atari 的小遊戲，都可以痛電人類
+一個 classifier 所沒有辦法發揮的更強大的力量
 
-然後，後來在 16 年的春天呢
+這些 classifier 通常會希望他們是 diverse 的
 
-又有大家都耳熟能詳的 AlphaGo，也是可以痛電人類
+每一個 classifier 有不同的屬性
 
-David Silver 就有說，他覺得說
+有不同的作用
 
-AI 就是 Reinforcement Learning 加 Deep learning
+如果今天大家一起出團去打王的時候
 
-Reinforcement Learning 加 Deep learning 就是
+每一個人都會有自己需要做的工作
 
-Deep Reinforcement Learning
+需要一個團隊裡面有各種不同的角色
 
-所以，這個東西現在講起來大家都覺得很興奮
+有人扮演坦、有人扮演補、有人扮演DD
 
-那這個 Reinforcement Learning 是甚麼呢？
+DD就是輸出類似
 
-在 Reinforcement Learning 裡面呢，也會有
+你要把不同的 classifier 把它集合在一起
 
-一個 Agent，跟一個 Environment
+集合的時候必須要用比較好的方法來把他們集合在一起
 
-這樣講可能有一點抽象
+就好像是在打王的時候
 
-等一下會舉比較具體的例子
+坦、補、DD他們有不同要站的位子
 
-告訴大家說這個 Agent 跟 Environment 它們分別可以是些甚麼
+ensemble 最適合在期末的時候講
 
-我找個喉糖出來吃一下這樣子
+為甚麼呢？因為假設現在已經開始做 final
 
-你可能會覺得說為什麼我一直咳嗽都不會好
+我相信其實你很累了
 
-但是，這其實是沒有甚麼關係的
+你可能沒什麼時間為 final 寫甚麼 fancy、新的程式
 
-我記得我高三的時候，不知道怎麼回事一直咳嗽咳嗽，咳到大二
+也許你想要摳一下手上現有的程式
 
-後來，就好了
+然後調調參數看可以做到多好
 
-好，那，
+而且有一個大招可以迅速 improve 你的 performance
 
-這個 Agent 呢，它會有 Observation，它會去看這個世界，
+就是 ensemble
 
-看到世界的某些種種的變化
+如果你今天已經想不到新招術了
 
-那這個 Observation 又叫做 State
+你現在做一做已經卡住了不知道怎麼進步的話
 
-你在看 Deep Reinforcement Learning 的時候，
+通常用 ensemble 可以讓你的 performance 再提升一個 level
 
-你常常會看到一個詞，叫做 State
+你會發現在 machine learning 比賽的時候
 
-其實這個 State，就是 Observation
+在 Kaggle 上的比賽的時候
 
-這個 State 這個詞呀，我覺得總是很容易讓人誤導
+你有一個好的模型，你可以拿到前幾名
 
-當你聽到 State這個詞，你總是會想好像是一個，它翻譯應該翻譯成狀態，而這個狀態感覺是系統的狀態
+但你要奪得冠軍你通常會需要 ensemble
 
-不是，這個 State 是環境的狀態。這樣，大家了解我的意思嗎?
+都會需要群毆的方式才能得到冠軍
 
-所以，我覺得用 Observation 這個詞或許是更貼切的
+今天就是要講怎麼來做群毆
 
-就是，你的 Machine 所看到的東西。
+群毆的方式有幾種不同的方法
 
-所以，這個 State 其實指的是這個環境的狀態，也就是你的 Machine 所看到的東西。
+我們先講 Bagging 這個方法
 
-所以，在這個 Reinforcement Learning 領域才會有這種胖 DP 的這種作法
+注意一下等一下除了會講 Bagging 之外還會講 Boosting
 
-所謂胖 DP 就是 Part your observe 的 state，就是我們 State 只能觀察到一部分的情況
+Bagging 和 Boosting 使用的場合是不太一樣的
 
-如果今天這個 State 是 machine 本身的 State，那怎麼會有那種 State 我會不知道的情況
+這個大家要特別注意一下
 
-那就是因為這個 State 其實是，所以如果你把 State 當作 machine 的 State，你就會搞不清楚 Partial observation
+複習一下我們在開學講過的東西
 
-Partial Observation State 的那套想法到底是在幹麻。
+我們開學講過做 Machine Learning 的時候有 Bias 和 Variance 的 trade-off
 
-今天就是因為 State 就是環境的 State，所以機器是有可能沒有辦法看到整個環境所有的狀態
+如果有一個很簡單的 Model
 
-所以才會有這個 Partial observation State 的這個想法
+我們會有很大的 Bias、比較小的 Variance
 
-總之我今天沒有要講那個，但是這個 State 呀其實就是 Observation。
+如果我們有複雜的 Model 可能是小的 Bias、大的 Variance
 
-如果你以後有有機會看看文獻的話，你再看看我說得對不對。
+在這兩者的組合下，我們會看到我們的 Error rate 隨著 Model 的複雜度增加逐漸下降再逐漸上升
 
-好，那 Machine 呢，會做一些事情，它做的事情就叫做 Action
+之前也有舉過說假設現在在不同的世界裡面
 
-那它做的這些事情，會影響環境，
+我們都在抓寶可夢
 
-會跟環境產生一些互動，
+在不同的世界裡面我們都會得到一個模型
 
-對環境造成一些影響
+假設我們用的是很複雜的模型
 
-那它因為對環境造成的一些影響，它會得到 Reward。
+我們會有很大的 Variance
 
-這 Reward 就會告訴它，它的影響是好的，還是不好的。
+在不同的世界，我們所預測出來可以預測寶可夢 CP 值的模型會非常的不一樣
 
-那這邊舉一個抽象的例子，比如說
+但是這些結果雖然 Variance 不大
 
-機器看到一杯水，然後它就 take 一個 action，
+但是他們的 Bias 是小的
 
-action 就把水打翻了，那
+所以我們可以把不同的模型
 
-Environment 它就得到一個 negative 的 reward，因為人告訴它說不要這麼做，
+我們可以把不同的模型通通集合起來
 
-所以它就得到一個負向的 reward。
+我們可以把不同模型的輸出做一個平均，得到一個新的模型 f hat
 
-接下來呢，因為水被打翻了，
+這個新的模型 f hat 可能就會跟正確答案是接近的
 
-在 Reinforcement Learning 裡面，這些發生的事情都是連續的
+那 Bagging 其實就是要體現這件事情
 
-因為水被打翻了，所以接下來它看到的 Observation 就是水被打翻的狀態。
+Bagging 要做的事情就是
 
-看到水被打翻了，它決定 take 另外一個 action，
+雖然我們不可能到不同的宇宙蒐集 data
 
-它決定要把它擦乾淨，人覺得它做得很對，它就得到一個 positive reward。
+但是我們可以創造出不同的 data set
 
-那，機器要做的事情，它生來的目標就是
+再用不同的 data set 各自訓練一個複雜的 Model
 
-它要去學習採取那些 action
+雖然每一個 Model 獨自拿出來看可能 Variance 很大
 
-它根據過去的得到的 positive reward 還有 negative reward，
+把不同的 Variance 很大的 Model 集合起來以後
 
-它去學習採取那些可以讓 reward 被 
-maximize 的那些 action，這個就是它存在的目標
+他的 Variance 就不會那麼大
 
-如果我們用 AlphaGo 為例子的話，一開始 Machine 的 Observation 是甚麼?
+他的 Bias 會是小的
 
-Machine 的 Observation 就是棋盤，那棋盤你可以用一個 19*19 的 matrix 來描述它
+怎麼自己製造不同的 data 呢
 
-所以如果是 AlphaGo 它的 Observation 就是棋盤
+假設現在有 N 筆 Training Data
 
-然後接下來呢，它要 take 一個 action，它 take 的 action 是甚麼呢?
+對這 N 筆 Training Data 做 Sampling
 
-它 take 的 action 就是落子的位置
+從這 N 筆 Training Data 裡面每次取 N' 筆 data
 
-它 take 的 action 就是放一個棋子到棋盤上，落一子這樣
+組成一個新的 Data Set
 
-下在這裡，下在 3 之 3。
+通常在做 Sampling 的時候會做 replacement
 
-接下來呢，在圍棋這個遊戲裡面
+抽出一筆 data 以後會再把它放到 pool 裡面去
 
-你的 Environment 是甚麼，你的 Environment 其實就是你的對手，
+那所以通常 N' 可以設成 N
 
-所以，你落子呀，落子在不同的位置，
+所以把 N' 設成 N
 
-你就會影響你的對手的反應，總之你落子以後，
+從 N 這個 Data Set 裡面
 
-你的對手會有反應
+做 N 次的 Sample with replacement
 
-你看到的這個 observation 呢，就變了。假設說，你的對手呢落一個白子在這個地方，你的 observation就變了
+得到的 Data Set 跟原來的這 N 筆 data 並不會一樣
 
-機器看到另外一個 observation 以後，它又要決定它的 action
+因為你可能會反覆抽到同一個 example
 
-所以它再 take 一個 action，它再採取某一個行動，它再落子在另外一個位置。
+總之我們就用 sample 的方法建出好幾個 Data Set
 
-所以下圍棋呢，用機器下圍棋呢，就是這麼一回事。
+每一個 Data Set 都有 N' 筆 Data
 
-那今天在圍棋這個 case 裡面，它是個還蠻困難的 Reinforcement Learning 的 task，
+每一個 Data Set 裡面的 Data 都是不一樣的
 
-因為在多數的時候，你得到的 reward 都是零，
+接下來
 
-因為你落子下去，通常是甚麼事也沒發生
+你再用一個複雜的模型
 
-你得到的 reward 就是零。
+去對這四個 Data Set 做 Learning
 
-只有在你贏了，或者是輸了的時候，
+就找出了四個 function
 
-你才會得到 reward。
+接下來在 testing 的時候
 
-如果你贏了，你就得到 reward 是 1，如果是輸了，你就得到 reward 是 -1
+就把一筆 testing data 丟到這四個 function 裡面
 
-所以做 Reinforcement Learning 困難的地方就是，有時候你的 reward 是很?
+再把得出來的結果作平均
 
-只有少數的 action，只有在少數的情況你才能夠會得到 reward
+或者是作 Voting
 
-所以它的難點就是機器怎麼在只有少數的 action 會得到 reward 的情況下
+通常就會比只有一個 function 的時候
 
-卻發覺正確的 action，這是一個很困難的問題。
+performance 還要好
 
-對 machine 來說呢，它要怎麼學習下圍棋呢，
+performance 還要好是指說你的
 
-它就是不斷地找某一個對手一直下一直下，有時候輸、有時候贏
+Variance 會比較小
 
-接下來，它就是調整它看到的 observation 和 action 之間的關係。
+所以你得到的結果會是比較 robust 的
 
-它裡面有一個 model，它會調整它看到 observation 時，它要採取甚麼 action，
+比較不容易 Overfitting
 
-它會調整那個 model，讓它得到的 rewards 可以被 maximize。
+如果做的是 regression 方法的時候
 
-那我們可以比較一下，如果今天要下圍棋的時候，用 Supervised learning 和 un-supervised learning
+你可能會用 average 的方法來把四個不同 function 的結果組合起來
 
-你得到的結果會有怎麼樣的差別
+如果是分類問題的話可能會用 Voting 的方法把四個結果組合起來
 
-你的 training 的方法有怎麼樣的差別
+就看這四個 function 裡面哪一個類別
 
-如果是 supervised learning 的話
+最多 classifier 投票給他，就選那個 class 當作 Model 的 output
 
-那你就是告訴機器說，看到這樣子的盤勢，
+注意一下，甚麼時候做 Bagging
 
-你就落子在這個位置；
+當你的 model 很複雜的時候、擔心它 Overfitting 的時候
 
-看到另一個盤勢，你就落子在另外一個位置。
+才做 Bagging
 
-那 Supervised learning 會不足的地方是，
+做 Bagging 的目的是為了要減低 Variance
 
-當我們會用 Reinforcement Learning 的時候，往往是你不知道
+你的 model Bias 已經很小但 Variance 很大
 
-連人都不知道正確答案是甚麼，所以在這個 task，你不太容易做 Supervised learning。
+想要減低 Variance 的時候
 
-因為，在圍棋裡面，看到這個盤勢到底下一個位置最好的點是哪裡，其實有時候人也不知道
+你才做 Bagging
 
-那機器可以看著棋譜學，
+所以適用做 Bagging 的情況是
 
-那棋譜上面的這個應對不見得是最 optimal
+你的 Model 本身已經很複雜在 Training Data 上很容易就 Overfit
 
-所以用 Supervised learning 可以學出一個會下圍棋的 Agent
+這個時候你會想要用 Bagging
 
-但它可能不是真正最厲害的 Agent。
+甚麼樣的 Model 會很容易 Overfit 呢
 
-如果用 Supervised learning 就是 machine 從一個老師那邊學，
+有人會說 NN 很容易 Overfit
 
-那老師會告訴它說，每次看到這樣子的盤勢，你要下在甚麼樣的位置；看到那樣子的盤勢，你要下在甚麼樣的位置。
+沒有，其實 NN 沒有那麼容易 Overfit
 
-這個是 Supervised Learning。
+相較於看你跟誰比
 
-如果是 Reinforcement Learning ，就是讓機器呢，就不管它，它就找某一個人
+很多人就憑著直覺說：一個 Neural Network 參數那麼多應該很容易 Overfit 吧
 
-去跟它下圍棋，然後下一下以後，如果贏了，它就得到 positive reward。
+如果你有實作過 Neural Network 的話
 
-輸了，就得到 negative reward。
+我想你其實是不會這麼想
 
-贏了它就知道說，之前的某些下法，可能是好，但是沒有人告訴它
+做 Neural Network 的時候常常遇到的問題是
 
-甚麼樣的下法，在這幾百步裡面，哪幾步是好的，哪幾步是不好的，沒有人告訴它這件事
-
-它要自己想辦法去知道。
-
-在 Reinforcement Learning 裡面，你是從過去的經驗去學習，
-
-但是，沒有老師告訴你說甚麼是好的，甚麼是不好的。
-
-Machine 要自己想辦法。
-
-其實在做 Reinforcement Learning 下圍棋的這個 task 裡面，
-
-Machine 需要大量的 training 的 examples
-
-它可能要下三千萬盤以後，它才能夠變得很厲害。
-
-但是因為沒有人可以跟 machine 下三千萬盤，
-
-所以大家都知道 AlphaGo 的解法，就是任兩個 machine，然後它們自己互下。
-
-我們知道 AlphaGo 其實是先做 Supervised learning，讓 machine 學得不錯了以後，
-
-再讓它去做 Reinforcement Learning。
-
-Reinforcement Learning 也可以被用在 chat-bot 上面
-
-怎麼用呢?
-
-我們之前其實也有講過 chat-bot 是怎麼做的，learn一個sequence-to-sequence model，
-
-input 是一句話，output 就是機器人回答
-
-如果你用 supervised learning learn 一個 chat-bot
-
-你就是告訴 machine 說，
-
-如果有人跟你說 "Hello"，你就要講 "Hi"
-
-如果有人跟你說 "Bye bye"，你就要說 "Goodbye"，
-
-這個是 Supervised learning 的 learn 法。
-
-如果是 Reinforcement Learning 的 learn 法，就是讓 machine 胡亂去跟人講話，講一講以後，人最後就生氣了
-
-Machine 就知道說，它某句話可能講得不太好，但是沒有人告訴它，它到底哪句話講得不好
-
-它要自己去想辦法發覺這件事情。
-
-這個想法聽起來很 crazy，但是真的有 chat-bot 是這樣 learn 的。
-
-這個怎麼做呢，因為你要讓 machine 去跟人一直講話，
-
-學習看出人生氣了，或者是沒有生氣，然後去學怎麼跟人對話
-
-這個學習太慢了，你可能要講好幾百萬次以後
-
-你要跟好幾百萬人對話以後才會學會
-
-但是如果一個 Agent 要跟好幾百萬人對話的話，大家都會很煩，沒有人要跟它對話。
-
-所以怎麼辦呢，就用 AlphaGo style 的講法，
-
-它任兩個 Agent，讓它們互講。
-
-任兩個 Chat-bot 互講，可能都亂講，
-
-有一個說 "See you"，另外一個說 "See you"
-
-然後另外一個再說 "See you" ，陷入如窮地 loop。
-
-然後就亂講，就讓兩個 chat-bot 去對話
-
-然後它對話完以後，還是需要有人去告訴它說，它們講的好呢，還是不好
-
-所以如果是在圍棋裡面比較簡單，因為圍棋的輸贏是很明確的
-
-贏了就是 positive，輸了就是 negative
-
-那輸贏你就寫個程式來判讀就好了
-
-可是如果是對話的話就很麻煩，因為你可以讓兩個 machine 去互相對話，
-
-它們兩個可以對話好幾百次，好幾百萬次，但是
-
-問題就是你不知道這個對話，沒有人告訴那兩個 machine 說你們現在聊天到底還是聊得好還是聊得不好。
-
-所以這個算是一個尚待克服的問題，
-
-那這個在文獻上的方法是，這方法可能不見得是最好的方法，
-
-它說，就訂個 rule，人去寫些規則，這規則其實在 paper 裡面寫得是，也是蠻簡單的，就蠻簡單的幾條規則
-
-然後這幾條規則會去檢查，我看過去這兩個 Agent 對話的紀錄，
-
-如果講得好的話，就給它 positive 的 reward，講得不好，就給它 negative 的 reward
-
-講得好或不好，就是人自己主觀訂的，所以不知道人訂得好不好
-
-然後 machine 就從它這個 rewards 裡面去學怎麼樣講才是好的
-
-其實我可以在這邊做個預言，就是我覺得接下來就會有人用 game 來 learn 這個 chat-bot 了
-
-雖然現在還沒有看到，但我相信很快就會有人幹這麼一件事。
-
-這個怎麼做呢，你就 learn 一個 discriminator，
-
-然後這個 discriminator 它會看真正人的對話和那兩個 machine 的對話
-
-然後就判斷說你們現在這兩個 Agent 的對話，像不像人
-
-如果像的話，
-
-它會去抓說像人還是不像人
-
-接下來呢，那兩個 Agent 的對話它們就會去想要騙過那個 discriminator， 讓它講得越來越像人。
-
-那個 discriminator 判斷它說像人或不像人的這個結果就是 reward
-
-它等於是用 discriminator 自動 learn 出給 reward 的方式
-
-我相信很快就會有人做這麼一件事了
-
-其實這個 Reinforcement Learning 有很多的應用，今天它特別適合的應用就是，
-
-如果有一個 task ，人也不知道怎麼做，那你人不知道怎麼做就沒有 labeled data，
-
-這個時候，用 Reinforcement Learning 是最適合的。
-
-比如說在語音實驗室裡面，我們有做讓 machine 學會做 Interactive retrieval
-
-所謂 Interactive retrieval 意思是說，有一個搜尋系統，
-
-Machine 跟它說想要找尋一個跟 US President 有關的事情
-
-那 machine 可能覺得說，這 US President 太廢了，
-
-很多人都是美國總統，你到底是要知道跟美國總統甚麼有關的事情呢?
-
-這 machine 會反問它一個問題，要求它 modify
-
-它說它要找跟川普有關的事情
-
-那 machine 反問它說，你要找的是不是跟選舉有關的事情等等
-
-但是，machine 要反問甚麼問題，這個人也不知道，我們人也不知道要問甚麼樣的問題才是好
-
-但是，你可以用 Reinforcement Learning 的方式，
-
-來讓 machine 學說，問甚麼樣的問題，它可以得到最高的 reward。
-
-那你的 reward 可能就是，最後搜尋的結果，使用者覺得越好，就是 reward 越高。
-
-但是，每一次 machine 只要每問一個問題，它就會得到一個 negative 的 reward
-
-因為每問一個問題，對人來說，就是 extra 的 effort
-
-所以，應該要有一個 negative reward
-
-Reinforcement Learning 還有很多 applications，比如說開一台直升機，開一個無人車，或者是
-
-據說最近 DeepMind 用 Reinforcement Learning 的方法，來幫 Google 的 server 節電
-
-現在也有人拿 Reinforcement Learning 來讓 machine 產生句子
-
-在很多 task 裡面，machine 都需要產生句子，比如說 summarization，或者是 translation。
-
-那這種產生句子的 Task，有時候還蠻麻煩的，為什麼?
-
-因為有時候，machine 產生出來的句子，它是好的
-
-但是，可是卻跟答案不一樣。
-
-因為 translation 有很多種呀，
-
-有一個標準答案是那樣，但是並不代表說 machine 現在產生出來的跟標準答案不一樣，它一定是壞的
-
-所以這個時候，你如果可以引入 Reinforcement Learning 的話呢，其實是會有幫助的。
-
-那 Reinforcement Learning 最常用的 application 就是
-
-現在最常用的 application 就是打電玩
-
-打電玩的 applications 現在已經滿坑滿谷
-
-如果你想要玩的話，現在都有現成的 environment
-
-可以讓你在現成的 environment 上面去玩
-
-一個呢，叫做 Gym，這都是 Open AI 公司開發的。
-
-這個 Gym 比較舊，最近他們又開了一個 Universe
-
-Universe 裡面有很多那種 3D 的遊戲。
-
-那每次講說讓 machine 玩遊戲，
-
-就會有個問題說，可是 machine 不是本來就已經會玩遊戲了嗎?
-
-在那些遊戲裡面，不是本來就已經有一個 AI  了嗎?
-
-但是，現在你要讓 machine 用 Reinforcement Learning 的方法，去學玩遊戲，跟那些已經內建的 AI
-
-其實是不一樣的。
-
-因為，machine 它學怎麼玩這個遊戲，其實是跟人一樣的，
-
-它是坐在螢幕前的，也就是說它看到的東西，並不是從那個程式裡面去擷取甚麼東西出來，
-
-它看到的東西就是那個螢幕畫面，
-
-它看到的東西跟人一樣就是 pixels，
-
-當你用 machine 來玩，用 Reinforcement Learning 讓 machine 學習玩這些電玩的時候
-
-Machine 看到的，就是 pixels。
-
-然後再來呢，它要 take 哪個 action，它看到這個畫面，它要做甚麼事情
-
-它自己決定了，並不是人寫程式告訴它說，if 你看到這個東西，then 你做甚麼
-
-它是自己學出來的。
-
-舉例來說，你可以讓 machine 玩 Space invader，space invader 就是叫小蜜蜂還是大黃蜂，反正這是 translation 不太重要
-
-我們等一下舉例的時候都用這個來作例子
-
-都用 Space invader 來作例子，我們可以稍微解說一下這個遊戲，
-
-在這個遊戲裡面，你可以 take 的 action 有三個，就是左、右移動，跟開火，
-
-那它怎麼玩這個 video game 呢? 整個 scenario 是這樣，
-
-首先呢，machine 會看到一個 observation，
-
-這個 observation 就是螢幕的畫面，
-
-也就是螢幕畫面裡面的 pixels
-
-那開始的 observation 我們就叫它 S1，所以一開始 machine 看到一個 S1
-
-那這個 S1 其實就是一個 matrix，那這個 matrix 其實就是每一個 pixel 用一個 vector 來描述它
-
-所以這邊應該是一個三維的 tensor
-
-這是一個 matrix，但它是有顏色的，所以它三維
-
-好，那 machine 看到這個畫面以後，它要決定它要 take 哪一個 action，
-
-它現在只有三個 action 可以選擇，比如說它決定要 "往右移"
-
-那每次 machine take 一個 action 以後，它會得到一個 reward
-
-但是因為只是往右移，這個 reward 是甚麼
-
-就是左上角的這個分數，就是它的 reward，那往右移不會得到任何的 reward，
-
-所以得到的 reward r1 是 0
-
-Machine take 完這個 action 以後，它的 action 會影響了環境，machine 看到的 observation 就不一樣
-
-現在 machine 看到的 observation 叫做 s2，
-
-那有點不一樣，因為它自己往右移了。
-
-當然這些外星人，也會稍微移動一點，
-
-不過這個跟 machine take 的 action 是沒有關係的，
-
-但是，有時候環境的變化本來就會跟 action 沒有關係
-
-有時候環境的變化會是純粹隨機的，跟 machine take 的 action 是沒有關係的
-
-那看到 s2
-
-這邊講一下通常環境會有 random 的變化
-
-環境這個 random 的變化跟 machine take 的 action 是沒有甚麼關係的
-
-比如說這邊突然多出一個子彈
-
-這些外星人甚麼時候要放出來我覺得應該就是隨機的
-
-然後 machine 看到 s2 以後他要決定 take 哪一個 action
-
-這個是 a2 假設他決定他要射擊了
-
-假設他成功殺了一隻外星人
-
-他就會得到一個 reward
-
-那我發現殺不同外星人其實得到分數不一樣
-
-假設他殺了一個五分的外星人
-
-那他看到的 observation 就變少了一隻外星人
-
-這個是第三個 observation
-
-這個 process 就一直進行下去
-
-直到某一天在第 T 個回合的時候
-
-machine take action aT
-
-然後他得到的 reward rT 進入了另外一個 state
-
-這個 state 是個 terminal 的 state
-
-它會讓這個遊戲結束
-
-在這個 Space Invader 這個遊戲裡面
-
-terminal state 就是你被殺死就結束了
-
-所以 machine 可能 take 一個 action 比如說往左移
-
-那得到 reward 0 不小心撞到 alien 的子彈
-
-就死了遊戲就結束了
-
-遊戲的開始到結束叫做一個 episode
-
-對 machine 來說它要做的事情就是要不斷去玩這個遊戲
-
-他要學習在怎麼在一個 episode 裡面 maximize 它可以得到的 reward
-
-maximize 他在整個 episode 裡面可以得到的 total 的 reward
-
-它必須要在死之前殺最多的外星人
-
-他要殺最多的外星人而且他要閃避外星人的子彈，讓自己不要那麼容易被殺死
-
-Reinforcement Learning 的難點在哪裡
-
-它有兩個難點
-
-第一個難點是 reward 的出現往往會有 delay
-
-比如說在 Space Invader 裡面
-
-其實只有開火這件事情才可能得到 reward
-
-也就是開火以後才得到 reward
-
-但是如果 machine 只知道開火以後就得到 reward
-
-它最後 learn 出來的結果它只會瘋狂開火
-
-對它來說往左移、往右移沒有任何 reward 它不想做
-
-實際上往左移、往右移這些 moving
-
-它對開火能不能夠得到 reward 這件事情是有很關鍵的影響
-
-雖然往左移、往右移的 action 本身沒有辦法讓你得到任何 reward
-
-但它可以幫助你在未來得到 reward
-
-這些事情其實就像規劃未來一樣
-
-所以 machine 需要有這種遠見，它要有這種 vision
-
-它才能夠把這些電玩完好
-
-那其實下圍棋也是一樣
-
-有時候短期的犧牲最後可以換來最後比較好的結果
-
-就像是虛子把自己的子堵死一塊
-
-結果最後反而贏了
-
-另外一個就是你的 agent 採取的行為
-
-會影響它之後所看到的東西
-
-所以 agent 要學會去探索這個世界
-
-比如說在 Space Invader 裡面你的 agent 只會往左移、往右移
-
-它從來不開火，他就永遠不知道開火可以得到 reward
-
-或是它從來沒有試著去擊殺最上面這個紫色的母艦
-
-它可能從來沒有試著擊殺紫色的母艦，它就永遠不知道擊殺那個東西可以得到很高的 reward
-
-所以要讓 machine 知道要去 explore 這件事情
-
-它要去探索它沒有做過的行為
-
-這個行為可能有好的結果、壞的結果
-
-但是要探索沒有做過的行為
-
-在 Reinforcement Learning 裡面也是重要的一件事情
-
-在下課之前要講一下等一下要講甚麼
-
-Reinforcement Learning 其實有一個 typical 的講法
-
-要先講 Markov Decision Process
-
-但如果先講 Markov Decision Process 的話
-
-講完 Markov Decision Process 其實就下課了
-
-你就只聽到 Markov Decision Process
-
-而且很多課有講 Markov Decision Process
-所以我覺得不要從 Markov Decision Process 講起
-
-在 Reinforcement Learning 裡面很紅的一個方法叫 Deep Q Network
-
-今天也不講 Deep Q Network
-
-為甚麼
-因為那個東西已經被打趴了
-
-現在最強的方法叫 A3C
-
-Deep Reinforcement 已經有點退流行了
-
-會發現在gym 裡面最強的那些 agent 都是用 A3C
-像我剛才看到的例子
-
-剛剛看到自己玩 Space Invader 的例子就是用 A3C learn
-
-所以我想說不如直接來講 A3C
-
-迎頭趕上的概念，直接來講最新的東西
-
-講 A3C 之前
-
-需要知道甚麼事情
-
-需要知道 Reinforcement Learning 的方法
-
-分成兩大塊
-
-一個是 Policy-based 的方法
-一個是 Value-based 的方法
-
-Policy-based 的方法應該是比較後來才有的
-
-應該是先有 Value-based 的方法
-
-所以一般教科書都是講 Value-based 的方法比較多
-講 Policy-based 的方法比較少
-
-如果你看 Sutton
-
-有一本 Deep Reinforcement Learning 的 Bible 是 Sutton 寫的
-
-它在 97 版的教科書裡面
-
-Policy 的方法講很少
-
-但它今年又再版
-
-它還在撰寫中
-
-我暑假載下來的教科書的內容
-
-跟最近載下來的內容完全不一樣，差很多
-
-它最近在改那本教科書
-
-就有一整個章節在講 Policy Gradient
-
-在 Policy-based 方法裡面
-
-會 learn 一個負責做事的 actor
-
-在 Value-based 的方法裡面會 learn 一個不做事的 critic
-
-它專門批評，不做事的
-
-但是要把 actor 跟 critic 加起來叫做 Actor-Critic 的方法
-
-現在最強的方法就是 Asynchronous Advantage Actor-Critic，縮寫叫 A3C
-
-所以等一下就講 Actor-Critic 這個方法
-
-你可能會問最強的 Alpha Go 是用甚麼方法
-
-如果仔細讀 Alpha Go paper，它是各種方法大雜燴
-
-它裡面其實有 Policy Gradient 方法、Policy-based 方法
-
-它也有 Value-based 的方法，它還有 Model-based 的方法，我就沒有講到 Model-based 的方法
-
-所謂 Model-based 的方法是指一個 Monte Carlo tree search 那一段
-
-算是 Model-based 的方法
-
-不過像 Model-based 方法就是要預測未來會發生甚麼事
-
-有一個對未來事件的理解，預測未來會發生甚麼事
-
-這種方法應該是只有在棋類遊戲比較有用
-
-如果是打電玩的話
-
-就沒有看到 Model-based 的方法有甚麼成功的結果
-
-打電玩裡面要預測未來會發生的狀況是比較難的
-
-未來會發生的狀況是難以窮舉
-
-不像圍棋雖然未來會發生的狀況很多
-
-但還是可以舉出來
-
-但是如果是電玩的話
-
-我就很少看到 Model-based 的方法
-
-看起來做 Model-based 的方法在電玩上是比較困難的
-
-以下是一些 reference 如果想學更多的話
-
-Sutton 的教科書在這裡
-
-David Silver 有十堂課
-
-它的內容就是 base on Sutton 的教科書講的
-
-他講的十堂課，每堂有一個半小時
-
-他沒講太多 Deep Reinforcement Learning 的東西
-
-但是他有一個 Deep Reinforcement Learning 的 tutorial
-
-video lecture 往下找就找到
-
-另外你可以找到這個 OpenAI、John Schulman 的 lecture
-
-他 lecture 講的是 Policy-based 的方法
-
-我們就先來講怎麼學一個 Actor
-
-所謂的 Actor 是甚麼
-
-開學的時候就有說過 Machine Learning 在做的事情就是找一個 function
-
-在 Reinforcement Learning 裡面
-
-Reinforcement Learning 也是 Machine Learning 的一種
-要做的事情也是找一個 function
-
-我沒有寫錯，我本來想說我應該寫 Actor，但這邊我沒有寫錯
-
-Actor 就是一個 function
-
-這個 Actor 通常就寫成 pi，用 pi 來代表這個 function
-
-這個 function 的 input 就是 machine 看到的 observation
-
-他的 output 就是 machine 要採取的 action
-
-observation 就是現在要找的 function 的 input
-
-action 就是現在要找的 function 的 output
-
-我們要透過 reward 幫助我們找出這個 function
-也就是幫助我們找出 Actor
-
-在有些文獻上 Actor 又叫作 Policy
-所以看到 Policy 的時候他指的就是 Actor
-
-找這個 function 有三個步驟
-
-Deep Learning 很簡單的就是三個步驟
-
-第一個步驟就是決定 function 長甚麼樣子
-
-決定你的 function space
-Neural Network 他決定了一個 function space
-
-所以 Actor 他可以就是一個 Neural Network
-
-如果你的 Actor 就是一個 Neural Network 那你就是在做 Deep Reinforcement Learning
-
-所以這個 Neural Network 的 input
-
-就是 Machine 看到的 observation
-
-這 observation 就是一堆 pixel 可以把他用一個 vector 來描述
-
-或者是用一個 matrix 來描述
-
-output 就是現在可以採取的 action
-
-或者是直接看下面這個例子可能會比較清楚
-
-output 是甚麼
-
-input 就是 pixel
-把 Neural Network 當作 Actor
-
-他可能不只是一個簡單的 Feed Forward Network 因為你的 input 現在是張 image
-
-所以裡面應該會有 Convolution Layer
-
-所以應該是會用 Convolutional Neural Network
-
-output 的地方呢
-
-現在有幾個可以採取的 action
-
-output 就有幾個 dimension
-
-假設現在在玩 Space Invader 這個遊戲
-
-可以採取的 action 就是左移、右移跟開火
-
-那 output layer 就只需要三個 dimension 分別代表左移、右移跟開火
-
-這個 Neural Network 怎麼決定 Actor 採取哪個 action
-
-通常做法是這樣，把 image 丟到 Neural Network 裡面去
-
-他就會告訴你每一個 output 的 dimension 也就是每一個 action 所對應的分數
-
-你可以採取分數最高的 action
-
-比如說 left 分數最高
-假設已經找好這個 Actor
-
-machine 看到這個畫面他可能就採取 left
-
-但是做 Policy Gradient 的時候
-
-通常會假設 Actor 是 stochastic
-
-Policy 是 stochastic
-
-所謂的 stochastic 的意思是你的 Policy 的 output 其實是個機率
-
-如果你的分數是 0.7、0.2 跟 0.1
-
-有 70% 的機率會 left
-
-有 20% 的機率會 right
-10% 的機率會 fire
-
-看到同樣畫面的時候，根據機率，同一個 Actor 會採取不同的 action
-
-這種 stochastic 的做法其實很多時候是會有好處的
-
-比如說要玩猜拳
-
-要玩猜拳的時候
-
-如果 Actor 是 deterministic，可能就只會出石頭一直輸跟小叮噹一樣
-
-所以有時候會需要 stochastic 這種 Policy
-
-在底下的 lecture 裡面都假設 Actor 是 stochastic 的
-
-用 Neural Network 來當 Actor 有甚麼好處
-
-傳統的作法是直接存一個 table
-
-這個 table 告訴我看到這個 observation 就採取這個 action
-
-看到另外一個 observation 就採取另外一個 action
-
-但這種作法要玩電玩是不行的
-
-因為電玩的 input 是 pixel，要窮舉所有可能 pixel 是沒有辦法做到的
-
-所以一定要用 Neural Network 才能夠讓 machine 把電玩玩好
-
-用 Neural Network 的好處就是 Neural Network 可以舉一反三
-
-就算有些畫面完全沒有看過
-
-machine 從來沒有看過
-
-因為 Neural Network 的特性
-給他 input 一個東西總是會有 output
-
-就算是他沒有看過的東西
-他也有可能得到一個合理的結果
-
-用 Neural Network 的好處是他比較 generalize
-
-再來第二個步驟就是要決定一個 function 的好壞
-
-也就是要決定一個 Actor 的好壞
-
-在 Supervised Learning 怎麼決定 function 的好壞
-
-假設給一個 Neural Network 
-他的參數假設已經知道就是 theta
-
-有一堆 training example
-假設在做 image classification
-
-就把 image 丟進去看 output 跟 target 像不像
-
-如果越像代表 function 越好
-
-會定義一個東西叫做 Loss
-
-算每一個 example 的 Loss 合起來就是 Total Loss
-
-需要找一個參數去 minimize 這個 Total Loss
-
-其實在 Reinforcement Learning 裡面，一個 Actor 的好壞的定義其實是非常類似的
-
-怎麼樣類似法
-
-假設有一個 Actor，Actor 就是一個 Neural Network
-
-這個 Neural Network 假設他的參數是 theta
-
-一個 Actor 會用 pi 下標 theta 來表示它
-
-一個 Actor 是一個 function 他的 input 就是一個 s
-
-這個 s 就是 machine 看到的、Actor 看到的 observation
-
-怎麼知道一個 Actor 表現好還是不好
-
-就讓 Actor 實際的去玩一下這個遊戲
-
-假設拿 pi( s )
-拿參數是 theta 這個 Actor
-
-實際去玩一個遊戲
-他就玩了一個 episode
-
-他說他看到 s1、take action a1、得到 r1
-再看到 s2、take action a2、得到 r2 等等等
-
-最後就結束了
-這個時候玩完遊戲以後
-
-他得到的 Total Reward 可以寫成 Rθ
-
-這個 Rθ 就是 r1 + r2 一直加到 rT
-
-把所有在每一個 step 得到的 reward合起來就是在這一個 episode 裡面得到的 Total Reward
-
-而 episode 裡面的 Total Reward 才是我們要 maximize 的對象
-
-我們不是要去 maximize 每一個 step 的 reward
-
-我們是要去 maximize 整個遊戲玩完會得到的 Total Reward
-
-但是就算拿同一個 Actor 來玩這個遊戲
-
-每次玩的時候 Rθ 其實都會是不一樣
-
-為甚麼？因為兩個原因
-
-首先 Actor 如果是 stochastic 看到同樣的場景
-也會採取不同的 action
-
-就算是同一個 Actor、同一組參數
-
-每次玩的時候得到的 Rθ 也會是不一樣
-
-再來遊戲本身也有隨機性
-
-就算採取同樣的 action，看到的 observation 每一次也可能都不一樣
-
-所以遊戲本身也有隨機性
-
-所以 Rθ 是一個 random variable
-
-所以我們希望做的事情不是去 maximize 某一次玩遊戲得到的 Rθ
-
-希望去 maximize 的其實是 Rθ 的期望值
-
-拿同一個 Actor 玩了千百次遊戲以後
-
-每次 Rθ 都不一樣但這個 Rθ 的期望值是多少
-
-這邊用 Rθ bar 來表示它的期望值
-
-希望這個期望值越大越好
-
-這個期望值就衡量了某一個 Actor 的好壞
-
-好的 Actor 他的期望值就應該要比較大
-
-這個期望值實際上要怎麼計算出來
-
-你可以這麼做
-
-假設一場遊戲就是一個 trajectory τ
-一場遊戲用 τ 來表示
-
-τ 是一個 sequence 裡面包含了 state、包含 observation，看到這個 observation 以後 take 的 action
-
-還有得到的 reward，還有新的 observation、take 的 action、得到的 reward 等等，他是一個 sequence
-
-R(τ) 代表這個 trajectory 在這場遊戲最後得到的 Total Reward
-
-把所有的小 r summation 起來就是 total 的 reward
-
-當我們用某一個 Actor 去玩這個遊戲的時候
-
-每一個 τ 都會有一個出現的機率
-
-這個大家可以想像嗎
-
-就是 τ 代表某一種可能的從遊戲開始到結束的過程
-
-他代表某一種過程
-這個過程有千千百百種
-
-但是當你選擇了一個 Actor 去玩這個遊戲的時候
-
-你可能只會看到某一些過程
-
-某一些過程特別容易出現
-某一些過程比較不容易出現
-
-比如說現在 Actor 是一個很智障的 Actor
-
-他看到敵人的子彈就要湊上去被自殺
-
-你看到的每一個 τ 都是你自己控制的太空船挪一下
-然後就去自殺了
-
-當你選擇 Actor 的時候就會有一些 τ 特別容易出現
-
-只有某一些遊戲的過程特別容易出現
-
-每一個遊戲出現的過程可以用機率來描述他
-
-這邊寫一個 P( τ | θ )
-
-就是當 Actor 的參數是 θ 的時候
-τ 這個過程出現的機率
-
-如果可以接受這樣子的話
-
-那 Rθ 的期望值，Rθ bar 就寫成
-
-summation over 所有可能的 τ
-所有可能的遊戲進行的過程
-
-當然這個非常非常的多
-尤其如果又是玩電玩
-
-他是連續的
-
-他有非常多的可能
-這個 τ 是難以窮舉
-
-現在假設可以窮舉他
-
-每一個 τ 都有一個機率用 P( τ | θ )
-
-每一個 τ 都有一個 reward R(τ)
-
-把這兩個乘起來
-再 summation over 所有遊戲可能的 τ 的話
-
-那就得到了這個 Actor 他期望的這個 reward
-
-實際上要窮舉所有的 τ 是不可能的
-所以怎麼做
-
-讓 Actor 去玩這個遊戲玩 N 場
-
-得到 τ1、τ2 到 τN
-
-這 N 場就好像是 N 筆 training data 這樣子
-
-玩 N 場這個遊戲就好像是從 P( τ | θ ) sample 出 N 個 τ
-
-假設某一個 τ 他的機率特別大
-
-他就特別容易在 N 次 sample 裡面被 sample 出來
-
-sample 出來的 τ 應該是跟機率成正比的
-
-當用這個 Actor 玩 N 場遊戲的時候
-
-就好像是從 P( τ | θ ) 這個機率裡面去做 N 次 sample 一樣
-
-最後得到的結果是甚麼
-
-最後就是把 N 個 τ 的 reward 都算出來
-
-然後再平均起來
-就可以拿這一項去近似這一項
+你沒辦法在 Training Set 上 Overfit
+而不是你非常容易 Overfit
 
 對不對
-這個大家應該沒有甚麼問題
 
-接下來只要記得 summation over N 次 sample 做平均
+甚麼樣的 Model 非常容易 Overfit 呢
 
-對 N 次 sample 做平均
+舉例來說 Decision Tree
 
-其實就可以近似從 θ sample τ 出來
+就是一個非常容易 Overfit 的方法
 
-再 summation over 所有的 τ
+Decision Tree 你只要想的話，把樹長得很深
 
-summation over 所有的 τ 乘上機率這件事情
+他在 Training data 上只要夠深都能可以拿到 100% 的正確率
 
-跟 sample N 次這件事情是可以近似的
+NN 很難拿到 100% 的正確率
 
-接下來就進入最後第三步
+要拿到 100% 的正確率就要在 MNIST 上好好調參數
+才能拿到 100% 正確率
 
-我們知道怎麼衡量一個 Actor
+但像 Decision Tree 這種方法只要他想他可以拿到 100% 正確率
 
-接下來就是要選一個最好的 Actor
+但在 Training data 上拿到 100% 正確率不見得有甚麼特別厲害的地方
 
-怎麼選一個最好的 Actor
-其實就是用 Gradient Descent
+其實就只是 Overfitting 而已
 
-現在已經有我們的 Objective Function
+所以甚麼時候要做 Bagging
 
-我們已經找到目標了
-目標就是要最大化這個 Rθ bar
+就是 Model 很容易 Overfitting 的時候要做 Bagging
 
-找一個參數最大化 Rθ bar
+所以 Decision Tree 很需要做 Bagging
 
-Rθ bar 的式子也有了就寫在這邊
+Random Forest 就是 Decision Tree 做 Bagging 的版本
+就是 Random Forest
 
-接下來就可以用 Gradient Ascent 的方法找一個 θ
+我們沒有講過 Decision Tree
 
-讓 Rθ bar 的值最大
+那其實我覺得也不見得需要講
 
-這邊不做 Gradient Descent ，因為 Gradient Descent 要去 minimize 一個東西用 Gradient Descent
+你們每個人都知道 Decision Tree 對不對
 
-maximize 一個東西用 Gradient Ascent
+我看大家在作業裡面都能夠用到 Decision Tree
+
+都用得很爽，所以就好像是不太需要講
+
+我們就秒講過去
+
+現在假設每個 object，有兩個 feature x1 跟 x2
+
+Decision Tree 就是根據 Training data 建出一棵樹
+
+這棵樹告訴我們
+
+如果輸入的 object x1 < 0.5 就是 yes
+x1 > 0.5 就是 no
+
+所以就是在 x1 = 0.5 的地方切一刀
+
+以左就走到左邊這條路上去
+往右就走到右邊這條路上去
+
+接下來再看 x2 < 0.3 的時候
+
+那就說是 Class 1，藍色
+
+x2 > 0.3 的時候就說是 Class 2，就紅色
+
+那如果在右邊呢
+
+右邊如果 x2 < 0.7 的時候就塗紅色
+
+x2 > 0.7 的時候就塗藍色
+
+那這邊這個 Decision Tree 的問題是比較簡單的
+
+它只看一個 dimension
+其實可以同時看兩個 dimension
+
+其實可以問更複雜的問題
+
+要問甚麼問題是人自己決定的
+
+所以做 Decision Tree 的時候會有很多需要注意的地方
+
+舉例來說，在每個節點做多少分支
+
+要用甚麼樣的 criterion 來做分支
+
+要甚麼時候停止分支
+
+有可以問的問題在集合裡面，有那些問題等等
+
+也是有很多參數要調，跟 NN 一樣有一些東西是需要調整的
+
+我們就來舉一個 Decision Tree 的例子吧
+
+我們把 Decision Tree 實作在以下這個 task 上面
+
+這個 task 叫做初音 task
+
+這個 task 是這樣的，有一個分類的問題
+
+這個分類的問題是說輸入的 feature 就是二維
+
+這個紅色的部分是屬於 Class 1
+
+在藍色的部分是屬於另外一個 Class，Class 2
+
+Class 1 分佈的樣子正好就跟初音是一樣的
+
+如果你要用這個 data 我放在這邊
+你可以載這個 data 來用
+
+這個是初音的 task
+
+一般教科書都會用方型、圈圈那個都太弱了
+
+這個要用初音的 task
+
+Class 1 的分佈就跟初音一樣
+
+現在 Decision Tree 能不能夠在這個 task 裡面把 Class 1 和 Class 2 進行正確的分類呢
+
+我們來看一下結果
+
+現在用一棵 Decision Tree
+
+那這個 Decision Tree 的深度是 5
+
+他沒有辦法把 Class 1 和 Class 2 分開
+
+它只能框說這個方塊的地方就是 Class 1
+
+如果更深的 Decision Tree 呢
+如果 Decision Tree 的深度深達 10 的話
+
+看起來就有點初音的樣子
+
+不過它有很明顯的鋸齒狀
+看起來像是在 Minecraft 世界裡面看到的初音
+
+如果 Depth = 15 的話就看起來更好
+
+這個樣子看起來就滿對的
+
+有一些地方還是有點怪怪的比如說這裡
+這邊凸起來一塊
+
+如果 Decision Tree 的深度是 20 的話
+
+那你就可以完美的把 Class 1 的位置跟 Class 2 的位置區別開來
+
+就可以完美的把初音的樣子勾勒出來
+
+這個其實沒有甚麼，Decision Tree 只要你想的話
+
+永遠可以做到 Error Rate 是 0
+
+永遠可以做到正確率是 100
+
+因為你想想看最極端的 case 就是這個 tree 一直長下去
+
+每一筆 data point 就是一個很深的樹的其中一個節點
+
+的其中一片葉子
+
+這樣正確率就一定是 100%
+
+所以這個沒有甚麼
+樹夠深，Decision Tree 可以做出任何 function
+
+但是因為 Decision Tree 太容易 Overfitting
+
+所以單用一棵 Decision Tree 你往往不見得可以得到好的結果
+
+所以要對 Decision Tree 做 Bagging 這個方法就是 Random Forest
+
+我們可以用傳統 Bagging 的方法
+
+來做 Random Forest
+可以用傳統的剛才講的 sample 那個方法來做 Bagging
+
+但是如果用那種方法你得到的 tree 通常每棵都沒有差太多
+
+所以光用 sample 的方法看起來是不太夠的
+
+在做 Random Forest 比較 typical 的方法是
+
+在每一次要產生 Decision Tree 的 branch 的時候
+
+都 random 的決定哪一些 feature 或哪一些問題是不能用
+
+你 random 的決定現在要做 split 的時候
+
+那些 question 或那些 feature 不能用就可以促使
+
+就算你用的是一模一樣的 dataset
+
+每一次你產生的 Decision Tree 也會是不一樣的
+
+最後再把所有 Decision Tree 的結果通通集合起來
+
+就得到 Random Forest
+
+如果是用 Bagging 的方法有一個
+
+有一個叫 Out-of-bag 的方法可以幫你做 Validation
+
+一般我們在做 validation 都是把手上的 training set 切成兩塊
+
+手上原來有 label 的 data 切成兩塊
+training set 跟 validation set
+
+如果是用 Bagging 的方法的話
+
+你可以不要把你的 labeled data 切成 training set 跟 validation set
+
+但一樣有 validation 的效果，怎麼做呢
+
+因為我們知道在做 Bagging 的時候
+
+每一個 function，train 出來的每一個 model 他都只用到部分的 data
+
+假設現在 training data 裡面有 x1 到 x4 總共有四筆 data
+
+f1 只用第一筆和第二筆 data train
+
+f2 只用第三筆、第四筆 data train
+
+f3 只用 1、3筆 data train
+f4 只用 2、4筆 data train
+
+那我們就會知道實際上在 train f2 跟 f4 的時候
+
+其實沒有用到 x1
+
+所以可以用 f2 加 f4 Bagging 的結果去在 x1 上面 testing 他的 performance
+
+同理我們可以用
+
+x2 跟 x3 做 Bagging 的結果去 test x2
+
+用 f1 跟 f4 Bagging 的結果 test x3
+
+用 f1 跟 f3 Bagging 的結果 test x4
+
+接下來再把 x1 跟 x4 的結果
+
+把它做平均
+
+算一下 error rate 就得到 Out-of-bag 的 error
+
+雖然這邊沒有明確的切出一個 Validation Set
+
+但是在做 testing 的時候所用的 model
+
+並沒有看過那些 testing 的 data
+
+在 test x1 到 x4 的時候
+
+這些 model 並沒有看過 x1 到 x4
+
+所以這個 Out-of-bag error 其實也是一個可以在 Testing set 上可以反應 testing set 結果的 estimation
+
+那我們看一下 Random Forest 在初音的 task 上的結果
+
+這邊是做一百棵樹
+
+你會發現如果是一百棵 Depth = 5 的樹
+
+做出來的結果是這個樣子
+
+這邊要強調一下做 Bagging 並不會使你的 model 更能夠 fit data
+
+所以 Depth 是 5 的樹沒有辦法 fit 出那個 function
+
+用 Random Forest 還是沒有辦法 fit 出那個 function
+
+可以得到的結果只是現在因為是把五棵樹平均起來
+
+所以得到整體的 function 他是比較平滑的而已
+
+所以比如說 Depth = 10
+看起來就比較不像 Minecraft 的世界就是了
+
+如果 Depth = 15 得到的結果是這樣
+
+看起來很好但其實他是有一個瑕疵的
+
+他有一些地方沒有做好
+我記得這邊有一條頭髮垂下來
+
+他沒有把那條頭髮框出來的樣子
+
+我看一下，喔對沒錯
+如果是 Depth = 20
+
+把一棵 Depth = 20 的樹
+就可以完美的把初音框出來
+
+這邊其實是有一條頭髮
+
+要把這個做出來才是真的正確
+
+接下來要講 Boosting
+
+Boosting 跟剛才的 Bagging 是不一樣的
+
+Bagging 是用在很強的 model
+
+Boosting 是用在弱的 model 上面
+
+當你有一些弱的 model
+
+但問題是你沒有辦法讓他們去 fit data 的時候
+
+這個時候你就會想要用 Boosting
+
+Boosting 是這樣
+Boosting 他
+
+它有一個很 powerful 的 guarantee
+
+這個很 powerful 的 guarantee 是這樣說的
+
+假設有一個 ML 的 algorithm
+
+它可以給你一個錯誤率高過 50% 的 classifier
+
+假設要做分類的問題
+
+那錯誤率高過 50% 的 classifier
+
+假設這二元分類的問題
+
+用 random 猜都高過 50%
+
+很爛的模型都可以辦到
+
+只要能夠做到這件事
+
+Boosting 這個方法可以保證最後把這些錯誤率僅略高於 50% 的 classifier 組合起來以後
+
+它可以讓錯誤率達到 0%
+
+有沒有聽起來非常神奇
+
+聽起來就是非常的強
+
+Boosting 的 framework
+
+整個大架構大概是這樣
+
+首先找一個 classifier f1
+
+這個 classifier f1 很弱沒有關係
+
+接下來再找一個 classifier f2 他去輔助 f1
+
+但要注意 f2 跟 f1 不可以很像
+他們要是互補
+
+f2 跟 f1 的特性是互補
+
+f2 要去彌補 f1 的缺失
+
+f2 要去做 f1 沒有辦法做到的事情
+
+這樣進步量才大
+那 Boosting
+
+等一下就會講怎麼樣找到一個 f2
+
+它跟 f1 是最互補的
+
+然後就得到第二個 classifier f2
+
+接下來呢 你再找說 我先找 classifier f2
+
+再找一個 f3 跟 f2 是互補的
+
+接下來再找一個 f4 跟 f3 是互補的
+
+這個 process 就繼續下去，找到一把的 classifier
+
+再把這把 classifier 及合起來就可以得到很低的 error rate
+
+就算是每個 classifier 他們都很弱
+
+也沒有關係
+
+要注意的是在做 Boosting 的時候
+
+classifier 的訓練是有順序的
+
+要先找出 f1
+
+才找得出 f2 才找得出 f3
+
+它是 sequential 的
+
+要先找 f1 才知道怎麼找 f2 跟 f1 是互補的
+
+所以它是有順序的找
+
+那前面在 Bagging 的時候
+
+每一個 classifier 是沒有順序的
+
+在做 Random Forest 要 train 一百棵 Decision Tree
+
+這一百棵 Decision Tree 可以一起做
+
+但這邊如果是要把一百個 Decision Tree 用 Boosting 的方法把它變得很強的話
+
+要按順序做，它不是平行做的方法
+
+這邊假設我們考慮的一個 task 是一個 Binary Classification 的 task
+
+就是有一堆 training data，x 跟 y hat
+
+y hat 就等於 +-1
+
+接下來要講的是怎麼得到不同的 classifier
+
+剛剛在 Bagging 的時候講過
+
+要得到不同的 classifier
+
+可以用製造不同的 training set 的方式
+
+來得到不同的 classifier
+
+在 Boosting 的時候也可以這麼做
+
+可以用 resample 的方式來製造不同的 training data
+然後得到不同的 classifier
+
+但是有另外一種方法可以幫你製造出不同的 dataset
+
+你可以給你 training data 裡面的每一筆 data 一個 weight
+
+舉例來說
+
+這邊用 u 來代表每一筆 data 的 weight
+
+一開始
+
+可以藉由改變這個 weight 來製造不同的 dataset
+
+舉例來說現在本來有三筆 data
+
+每一筆 data 的 weight 都是 1
+
+你可以把它改成第一筆 data weight 是 0.4
+
+第二筆 data weight 是 2.1
+第三筆 data weight 是 0.7
+
+這樣就等於製造出了一個新的 dataset
+
+其實 sampling 也可以視同是改了 weight
+
+只是 sampling 比如說某一筆 data 被 sample 兩次
+
+就代表他的 weight 變成 2
+
+如果用 sampling 的方法 weight 只能是整數
+
+直接調一個 weight u 的話可以給小數就是了
+
+就算是改變了 weight
+
+對 training 也不會有太大的影響
+
+我們知道在 training 的時候
+
+原來 Objective Function 是寫成這個樣子
+
+有一個 Loss Function 要去 minimize 他
+
+這個 Loss Function 是 summation over 所有的 training data
+
+對每一筆 training data x n
+
+都把他帶到 function f 裡面去得到 f(x n)
+
+計算 f(x n) 跟 y hat n 的差距
+
+這個差距就用 Loss Function 來表示
+
+這個小 L 可以是各種不同的 function
+
+反正能夠量 f(x n) 跟 y hat n 之間的差異就行了
+
+然後就用 Gradient Descent 的方法
+
+去找一個 function f 來 minimize 大 L 這個 Total Loss Function
+
+如果加上 weight 的話有甚麼不同呢
+
+沒有甚麼不同，唯一的不同只有會在每一個小 L 的 function 前面
+
+乘上 u
+
+會在每一個小 L 的 function 前面乘上那筆 data 的 weight
+
+代表那筆 data 的權重
+
+如果有一筆 data 它的權重比較重
+
+他的 u 比較大，那在 training 的時候
+
+他就會被多考慮一點
+
+那有了這個概念以後
+
+Adaboost 的精神是甚麼
+
+Boosting 有很多的方法等一下我們要介紹其中最經典的 Adaboost
+
+Adaboost 他的想法是
+
+先訓練好一個 classifier f1
+
+要去找一組新的 training data
+
+所謂找一組新的 training data 其實就是 reweight training 的 example
+
+要去找一組新的 training data
+
+讓 f1 在這組新的 training data 上結果是會爛掉的
+
+會 fail 掉，正確率會變成只有 50%
+
+要找一組新的 training data
+f1 在這組新的 training data 是做不好的
+
+然後再用 f2 在這組新的 training data 上面訓練
+
+接下來怎麼找 f1
+
+怎麼找一個新的 training data 可以讓 f1 壞掉
+假設給你一個 f1
+
+先來看一下 f1 在 training data 上的 Error Rate 怎麼計算
+
+f1 在 training data 上的 Error Rate 這邊寫成 epsilon 1
+
+epsilon 1 的計算方法就是
+
+summation over 所有的 training example n
+
+然後去計算每一筆 training example 的結果是不是對的
+
+如果是對的話就是 0
+
+如果是錯的話就是 1
+
+每一筆 training example 還要乘上他的 weight u n
+
+然後再做一下 normalization
+因為這個 u n 的值
+
+合起來不見得是 1
+所以要做一個 normalization
+
+這個 normalization 就是 summation over
+
+所有的 u1
+
+summation over 所有的 weight
+
+就是這個 normalization 的 term
+
+那 epsilon 1 一定會小於 0.5
+
+因為我們假設 classifier 是還可以的
+
+不是一個完全 random 的 classifier
+
+所以 Error Rate 總是可以小於 0.5
+
+其實沒有辦法製造一個 classifier 他的 Error Rate > 0.5
+
+你知道嗎，因為 classifier 他的 Error Rate > 0.5只要把它的 output 反過來
+
+它的 Error Rate 就小於 0.5 了
+
+原來 training data 的 weight 是 u1
+
+要給一組新的 training data 的 weight u2
+
+這組新的 training data 的 weight 會使得
+
+如果把上面這個算 epsilon 1 的式子的 u1
+
+換成 u2 得到的結果
+
+會變成 0.5
+
+本來 epsilon 1 是小於 0.5
+
+在 u1 作為 weight 做計算的時候小於 0.5
+
+把 u1 換成 u2 weight 就變成 0.5
+
+這個就好像是假如重新 weight 我們的 training data
+
+本來用 u1 作為 training data 的 weight
+
+現在用 u2 作為 training data 的 weight
+
+在這組新的 weight 上面
+
+f1 的 performance 就像是隨機的一樣
+
+接下來再拿這組新的 training data
+
+用 u2 當作 weight 的 training data 再去訓練 f2
+
+f2 就會跟 f1 是互補的
+
+這樣講也許有點抽象舉一個實際的例子
+
+現在有四筆 training data
+
+這四筆 training data 的 weight 就是 u1 到 u4
+
+假設 u1, u2, u3, u4 通通等於 1
+這四筆 training data 的 weight 是一樣的
+
+用這四筆 training data 去訓練一個模型
+
+去訓練一個 classifier f1
+
+假設 f1 它不是一個特別 powerful 的 algorithm
+
+所以就算是 training data 他也沒有辦法每一筆 training data 都分類正確
+
+假設他指正確分類三筆 training data
+一筆 training data 是分類是錯的
+
+所以它的 Error Rate 是 0.25
+
+四筆 training data 它分錯一筆所以它的 Error Rate 是 0.25
+
+接下來要改變 data 的 weight
+
+要把 u 值變一下
+
+讓 f1 在新的 training dataset 上
+
+它的 error 變成 0.5
+
+怎麼改
+其實有不同的改法
+
+假設 u1 的 weight 是 1/√3
+
+現在要讓 f1 的 error 變大
+
+怎麼讓 f1 的 error 變大
+就是看它答對哪幾題
+
+那幾題的配分就變小
+
+答錯哪幾題，那幾題的配分就變大
+
+考試的時候先把考卷寫完
+
+老師也改完以後再重新去計算配分
+
+答錯的配分就比較高
+答對的配分就比較低
+
+你就會發狂生氣
+
+今天要做的事情就是要讓 f1 生氣
+
+我們先看它答對那些答錯那些
+
+它答對的
+本來跟他說好每一題的配分都是一樣的
+
+但是你騙它，它答完以後
+
+再改一下題目的配分
+
+第一題它答對了
+所以配分就變成 1/√3
+
+第二題它答錯了
+所以配分就增加變成 √3
+
+第三題跟第四題都答對了
+所以配分都減少變成 1/√3
+
+如果在這筆新的 training data 情況下就會變成
+
+f1 就會變得很糟
+因為你想想看
+
+他答錯的題目 weight 是 √3
+
+它答對的題目 weight 是 1/√3 有三題
+
+1/√3 * 3 也是 √3
+
+所以答錯的題目跟答對的題目的 weight 是一樣
+
+所以 f1 的 Error Rate 就變成 0.5
+
+接下來在這組新的 training data 上面
+
+這組新的 training data 可以讓 f1 整個爛掉
+
+在這組新的 training data 上面再去訓練 f2
+
+那 f2 因為它是看著這組新的 weight、新的配分去做練習的
+
+所以新的 Error Rate 在這組 weight 上它的 error 會是小於 0.5
+
+所以 f2 可以跟 f1 是互補
+
+更詳細的證明之後會有
+今天都是講個精神
+
+接下來講一下實際怎麼做 reweight 這件事情
+
+如果某一筆 data x n
+
+他會被 f1 分類錯
+
+就把第 n 筆 data 的 weight u1 乘上一個值 d1 變成 u2
+
+這個 d1 是大於 0 的值
+
+也就是 x n 如果分類錯誤的話就那一個題目、那筆 data 的權重提高
+
+乘上 d1 把它提高
+
+如果 x n 是正確的被 f1 分類的話
+
+就把 u1 除掉 d1，把它變小
+
+所以對錯的就增加，對的就變小
+
+f2 會在新的 weight u2 上面
+
+進行訓練
+
+再來的問題就是 d1 的值要設多少
+
+這邊沒有甚麼高深的數學
+
+就是推一下
+
+要設甚麼樣的 d1
+
+可以讓 u1 變成 u2 以後可以讓 f1 的 Error Rate 是 0.5
+
+這邊就只是數學式比較繁瑣但其實很簡單的數學
+
+這個數學是這樣
+
+已經計算出 epsilon 1
+epsilon 1 的式子是這個樣子
+
+現在希望把 u1 換成 u2
+
+得到的 weight 是 0.5
+
+原則就是如果第二筆 data 的分類是錯誤的那就乘上 d1
+
+如果是正確的就除掉 d1
+
+先看一下上面這邊
+
+上面這邊是指 summation over 分類錯誤的那些 data
+
+上面這邊是指先 summation over 分類錯誤的那些 data
+
+所以上面的這些 u2 都是分類錯誤的，所以都會乘上 d1
+
+所以上面分子的地方
+
+可以寫成 summation over u1 乘上 d1
+
+上面這些 u 每一筆都是 u1 乘上 d1
+
+因為他們都是分類錯的
+
+再來看分子的地方
+
+分子的地方是 summation over u2
+
+u2 有兩個 case
+
+一個是如果 f1 會把這筆 data 分類錯誤的話
+
+那 u2 是來自於 u1 * d1
+
+如果是分類正確的話
+
+那 u2 就是來自 u1/d1
+
+所以這整個式子列出來的話就是這個樣子
+
+然後把分子的地方
+
+帶進去
+
+分母的地方，這一項帶進去得到這個式子
+
+這個式子是等於 0.5
+
+然後把分子和分母倒過來
+
+所以左邊分子和分母倒過來
+
+右邊就從 0.5 變成 2
+
+接下來發現分子和分母都有共同的這一項
+
+所以知道這一項除以這一項
+
+這一項除以這一項
+
+會等於 1
+
+這告訴我們 u1 除以 d1
+
+把所有那些 f1 會答對的 data x n 拿出來
+
+把他們的 u1 除以 d1
+
+要等於所有 f1 會答錯的那些 x n 他們的 u1 乘以 d1
+
+也不用剛才推導其實也可以很直覺地寫出這個式子
+
+如果要讓 f1 在新的 weight 的 Error Rate 是 0.5 的話
+
+當然他答對的部分的新的 weight
+
+要等於答錯的部分的新的 weight
+
+接下來就把 d1 提出去
+
+epsilon 1 可以寫成這個樣子
+
+epsilon 1 分子的地方是對那些答錯的 example x n 的 weight 的總和
+
+然後再做 normalization，那這一項
+
+出現在這個地方
+
+所以可以把這一項用 epsilon 1 把它代換掉
+
+所以這一項 = z1 * epsilon 1
+
+那這一項呢
+
+這一項是 Z1 *( 1 - epsilon 1 )
+
+因為這一項加這一項會是 Z1
+
+既然它是 Z1 * epsilon 1
+
+它就是 Z1 *( 1 - epsilon 1)
+
+總之經過一翻推導以後
+
+你會算出來 d1 = 更號 1 除以 epsilon 1 除以 epsilon 1
+
+拿這個 d1 去乘或者是除 u1
+
+就可以製造一個 training dataset 它是會讓 f1 fail 掉的 training dataset
+
+這個 d1 的值一定會大於 1
+
+因為 epsilon 1 一定小於 0.5
+
+所以在 d1 的更號項裡面
+
+分子會大於分母所以 d1 都會大於 1
+
+整個 Adaboost 的演算法可以講完這一頁就好
+
+整個 Adaboost 的演算法看起來就是這個樣子
+
+現在有一堆 training data，每一筆 training data 給它的初始的 weight 都是 1
+
+接下來要跑大 T 個 iteration
+
+每一個 iteration 都會給一個 weight 的 classifier ft
+
+最後再把所有的 ft 集合起來就變成一個強的 classifier
+
+在每一個 iteration 每一筆 training data 都有自己的 weight
+
+這邊寫成 u 上標 1 下標 t 
+到 u 上標 N 下標 t
+
+用下標 t 代表那一個 iteration 的 weight
+
+用這個 weight 訓練出 ft
+
+然後計算 ft 在原來 weight 上面的 error epsilon t
+
+計算 epsilon t 以後
+
+就可以 reweight 每一筆 training data
+
+如果 x n 它被 ft 分類錯誤的話
+
+就把 u 上標 n 下標 t 乘上 d 下標 t
+
+就把 u 上標 n 下標 t 乘上一個大於 1 的值
+
+然後得到一組新的 weight
+這組新的 weight 會在下一個 iteration 的時候被使用
+
+反之就把原來的 weight 除掉 dt
+
+然後得到一組新的 weight
+這組新的 weight 要在下一個 iteration 的時候被使用
+
+這個 dt 就等於 √ ( 1 - epsilon t ) / epsilon t
+
+或者是可以寫成另外有一個變數叫 alpha t
+
+這個 alpha t = ln√ ( 1 - epsilon t ) / epsilon t
+
+這麼做是有涵義的
+這麼做的話
+
+可以把 dt 換成 exp ( alpha t )
+
+把除 dt 換成 乘以 exp ( - alpha t )
+
+本來是有乘有除
+
+現在變成一個是  * exp ( alpha t )
+
+一個是 * exp ( - alpha t )
+
+之所以這麼做是為了要表達式子的時候
+
+可以更簡便一點
+
+怎麼樣更簡便?
+
+可以把這兩個式子合成一個式子
+
+這兩個式子差的只有一個負號而已
+
+都是要把原來的 weight 乘上 exp ( alpha t )
+
+只是這個 alpha t 前面有時候是 +1 有時候是 -1
+
+怎麼用一條式子決定 alpha t 前面應該是 +1 還是 -1
+
+只需要把 y n hat * ft ( x n )
+
+如果是 misclassified 的情況下
+
+y hat 跟 ft( x ) 它是不一樣的
+
+這兩個值是不一樣的所以它是 -1
+
+-1 * -1，alpha t 前面就變成 1
+
+如果是分類正確的情況下，這兩項是一樣的
+
+這兩項相乘就是 +1
+
+所以再乘上 -1 這一項就變成 -1
+
+總之可以直接用這一個式子來表示這兩個式子
+
+經過剛才的訓練以後就得到一把 classifier f1 到 fT
+
+再來就是怎麼把這把 classifier 集合在一起
+
+你可以用 uniform 的 weight
+現在有大 T 個 classifier
+
+叫這大 T 個 classifier 都得到一個 output
+
+把大 T 個 classifier 的 output 就加起來看是正的還是負的
+
+如果是正的話就代表是 class 1
+如果是負的話就代表是 class 2
+
+就把這大 T 個 classifier 的值通通加起來然後取正負號
+
+這樣雖然可以但這樣不是最好的方法
+
+因為這大 T 個 classifier 有好有壞
+
+所以應該要給它不同的權重
+
+怎麼給不同的權重
+在每一個 classifier output 前面都乘上一個權重 alpha t
+
+然後在全部加起來以後
+
+再取它的正負號這樣可以得到比較好的結果
+
+alpha t 怎麼得到
+
+這個 alpha t 在前一頁的式子有看過
+
+這個 alpha t 就是拿來改變每一筆 training data 的 weight 的 alpha t
+
+那個 alpha t 在前面看過
+
+現在看一下 alpha t 的精神
+
+如果某一個 classifier 的 epsilon t 是 0.1
+
+是一個錯誤率比較低的 classifier
+
+把 epsilon t = 0.1 帶到這個式子去算出 alpha t
+
+它的 alpha t 就是 1.1
+
+錯誤率低的 classifier 會有比較大的 alpha t
+
+如果有另外一個 classifier 它的 epsilon t 是 0.4 代表它是個很爛的 classifier，錯誤率已經接近 0.5 了
+
+把 epsilon t = 0.4 帶到這個式子裡面去算 alpha t 得到 alpha t 是 0.2
+
+如果有一個比較正確的 classifier
+
+錯誤率比較低的 classifier 它得到的 alpha t 的值是大的
+
+如果爛的 classifier 它得到的 alpha t 的值是小的
+
+也就是在做 weighted sum 的時候
+
+如果有一個 classifier 的正確率
+
+它當初訓練的時候錯誤率是比較大的
+
+它的 weight 就比較小
+
+它當初訓練的時候錯誤率比較小它的 weight 就比較大
+
+這件事情是非常有道理的
+
+這個 alpha t 是 make sense 的
+
+我們很快把後面這個例子講過好了
+
+如果這邊你覺得太快就回去自己看投影片
+我相信這個對大家非常容易
+
+我講的這一段就請助教來講一下作業六
+
+這個很簡單
+
+剛剛的演算法如果沒有聽懂就看這個例子
+就知道它的意思了
+
+假設大 T = 3
+現在 weak 的 classifier 很 weak
+它不是 Decision Tree 也不是 Neural Network
+
+它叫做 decision stump
+
+decision stump 沒什麼好講的它太簡單了
+
+它做的事情就是
+
+假設 feature 都分佈在二維平面上
+
+在二維平面上選一個 dimension 切一刀
+
+其中一邊當作 class 1 另外一邊當作 class 2
+
+結束，這個就叫做 decision stump
+
+要做 Boosting 一定要找個 weak 的 classifier
+
+decision stump 它夠 weak 所以把它用在這裡
+
+一開始每一筆 training data 的 weight 都是一模一樣的都是 1.0
+
+用 decision stump 找一個 function
+
+這個 function 是 f1
+
+它的 bounder 就切在這個地方
+
+以左就說是 positive 的 example
+
+就算是 positive 的
+
+一邊 class 1 是 positive 的
+
+往右就是粉紅色就是 negative 的
+
+發現這邊有三筆 data 它的分類是錯的
+
+計算一下有三筆 data 總共有十筆 data
+
+有三筆 data 分類錯
+
+所以 Error Rate 是 0.3
+
+Error Rate 是 0.3 的話 d1 算出來就是 1.53 alpha 算出來就是 0.42
+
+就帶前一頁投影片的公式就可以輕易地求出來了
+
+現在已經算出 epsilon 1, d1, alpha 1 以後
+
+接下來就是改變每一筆 training data 的 weight
+
+分類正確的 weight 就要變小
+
+分類錯誤的 weight 就要變大
+
+分類錯誤的要乘 1.53
+
+分類對的就要除 1.53
+
+這三筆分類錯的 weight 就變大
+
+分類對的 weight 就變小
+
+有了一組新的 weight 以後
+
+就可以再去找一次另外一個 decision stump
+
+有一組新的 weight 找出來的 decision stump 就不一樣了
+
+在新的 decision stump 切一刀切在這個地方
+
+往左是 positive 往右是 negative
+
+往左是藍色往右是紅色
+
+會發現有三筆 data 分類是錯的
+
+現在 f2 的 Error Rate 是多少
+
+會根據每一筆 data 的 weight 進行計算
+
+就會發現第二個 classifier 的 Error Rate 是 0.21
+
+它的 d2 = 1.94, alpha 2 = 0.66
+
+接下來這三筆 data 分類錯所以給他 weight 比較大
+
+這三筆 data 要把它乘上 1.94
+
+剩下的 data 把他除掉 1.94
+
+就找到了第二個 classifier
+
+每一個 classifier 的 weight 就是它 alpha 的值
+
+把 alpha 的值寫再 classifier 的旁邊
+
+接下來找第三個 classifier
+
+第三個 classifier 上面是藍色下面是紅色
+
+它這麼講會導致有三筆 data 錯誤
+
+計算一下它的 Error Rate = 0.13
+
+可以計算它的 d3 可以計算它的 alpha 3
+
+如果有更多 iteration 的話會去重新 weight data
+
+但現在只跑三個 iteration 跑完就結束了
+
+得到三個 classifier 還有他們的 weight 就結束了
+
+最後怎麼把這三個 classifier 組合起來
+
+把每個 classifier 都乘上對應的 weight
+
+通通加起來再取它的正負號
+
+這個加起來的結果到底是怎麼回事
+
+有三個 decision stump 這三個 decision stump
+
+把整個二維的平面切成六塊
+
+左上角三個 classifier 都覺得是藍的
+所以就藍色
+
+中間這一塊他們兩個覺得是藍的，第一個覺得是紅的
+
+但是他們兩個合起來的 weight 比較大
+
+所以上面這組就是藍的
+
+右上角第一個覺得是紅的第二個覺得是紅的第三個覺得是藍的
+
+這兩個紅的 weight 合起來比藍的 weight 大
+所以又是紅的
+
+左下角是第一個藍的第二個藍的第三個紅的
+
+兩個藍的合起來比紅的大所以是藍的
+
+下面這個紅的藍的紅的
+
+兩個紅的加起來比藍的大所以是紅的
+
+右下角三個 decision stump 都說是紅的所以是紅的
+
+這三個 decision stump 沒有一個是 0% 的 Error Rate
+
+他們都有犯一些錯
+
+但把這三個 decision stump 組合起來的時候
+
+它告訴我們這三個區塊屬於藍色、這三個區塊屬於紅色
+
+而它的正確率是 100%
+
+三個 weak 的 classifier 把它組合起來可以得到好的結果
+
+接下來就請助教來講一下作業六
+
+我們來繼續講 Adaboost
+
+上次講的是 Adaboost 的 algorithm
+
+現在要講的是理論上的證明
+
+這邊要證明假設我們按照 Adaboost 的 algorithm
+
+來產生最後的 classifier
+
+這最後的 classifier 這邊寫成 H(x)
+
+這個最後的 classifier H(x) 是由一堆 weak 的 classifier ft 所組成的
+
+如果 Adaboost 的 algorithm 跑大 T 個 iteration 的話
+
+就會得到大 T 個 weak 的 classifier f1 到 fT
+
+每一個 weak 的 classifier 還有 weight 權重
+
+這樣就可以知道哪一些 weak classifier 應該被參考多一點
+哪一些應該被參考少一點
+
+這個權重就是 alpha t
+
+把所有 weak classifier 的 output
+
+假設切到 classifier 某一個 object x
+
+就把 x 分別丟到每一個 weak 的 classifier ft 裡面
+
+再把 x 的 output 乘上它的 weight alpha t
+
+再 summation over 所有 weak 的 classifier 再取它的正負號
+
+就可以得到最終的分類的結果
+
+這個 alpha t 是甚麼
+
+這個 alpha t 跟 epsilon t 有關
+
+epsilon t 組成的 alpha t
+
+epsilon t 是甚麼
+epsilon t 是 Error Rate
+
+我想先講另外一件事情就是我們接下來的規劃
+
+這周我們講 Boosting 跟 Structure Learning 的開頭
+
+下周有一位 NVIDIA 的外賓要來
+
+它要來告訴我們一些它做的研究
+
+相比於我自己授課我比較喜歡請外賓來講
+
+為甚麼? 因為我上課的內容都是有錄影的
+
+所以請外賓來講比較能夠聽到不一樣的東西
+
+如果我再講一次同樣的內容其實笑話都是差不多的
+
+所以如果有外賓的話就盡量請外賓來講
+
+沒有講的內容怎麼辦
+
+還沒講 SVM 阿，那個上課都有錄影
+
+都有上學期的錄影再把它放到課程網站就好
+
+所以不用太擔心
+
+在下下周講 Reinforcement Learning
+
+上學期其實沒有講完 Reinforcement Learning
+這學期會把它講完
+
+接下來就是 final，祝大家 final 做的順利
+
+有人可能會想說沒講到機器學習理論的部分
+
+剛才講到 alpha t 是跟 epsilon t 有關的
+
+epsilon t 是 Error rate
+
+是 classifier ft 的 Error Rate
+
+現在要證明如果 weak 的 classifier 越多
+
+或者換句話說 Adaboost 的 algorithm 跑越多的 iteration
+
+在 training set 上的 error
+
+會越來越小
+
+所以這樣子就可以增加 weak 的 classifier
+
+然後讓 model 在 training set 上的 performance 越來越好
+
+怎麼證
+其實是滿簡單的
+
+先算一下 H(x) 的 Error Rate
+
+先把 H(x) 的 Error Rate 的式子列出來
+
+其實就是 summation over n
+這個 x n 代表 training data
+
+如果 H(x n) 不等於 y n hat
+
+H(x n) 的 output 跟正確解答不一樣的話
+
+那就有一筆 error，得到的 error 就是 1
+
+反之如果 H 等於 y n hat 的話
+
+那得到的 error 就是 0
+
+然後再做一下平均
+
+假設有大 N 筆 training data
+
+這邊是先把大 T 個 weak classifier weighted sum 起來
+
+再取它的正負號
+
+括號裡面這一項用 g(x) 來表示
+
+g(x) 代表大 T 個 classifier 的 weighted sum
+
+所以 Error Rate 這一項
+
+也可以寫成是 y hat
+
+乘上 g(x) 看它是小於 0 還是大於 0
+
+小於 0 代表 y hat 跟 g 異號所以是錯誤的
+
+得到的 error 就是 1
+
+如果他們是同號代表是正確的得到的 error 就是 0
+
+這都沒有甚麼特別難的
+
+最後一項我們說這個 Error Rate 有一個 upper bound
+
+這個 upper bound 寫作這樣
+
+這個 upper bound 是 exp ( - y hat * g(x))
+
+如果把 y hat * g(x) 的這個值
+
+把它畫出來就一目瞭然了
+
+這個圖的橫軸是 y hat * g(x)
+
+綠色的線代表的是 delta ( y hat * g(x) < 0) 這個 function 的值
+
+所以 y hat * g(x) < 0 的話
+
+這個 output 是 1 反之 delta output 是 0
+
+綠色的 function 有一個 upper bound 就是藍色的 function
+
+藍色的 function 是 exp ( - y hat * g(x))
+
+exp ( - y hat * g(x)) 畫起來就是這個樣子
+
+藍色的 function 是綠色的 function 的 upper bound
+
+應該是沒有甚麼特別的問題
+
+再來是要證明這個 upper bound 會越來越小
+
+怎麼證 upper bound 會越來越小
+在直接證它之前來算另外一個式子
+
+我們來算 Zt，甚麼是 Zt
+
+在每一個 iteration 都會給 training data 一個 weight
+
+每一筆 training data 都有一個 weight
+
+用這些 weight 來算 ft
+
+所謂的 Zt 就是把所有 training data 的 weight 加總起來
+
+就是 Zt
+
+等一下會說明 Zt 跟上面 upper bound 的關係
+
+先不要管 upper bound，先算 Zt
+
+要先來算的是 Z T+1
+
+也就是當 T 個 iteration 跑完以後
+
+假設接下來要算、要學 F T+1
+
+第 T + 1 個 weak classifier
+
+那 train 第 T + 1 個 weak classifier 的時候
+
+那些 training data 的 weight 把它總合起來
+
+應該是多少
+
+Z T + 1 = summation over 所有的 training data 它的每一筆 training data 的 weight 總和
+
+每一筆 training data 的 weight 又是多少
+
+假設初始的時候、train 第一個  weak classifier 的時候
+
+這個時候每一筆 training data 裡面的 weight 都是一樣
+都是 1
+
+這是非常合理的假設
+
+接下來在第 T + 1 個 iteration
+
+要 train 第 T + 1 個 classifier 的時候
+
+會把原來的 weight
+
+在第 t 個 iteration 的 weight u t 乘上
+exp ( - y n hat * (ft) * (alpha t))
+
+這件事情其實之前有講過了
+
+如果第 n 筆 classifier
+
+它被 classified 是正確的
+
+它的 weight 就會被下降
+
+如果它 classified 是錯誤的它的 weight 就會被上升
+
+怎麼增加和減少它的 weight 靠的是乘後面這一項
+
+前面在講 Adaboost 的 algorithm 的時候
+
+有解釋過為甚麼這個式子長這個樣子
+
+這 alpha t 跟 epsilon t 有關係
+
+把它寫在右上角
+
+總之第 t + 1 個時間點的 weight
+
+跟第 t 個時間點的 weight 之間有甚麼樣的關係
+
+如果要算第 T + 1 的 iteration 的時候的 weight
+
+要 train 第 T + 1 個 weak classifier 的 weight
+
+會不會算呢
+
+因為第一項是 1
+
+一開始是 1，接下來就一直乘 exponential 這一項
+
+所以其實我們只是把
+
+這些 exponential 這些項乘上 T 次而已
+
+這個大家應該沒有問題吧
+
+知道 t 跟 t + 1 的關係就是乘這一項
+
+從 u1 到 u (T+1) 中間
+
+就是乘了這個 exponential 項乘了 T 次
+
+如果要算 Z 的話
+
+Z 就是把每一筆 training data 的 u 通通 summation 起來
+
+所以只是在這個式子前面、這個式子前面加了 summation 而已
+
+接下來可以把連乘這一項放到 exponential 裡面
+
+有一大堆 exponential 相乘等於指數項相加
+
+所以可以把連乘這一項放到 exponential 裡面
+
+那 y hat 是指第 n 筆 training data 正確答案
+
+它跟 iteration 是完全沒有關係
+
+label 它跟 iteration 完全沒有關係
+
+所以 y hat 這一項可以被提出來
+
+總之 Z ( T + 1 ) 會寫成右下角這個式子
+
+右下角這個式子是甚麼
+
+這一項其實就是 g(x)
+
+所以這一項其實就是這一項
+
+所以這 Z ( T + 1 ) 它的 upper bound 是非常有關係的
+
+其實 training 的時候，error 的 upper bound 就是
+Z(T+1) / N
+
+你會發現 training data 的 weight 的 summation 居然是跟 error 的 upper bound 是有關係的
+
+接下來要證 weight 的 summation 會越來越小
+
+所有的 training data 的 weight 的 summation 會越來越小
+
+如果可以證明這件事的話
+
+遊戲就結束了
+
+Z1 是甚麼
+
+Z1 在第一次 train 第一個 classifier 的時候
+
+每一筆 training data 的 weight 都是 1
+總共有 N 筆 training data 所以 weight 是 N
+
+所以 Z1 = N
+
+那 Zt 呢
+
+Zt 跟 Zt - 1 中間
+
+有以下的這個關係
+
+要從 Z( t - 1 ) 變到 Zt 只要做以下這個運算就好
+
+這個運算是甚麼意思
+
+這個運算是先找出 Z ( t - 1 ) 裡面
+
+misclassified 的部分
+
+misclassified 的部分、分類錯誤的部分
+
+會被乘上 exp( alpha )
+
+分類正確的部分會被乘上 exp( - alpha )
+
+分類錯誤的部分有多少
+
+假設 Error Rate 叫做 epsilon t
+
+那分類錯誤的部分就是 Z ( t - 1 ) * epsilon t
+
+分類正確的部分就是 Z ( t - 1 ) * ( 1 - epsilon t )
+
+分類錯誤的部分會被乘上 exp( alpha t )
+
+分類正確的部分會被乘上 exp ( - alpha t )
+
+把這兩項加起來就得到 Zt
+
+現在知道 alpha t 是多少
+alpha t 的式子就寫在這邊
+
+把 alpha t 帶進去
+
+就得到 Zt = Z( t - 1 ) * (εt) * √( 1 - εt) /εt
++ Z ( t - 1 )(1 - εt)* √ εt / ( 1 - εt)
+
+合起來就是這個太容易了
+
+就把分子跟分母消一下
+
+得到 Z(t - 1) * 2 √ εt ( 1 - εt )
+
+其實從這一項就可以看出
+
+Zt 會比 Z(t - 1) 還要小
+
+εt 是 Error Rate
+
+Error Rate 一定小於 0.5
+
+最大就是 0.5
+
+所以 Z(t - 1) 後面乘的這一項是多少
+
+如果 εt = 0.5 的時候它最大
+
+所以 2√ εt ( 1 - εt ) 最大就是 1
+它沒有辦法比 1 還要更大
+
+Z( t - 1 ) 會乘上一個比 1 小的值變成 Zt
+所以 Zt 會小於 Z( t - 1)
+
+Z ( T + 1 ) 算出來的話是多少
+
+Z ( T + 1 ) 就是 Z1 的 N 乘上 T 項
+
+每一項都是 2 √  εt ( 1 - εt )
+
+所以 training 的 error 會越來越小
+
+因為 2 √ εt ( 1 - εt ) 是小於 1 的
+
+所以 Zt 會越來越小
+
+Zt 就是 upper bound 所以 upper bound 會越來越小
+
+所以 Error Rate 可能也會是越來越小
+
+這個證明就到這邊
+
+接下來講 Adaboost 神秘的現象
+
+這個神祕的現象是這個樣子
+
+這邊橫軸是 training 的 iteration
+
+找多少個 weak 的 classifier 來幫忙
+
+縱軸是 Error Rate
+
+比較低的這條線是在 training data 上的 Error Rate
+
+比較高的這條線是在 testing data 上的 Error Rate
+
+但神奇的是 training data 的 Error Rate
+
+其實很快就變成 0
+
+大概在 5 個 iteration 之後
+找五個 weak 的 classifier combine 在一起以後
+
+Error Rate 其實就已經是 0
+
+雖然 Error Rate 是 0
+
+五個 weak classifier 的 Error Rate 合起來是 0
+
+這邊要強調一下是五個 weak classifier 的 Error Rate 合起來是 0
+
+並不是單一一個 weak classifier 的 Error Rate 是 0
+
+單一一個 weak classifier 都很弱
+要五個合起來以後 Error Rate 才是 0
+
+事實上在 Adaboost 演算法裡面如果你想一下
+
+如果 weak classifier 的 Error Rate train 在 training data 上就已經是 0 了
+
+其實這演算法是會有問題的
+
+算一下那個 alpha 會發現是 undefine
+
+Adaboost 假設你的 train weak classifier 的 algorithm 沒有辦法讓 Error Rate 變 0
+
+如果變 0 的話這個演算法是會有問題的
+
+雖然加了更多 weak classifier 以後
+
+整體的 Error Rate 在 training data 上沒已下降
+
+但是在 testing data 上仍然是有下降
+
+這又是一件還頗神奇的事情
+
+在 training data 上的 error 已經沒有再下降了
+
+但是在 testing data 上的 error 仍然可以繼續下降
+
+classifier 已經可以把 training data 的每一筆都 classify 正確
+
+感覺已經沒有可以學的東西了
+它可以把 training data 都 classify 正確
+
+但是在加了更多的 weak classifier 以後
+
+居然 testing data error 還可以再下降
+
+為甚麼
+
+我們來看一下這個式子
+
+最後找到的 classifier 叫 H(x)
+
+它是一大堆 weak classifier combine 後的結果
+
+把 weak classifier combine 後的 output 叫作 g(x)
+
+把 g(x) 乘上 y hat
+
+定義為 margin
+
+我們希望 g(x) 跟 y hat 是同號
+
+如果是同號分類才正確
+
+不只希望它同號，希望它相乘以後越大越好
+
+不只是希望這個 g(x)
+
+如果 x 是 positive
+
+如果 y hat 是正的
+
+不只希望 g(x) 就是稍微大於 0
+0.000001
+
+希望它比 0 大的越多越好
+
+如果 y hat 是正的，g(x) 是 0.00001
+
+那一點的 error 就會讓分類錯誤
+
+只要一點 training data、testing data mismatch 就會讓分類錯誤
+
+但如果 y hat 是正的，而 g(x) 是一個非常大的正值
+
+那 error 的影響就會比較小
+
+如果從現象上來看一下 Adaboost margin 變化的話
+
+會發現如果只有五個 weak classifier 合在一起
+
+margin 的分佈是這個樣子
+
+如果有一百個甚至一千個 weak classifier 結合在一起的時候
+
+它的分佈就是黑色的實線
+
+會發現雖然 training data 上的 error 已經不會再下降
+
+五個 weak classifier 的時候就已經不會再下降
+
+因為所有的 training data 它的 g(x) * y hat 都是大於 0
+
+會發現 margin 的分布都是在右邊
+
+也就是 y hat 跟所有的 g(x) 同號
+
+但在加上 weak classifier 以後可以增加 margin
+
+增加 margin 的好處是讓你的方法比較 robust
+
+可以在 testing set 上得到比較好的 performance
+
+其實 SVM 也有類似的效果
+
+Adaboost 也有這個效果
+
+為甚麼可以讓 margin 增加
+
+這邊就是要說明一下為甚麼 Adaboost 可以讓 margin 增加
+
+剛才已經把 Error Rate 的式子列出來
+這是 Error Rate 的式子
+
+它是綠色這條線
+
+這個 Error Rate 的式子有個 upper bound 是紅色這條線
+
+這一項是紅色這條線
+
+這個 upper bound 其實會越來越小
+
+剛才證明對每一個 iteration 而言
+
+這個 upper bound 會越來越小
+
+雖然並沒有對 upper bound 做微分之類的事情
+
+並沒有對 upper bound 做微分、做 Gradient Descent 等等的事情
+
+但是會讓這個 upper bound 越來越小
+
+所以可以把 upper bound 想成就是 Adaboost 的 Objective Function
+
+所以 Adaboost 做的事情是 minimize 一個 Objective Function
+
+而這個 Objective Function 是紅色的這條線
+
+這邊還畫了別的方法的 Objective Function
+
+黃色這條線是 SVM 的 Objective Function
+
+綠色這條線是 Logistic Regression 的 Objective Function
+
+Adaboost 的 Objective Function 是紅色這條線
+
+紅色這條線有甚麼樣的特性
+
+如果是考慮這條線
+
+只要讓 y hat * g(x) 到這個圖的右邊 error 就是 0
+
+到右邊以後如果讓 y hat * g(x) 再更靠右
+
+也沒什麼好處 error 不會下降
+
+但你看 Adaboost，其實 SVM 跟 Logistic Regression 也有同樣的效果
+
+看 Adaboost 這條線，當 y hat、g(x) 同號在右邊的時候
+
+error 並不是 0
+
+可以把 y hat 跟 g(x) 繼續再往右還是可以得到越來越小的 error
+
+所以就算是現在 Error Rate 算出來已經是 0 了
+
+對 Adaboost 來說還沒有結束
+
+還可以再做得更好
+
+因為它可以把 g(x) * y hat 再更往右邊推然後得到更小的 error
+
+這個是 Adaboost 為甚麼會 increase 這個 margin
+
+最後這一頁是個實作
+
+實作一下 Adaboost + Decision Tree
+
+Decision Tree 的深度就設為 5
+
+把很多深度只有 5 的 Decision Tree 集合起來
+
+看看他們可以變甚麼樣子，之前有講過
+
+深度是 5 的 Decision Tree 沒有辦法
+
+我們之前用的是初音的 function
+
+它沒有辦法 fit 一個初音的 function
+
+就算做 Bagging、做 Random Forest
+
+也沒有用 Random Forest 它本來要做的事情
+
+就並不是要讓不同 weak classifier 之間可以互補
+
+它只要讓強的 classifier varience 不要那麼大而已
+
+但是 Adaboost 不一樣它可以讓 weak classifier 彼此之間是互補
+
+所以就算是深度是 5 的 Decision Tree
+
+一棵沒有辦法 fit 出一個 function
+
+如果找了十棵，這邊 T = 10 代表 Adaboost iteration 跑了十次
+
+有十棵深度是 5 的 Decision Tree
+
+這些 Decision Tree 互相之間是互補的
+
+跟 Random Forest 不一樣
+
+這十棵 Decision Tree 是互補的
+
+如果是 Random Forest 找十棵一百棵都 fit 不了初音這個 function
+
+但是如果找十棵 tree 彼此之間是互補的就可以得到比較好的結果
+
+這是個初音的 function，你可以看到初音的樣子，可是他的腳是歪的
+
+如果有二十棵樹就可以做得好很多了
+
+只是這邊腳的地方還是有點奇怪的東西
+
+如果五十棵樹，幾乎就可以 fit 初音的 function
+
+但其實這樣還沒有結束因為這邊其實要有一根毛
+
+要把那根毛做出來才行
+
+如果用一百棵樹的話就可以幾乎完美的 fit 初音的 function
+
+從這個例子可以看到 Boosting 跟 Bagging 是不一樣的
+
+接下來講的是 Gradient Boosting
+
+Gradient Boosting 它是剛才那個 Boosting 演算法更 general 的版本
+
+整個 Boosting 演算法 in general 可以看成是
+
+以下這樣的 algorithm
+
+現在跑 T 個 iteration
+
+每次在 T 個 iteration 裡面
+
+找一個 function ft 跟 alpha t
+
+找一個 weak classifier ft 跟它的 weight alpha t
+
+這些人合在一起會 improve 一個 g t-1
+
+g t-1 是甚麼
+
+g t-1 是把過去所有的已經找出來的 function
+
+把過去所有已經找出來的 function 根據 weighted sum 的結果
+
+就是這個 g t-1
+
+已經有一個 g t-1 了
+
+要找一個 ft 跟 alpha t 跟 g t-1 是互補的
+
+把這個 ft 跟 alpha t 加到 g t-1 以後
+
+變成了 gt 了
+
+會比原來的 g t-1 更好
+
+最後跑完 T 個 iteration 就得到 H(x)
+
+問題是怎麼找到比較好的 g(x)
+
+怎麼樣找到一個 ft 把它加到 g t-1以後得到的 gt 是比較好的
+
+要為 g 設一個目標
+
+在做 Machine Learning 的時候要設一個 Objective Function
+
+接下來就是調整參數去 maximize Objective Function 或是 minimize Cost Function
+
+現在要做的就是 minimize Cost Function
+
+這 Cost Function 怎麼寫
+
+對某一個 function g 它的 Cost Function 怎麼寫
+
+寫成 summation over 所有的 training data n
+
+小 L 是 Loss Function
+
+小 L 這個 function 是算 y hat 跟 g(x) 他們之間的差異
+
+比如說可以用 Cross Entropy 或 Mean Square Error 等等
+
+來計算 y hat 和 g 之間的差異
+
+把小 L 定為 exp( - y hat * g(x))
+
+這個定義合不合理
+
+這個定義應該是合理的，因為如果要 minimize 它的話
+
+minimize exp( - y hat * g(x))
+
+希望 y hat 跟 g(x) 儘量同號
+
+而且他們同號相乘的時候要越大要越好
+
+那怎麼 minimize 這個 function g
+
+這一步可能需要稍微地想一下
+
+這件事情比較抽象可是其實要用 Gradient Descent
+
+來找一個新的 function gt
+
+它可以 minimize Loss Function L
+
+要把 g 這個 function 對 L 做微分
+
+算出它的 Gradient
+
+這邊 notation 好像沒有用的很好
+
+這邊我應該是寫三角形比較對
+
+沒關係大家知道我的意思
+
+要把 function g 對 L 算它的 gradient
+
+然後再用這個 gradient 去 update g t-1 得到 gt
+
+這樣新的 gt 跟原來的 g t-1 比起來它會讓 Loss Function 比較小
+
+這樣大家知道我的意思嗎
+
+我猜這邊你一定一下又卡住了
+
+甚麼叫拿一個 function 對 L 做 gradient
+
+function g 又不是參數
+
+對不對，如果是 Neural Network 參數 theta
+
+你知道怎麼對 L 算 gradient
+
+但是如果是一個 function g
+
+它要怎麼對 L 做 gradient
+這個地方
+
+你可以這樣想
+其實一個 function g(x)
+
+假設橫坐標就是 x
+
+它其實是高維不過這邊就意思一下
+
+其實一個 function 比如說它長這個樣子就是 g(x)
+
+你可以想成它的每一點就是一個參數
+
+這樣大家可以想像嗎
+
+取一個 x1
+
+得到一個 g(x1)
+
+取一個 x2
+
+得到一個 g(x2)
+
+假設 x 取的非常非常的密
+
+那其實 g(x) 就是一個 vector
+
+這個 g 就是一個 vector g(x1)
+
+g(x2)
+
+......
+
+它就是一個 vector
+這個 vector 就是這個 function 的參數
+
+可以調整參數就改變了這個 function 的形狀
+
+你可以決定這個 function 的形狀是甚麼
+
+你就調整這些參數這個 function 的形狀就變了
+
+其實可以把一個 function 想成它其實就是有無窮多的參數
+
+大家可以想像嗎
+
+反正我既然可以接受它是參數的話
+就可以把它對 L 做偏微分
+
+還是可以說我如果改變 g 在某一個點的位置
+
+它對 L 的影響有多小、有多大
+
+所以還是可以算出 g 對 L 的偏微分
+
+這個是如果從 Gradient Descent 的角度來考慮的話是這樣子
+
+如果從 Boosting 角度來看得話
+Boosting 做的事情是找一個 ft 跟 alpha t
+
+加到 g t-1 後變 gt
+
+怎麼找這個 ft 跟 alpha t
+
+就會希望 ft 跟 alpha t 這一項
+
+其實就是這一項
+
+或者是至少他們的方向
+
+要是一樣的，因為前面還有乘一個 Learning Rate
+
+這兩個式子一模一樣其實沒有必要但是
+
+希望他們的方向是一樣的
+
+如果 ft 的方向跟這個微分的方向一致的話
+
+把這個 ft 加給 g t-1
+
+就可以讓新的 gt loss 變小
+
+這個是比較抽象的部分
+
+假設定義 L 就是長樣子的話那對 g 做偏微分得到的值是多少
+
+把 L 對 g 做偏微分
+
+這邊是 exp( - y n * g(x))
+
+這邊是 exp (  - y n *g (t-1) )
+
+把它對 g 做偏微分得到的值是多少
+
+exponential 的部分做偏微分以後是不變的
+
+g 其實是我們的參數
+
+對 exponential 的指數項做微分的話
+
+這邊得到的是 - y hat
+
+前面這邊有一項符號我把它拿下來，這邊省略掉了 Learning Rate
+
+負號是可以消掉的
+
+所以得到了這樣的式子
+
+會希望 ft 跟這個式子的方向越一致越好
+
+所謂的方向越一致越好是甚麼意思
+
+每一個 function 都可以把它想成是一個 vector
+只是這個 vector 有無窮多維
+
+ft 是一個 vector 它有無窮多維
+
+這個也是一個 vector 這個 vector 有無窮多維
+
+如果你覺得無窮多維很難想像的話，可以只考慮 training data 有出現的 x
+
+那它的維度就是有限的，training data 一百萬筆 data 它就是一百萬維
+
+希望 ft 跟這個式子他們的的方向越一致越好
+
+怎麼讓它越一致越好
+
+因為 ft 是我們要找的目標
+
+我們要找出 ft
+
+要怎麼找 ft
+
+要找這個 ft 希望如果把 ft 乘上這一項
+
+這個值要越大越好
+
+如果這個值越大越好就代表 ft 跟這個式子
+
+他們的方向越一致
+
+這個式子要怎麼看
+
+這個式子可以想成對每一筆 training data 都希望 y hat 跟ft 他們是同號的
+
+然後每一筆 training data 前面都乘上了一個 weight
+
+這個 weight 是 u 上標 n 下標 t
+
+都乘上一個 weight 這個 weight 是 exp( - y hat * g (t-1))
+
+這個 weight exp ( - y hat * g t-1(x n )) 到底是甚麼
+
+把 g t-1 的式子帶進去
+
+g t-1 是一堆小 f 乘上它的 weight 的 summation
+
+然後再把相加的這一項提出來
+
+變成連乘
+
+就會發現這個 weight exactly 就是 Adaboost 的 weight
+
+所以找出來的這個 ft
+
+其實就是 Adaboost 裡面找出來的 f
+
+所以 Adaboost 裡面找一個 weak classifier ft 的時候
+
+可以想成好像在做 Gradient Descent 一樣
+
+有了這個 ft 把這個 ft 加到 g 裡面
+
+會讓 g 的 loss 變小
+
+再來的問題就是怎麼決定 alpha t
+
+這個 alpha t 的作用就很像是 Learning Rate 一樣
+
+在一般做 Gradient Descent、train Neural Network 的時候
+
+Learning Rate 就是設個 fix 的值或者是用種種比如說
+
+adaptive Learning Rate 的設法來設它
+
+但是這邊做的事情是給定了 ft 以後
+
+窮舉各種不同可能的 alpha、去試不同可能的 alpha
+
+看看哪一個 alpha 可以讓 gt 最小
+
+找完 ft 以後把 ft 固定下來試不同的 alpha
+
+看哪一個 alpha 可以讓 gt 的 loss 更小
+
+為甚麼這邊會選擇這樣的做法
+
+因為在做 Gradient Descent、在 train Neural Network 的時候
+
+算參數的 gradient 都是比較快的
+
+所以你可能不會稀罕說你的 Learning Rate 設得好不好
+
+如果 Learning Rate 設得太小
+
+反正就多算幾次 gradient、多跑幾次就行
+
+但是 Gradient Boosting 的方法裡面
+
+ft 是一個 classifier
+
+在找 ft 的過程中它的運算量可能就是很大的
+
+甚至如果 ft 是個 Neural Network
+
+要把 ft 找出來的時候本身就需要很多次的 Gradient Descent 的 iteration
+
+既然找出了 ft 以後就要好好的珍惜它
+
+把它的利用價值發揮到最大
+
+這邊 Gradient Boosting 採取的方式是
+
+既然已經找出 ft，固定住 ft 然後
+
+硬調一個最好的 Learning Rate alpha t
+
+窮舉所有的 Learning Rate alpha t
+
+看哪一個 alpha t 可以讓 loss 掉最多
+
+實際上不可能窮舉所有的 alpha t 一個一個去試試看
+
+這邊做的事情其實就是
+
+解一個 optimization 的 problem
+
+看哪一個 alpha t 可以讓 loss 最小
 
 怎麼做
-很簡單就先隨機的找一個初始的 θ0
+這邊就把 equation 略過
 
-隨機找一個初始的 Actor
-然後計算在使用初始的 Actor 的情況下
+實際上做的事情就是
 
-你的參數對 Rθ bar 的微分
+計算 alpha t 跟 L(g) 的微分
 
-算出你的參數對 Rθ bar 的微分
+然後再看 alpha t 的值是多少的時候這個微分是 0
 
-再去 update 你的參數得到 θ1
+這樣就可以把極值找出來
 
-接下來再算 θ1 對 Rθ bar 的微分
+巧合的是找出來的 alpha t
 
-然後再 update θ1 得到 θ2
+就是 ln√( 1 - εt)/εt
 
-用這個 process 最後就可以得到一個可以讓 Rθ bar 最大的 Actor
+就是 Adaboost 裡面的那個 weight
 
-當然會有 local optimum 種種問題，就跟做 Deep Learning 的時候是一樣的
+所以 Adaboost 整件事情
 
-所謂的 Rθ bar 的 gradient 是甚麼
+就可以想成它也是在做 Gradient Descent
 
-假設 θ 裡面就是一堆參數，有一堆 weight 有一堆 bias
+只是 Gradient 是一個 function
 
-就是把所有的 weight、所有的 bias 都對 Rθ bar 做偏微分，把他通通串起來變成個 vector
+Learning Rate 有一個很好的方法
 
-就是這個 gradient
+可以決定 Learning Rate
 
-接下來就是實際來運算一下
+Gradient Boosting 有一個想法好的地方是
 
-如果要計算 Rθ bar 的 gradient
+可以任意更改 Objective Function
 
-那 Rθ bar = summation over 所有的 τ 
-R( τ ) * P( τ | θ )
+我們剛才定了一個 Objective Function
 
-這個 R(τ) 跟 θ 是沒任何關係的
+是 exp(- y hat * g(x))
 
-只有 P( τ | θ ) 跟 θ 才是有關係的
+你永遠可以定其它的 Objective Function
 
-所以做 gradient 的時候只需要對 P( τ | θ ) 做 gradient 就好
+就可以創造出不一樣的新的方法
 
-R(τ) 不需要對 θ 做 gradient
+最後一個我要講的 ensemble 方法是 Stacking
 
-所以 R(τ) 就算是不可微的
+Stacking 是甚麼
+Stacking 非常實用我覺得
 
-也沒差因為本來就沒有要微分他
+final project 裡面非常實用的方法
 
-就算 R(τ) 他是個黑盒子
-不知道他的式子
+現在到了期末大家都很忙
 
-只知道把 τ 帶進去，R 的 output 會是甚麼也無所謂
+一組其實有四個人
 
-也能夠做
-因為我們在這邊完全不需要知道
+可能就四個人每個人都弄了一個自己的 model
 
-這邊就算 R(τ) 不可微
+選好一個 final project 題目後四個人都弄了一個自己的 model
 
-或者是不知道他的 function 也沒差
-因為不需要對它做微分
+但最後要怎麼讓 performance 再提升
 
-根本就不需要知道他長甚麼樣子
+就要把四個人的 model combine 起來
 
-我們只需要知道把 τ 放進去的時候他 output 的值會是多少就行了
+比如說把一把 data x 丟到四個 model 裡面
 
-他可以完全徹頭徹尾就是個黑盒子
+然後每一個 model 都會給你一個 output
 
-實際上對我們來說 R(τ) 也確實徹頭徹尾是個黑盒子
+再把這四個 output 想辦法把它合併起來得到最終的答案
 
-因為 R(τ) 是取決於
+假設是個分類的問題的話可以用 Majority Vote
 
-我們會得到多少 reward
-那個 reward 是環境給我們的
+最多系統選擇哪個 class 那那個 class 就是正確答案
 
-所以我們通常對環境是沒有理解
+今天會遇到的問題是並不是所有的系統都是好
+並不是所有的 model 都是好
 
-比如說在玩 Atari 的遊戲裡面
+有一些 model 可能是爛的，比如說可能小毛特別弱
 
-reward 是 Atari 的那個程式給我們的
+它做的系統是跟 random 一樣
 
-如果程式是有一些隨機的東西的話
+所以如果把它系統權重跟其它系統設一樣
 
-會根本搞不清楚程式的內容是甚麼
+那這樣不行這樣整個 performance 會壞掉
 
-其實就根本不知道 R(τ) 是長甚麼樣子
+但如果你本來就知道小毛特別弱，把他的權重設的很低的話
 
-不過反正你不需要知道他長甚麼樣子
-
-接下來怎麼做
-
-接下來要做一件事情
-做這件事情是為了要讓 P( τ | θ ) 出現
-
-把 P( τ | θ ) 放在分子的地方也放在分母的地方
-
-等於甚麼事都沒有做
-
-接下來這一項會等於這一項
-
-為甚麼
-
-dlog(f(x)) / dx = (1 / f(x)) * (df(x) / dx)
-
-所以對 log  P( τ | θ ) 做 gradient
-
-等於對 P( τ | θ ) 做 gradient 再除以 P( τ | θ )
-
-所以這一項就是這一項
-
-如果你看到 summation over 所有的 τ 再乘上 P( τ | θ ) 的話
-
-當看到紅色這個框框的時候可以把它換成 sampling
-
-所以這件事情可以換成拿 θ 玩 N 次遊戲得到 τ1 到 τN
-
-對 τ1 到 τN 都算出他的 R(τ)
-
-再 summation over 所有的 sample 出來的結果再取平均
-
-接下來的問題是怎麼計算這一項
-
-怎麼計算 log * P( τ | θ ) 的 gradient
-
-這一項也不難算可以很快地帶過去
-
-要算這一項要知道 P( τ | θ )
-
-怎麼算 P( τ | θ )
-
-首先要知道 P( τ | θ ) = p(s1)  也就是遊戲開始的畫面的出現的機率
-
-像 Space Invader 我記得每一次開始的畫面都是一樣的
-
-所以 p(s1) 就是只有某一個畫面的機率是 1
-其他都是 0
-
-有一些遊戲的畫面每次的起始畫面是不一樣的
-
-這邊需要有個機率
-
-接下來根據 θ
-
-在 s1 會有某一個機率採取 a1
-
-接下來根據在 s1 採取 a1 這件事情
-
-會得到 r1 然後跳到 s2
-這中間是有個機率的，取決於那個遊戲
-
-接下來在 s2 採取 a2 這個機率取決於你的 model θ
-
-接下來看到 s2 a2 得到 r2 s3
-
-這也是取決於那個遊戲
-
-所以整個畫起來就是這個樣子
-
-其中某些項跟 agent、Actor 是沒有關係的
-
-只有畫紅色底線這一項跟 Actor 是有關係的
-
-接下來就取 log
-
-取 log 就只是相乘變相加而已
-
-接下來可以對 θ 做 gradient
-
-跟 θ 無關的項
-
-跟 agent 無關的項只取決於遊戲的主機
-
-遊戲的部分那一項就可以直接被刪掉
-
-這兩項都跟 gradient 是無關的
-
-這一項可以刪掉，這一項可以刪掉
-
-只剩下這個部分
-
-所以最後算出來的結果就是
-
-Rθ bar 的 gradient
-
-它可以被 approximate 甚麼樣子
-
-sample 出 N 個 τ，每一個 τ 都算出他的 reward 再乘上每一個 τ 的出現的機率的 log 的 gradient
-
-出現的機率的 log 的 gradient 又可以把他算成是
-
-summation over 在這個 τ 裡面
-所有採取過的 action
-
-他的機率取 log 的 gradient
-
-這一項就等於這一項我只是把他置換一下
-
-把這個 summation 移出去
-把這個 R 乘進來
-
-可以寫成這樣的式子
-
-這個式子告訴我們甚麼
-
-這個式子告訴我們，現在要做的事情
-假設在 data 裡面
-
-在 s 上標 n 下標 t 這個 state
-
-我們曾經採取了 a 上標 n 下標 t 這個 action
-
-就計算這件事情根據我們的 model 現在發生的機率
-
-然後把它取 log 然後計算它的 gradient
-
-這項 gradient 前面會乘上一項
-乘上這一項是
-
-這一個 trajectory 在那一次玩遊戲裡面
-
-在看到這個 s 產生這個 a 的那一次遊戲裡面總共得到的 Total Reward
-
-這整個式子其實是非常直覺的
-
-用這一項去 update model 其實是非常直覺的
-
-因為它的意思是說
-假設某一次玩遊戲的過程中
-
-在 τn 這次玩遊戲的過程中
-
-我們在 s 上標 n 下標 t 採取 action a 上標 n 下標 t
-
-而最後導致的結果是整個遊戲的 R(τ) 是正的
-
-得到一個正的  reward
-就會希望說這個機率是越大越好
-
-我在某一次玩遊戲的時候
-我在看到某一個 observation 的時候
-
-採取某一個 action
-
-而最後整個遊戲得到好的結果
-
-就要調整我們的參數
-讓在這個 observation
-
-採取那個 action 的機率變大
-
-反之如果在玩遊戲的過程發現
-
-在某一個 state 採取某一個 action
-結果發現得到的 reward 居然是負的
-
-在之後看到同樣的 state 的時候、同樣的 observation 的時候
-
-我們就希望採取會讓我們看到 negative reward 的那個 action 它的機率變小
-
-這整個式子是非常直覺的
-
-這邊要注意的事情是
-
-這一項是在某一個時間點 t
-
-的 observation 採取的某一個 action
-
-但是我們必須要把它乘上整個 trajectory 的 reward
-
-而不是採取那個 action 以後所產生的 reward
-
-這件事情也是非常直覺
-直覺想就應該這麼做
-
-假設現在不是考慮整個 trajectory 的 reward
-
-而是考慮採取 action a 上標 n 下標 t 以後得到的 reward r 上標 n 下標 t 的話
-
-那會變成說
-
-只有 fire 會得到 reward
-
-其他的 action 只要採取 left 或 right 的移動
-得到的 reward 都是 0
-
-所以 machine 就永遠不會想要讓 left 跟 right 產生的機率增加，它只會讓 fire 機率增加
-
-所以 learn 出來的 agent 就只會一直在原地開火
-
-這個式子其實是很直覺的
-
-這邊還有一個問題就是為甚麼要取 log
-
-這件事情也是有辦法解釋的
-
-你看這一項它其實就是對 p 的微分再除掉 p 的這個機率
-
-它是微分再除掉機率
-
-你可能會想說加這一項多不自然
-
-把這一項就直接換成分子這一項不是感覺很好嗎
-
-為甚麼下面還要除一個 p( a | s ) 的機率
-
-你想想看這件事情是很有道理
-
-假設現在讓 machine 去玩 N 次遊戲
-
-那某一個 state 在第 13 次、第 15 次、第 17 次、第 33 次的遊戲裡面
-
-看到了同一個 observation
-
-因為 Actor 其實是 stochastic
-
-所以它有個機率，所以看到同樣的 s，不見得採取同樣 action
-
-所以假設在第 13 個 trajectory
-
-它採取 action a，在第 17 個它採取 b
-
-在 15 個採取 b
-在 33 也採取 b
-
-然後最後 τ 13 的這個 trajectory 得到的 reward 比較大是 2
-
-另外三次得到的 reward 比較小
-
-但實際上在做 update 的時候
-
-它會偏好那些出現次數比較多的 action
-
-就算那些 action 並沒有真的比較好
-
-對不對，因為是 summation over 所有 sample 到的結果
-
-如果 take action b 這件事情
-
-出現的次數比較多，就算它得到的 reward 沒有比較大
-
-machine 把這件事情的機率調高
-
-也可以增加最後這一項的結果
-
-雖然這個 action 感覺比較好
-
-但是因為它很罕見，所以調高這個 action 的機率
-
-最後也不會對你要 maximize 的對象 Objective 的影響也是比較小的
-
-machine 就會變成不想要 maximize action a 出現的機率
-轉而 maximize action b 出現的機率
-
-這就是為甚麼這邊需要除掉一個機率
-
-除掉這個機率的好處就是做一個 normalization
-
-如果有某一個 action 它本來出現的機率就比較高
-
-它除掉的值就比較大
-
-讓它除掉一個比較大的值
-
-machine 最後在 optimize 的時候
-
-就不會偏好那些機率出現比較高的 action
-
-這個聽起來都很 ok，但是這邊有一個問題
-
-什麼樣的問題
-
-假設 R(τ) 永遠是正的
-
-會發生甚麼事呢
-
-因為像玩 Space Invader
-
-得到的 reward 都是正的，殺了外星人就得到正的分數
-
-最糟就是殺不到外星人得到分數是 0
-
-所以這個 R(τ) 永遠都是正的
-
-在理想的狀況下
-
-這件事情不會構成問題
-為甚麼
-
-假設在某一個 state 可以採取三個 action a b c
-
-那這三個 action 採取的結果
-
-我們得到的 R(τ) 都是正的
-
-這個正有大有小
-
-假設 a 跟 c 的 R(τ) 比較大
-
-b 的 R(τ) 比較小
-
-經過 update 以後
-
-還是會讓 b 出現的機率變小
-
-a c 出現的機率變大
-
-因為這邊是個機率，所以它會做 normalization
-
-或是你為了要讓它機率裡的最後 network 的 output
-它是 soft-max layer
-
-就算是在算 gradient 的時候
-
-你想讓這三個的機率會增加
-
-但是增加量比較少的那個
-
-最後它的機率其實是會減少
-
-聽起來不太成一個問題
-
-但實作的時候，我們做的是 sampling
-
-所以某一個 state 可以採取 a b c 三個 action
-
-但是有可能只 sample 到 b 這個 action
-c 這個 action
-
-而 a 這個 action 就沒 sample 到
-
-很有可能 sample 就幾次而已
-
-所以可能 a 這個 action machine 從來沒玩過它、沒試過它，不知道它的 R(τ) 到底有多大
-
-這個時候就遇到問題了
-因為 b 跟 c 機率都會增加
-
-a 沒 sample 到，沒 sample 到機率就自動減少
-
-被 sample 到的在做玩 gradient 後的機率自動就會增加
-
-這樣就變成問題了
+就傷了他的自尊心
 
 所以怎麼辦
-這邊有一個很簡單的想法就是
+要去 learn 一個 classifier
 
-我們希望 R(τ) 有正有負
+這個 classifier 是這樣，它把前面這些 system 的 output
 
-不要都是正的
-怎麼避免都是正的呢
+當作 input，也就是說這些 system 的 output
 
-要把 R(τ) 減掉一個 bias
+對最後這個 classifier 來說就好像是個 feature 一樣
 
-這個 bias 其實要自己設計
+它把這些 system 的 output 當作 feature 再決定最終的結果是甚麼
 
-到底應該要放甚麼值
-設計一下這個 bias
+這個最終的 classifier 就不需要太複雜
 
-讓你的 R(τ) 都是正的
-減掉一個正的 bias 讓它有正有負
+最前面如果都已經用好幾個 Hidden Layer 的 Neural Network 了
 
-如果你的 trajectory 某一個 τn 它是特別好的
+也許 final classifier 就不需要再好幾個 Hidden Layer 的 Neural Network
 
-這個 b 叫做 baseline，它好過 baseline 才把那個 action 的機率增加
+它可以只是 Logistic Regression 就行了
 
-小於 baseline 把它 action 的機率減小
+那在做這個實驗的時候要注意
 
-這樣子就不會造成某一個 action 沒被 sample 到它的機率就會變小
+我們會把有 label 的 data 分成 training set 跟 validation set
 
-因為快要下課了所以不見得要講玩 Critic
+在做 Stacking 的時候要把 training set 再分成兩部分
 
-Critic 是甚麼
-Critic 就是
+一部份的 training set 拿來 learn 這些 classifier
 
-learn 一個 network 它不做事
+另外一部分的 training data 拿來 learn 這個 final classifier
 
-其實也可以從 Critic 得到一個 Actor
+為甚麼要這麼做? 因為有的 classifier
 
-這個東西就是 Q Learning
-但今天就沒辦法講 Q Learning
+有的要來做 Stacking 的前面 classifier
 
-Critic 就是這樣子
-learn 一個 function
+它可能只是 fit training data
 
-這個 function 可以告訴你
-現在看到某一個 observation 的時候
+舉例來說可能小明的 code 就是亂寫的
 
-這個 observation 有多好這樣子
+其實它的 classifier 甚麼事都不會做
+它的 classifier 就是
 
-比如說看到這樣子的 observation
+如果有一筆 data 進來跟 training data 一樣它就把它 label 找出來
 
-把它丟到 Critic 裡面去
-它可能會 output 一個很大的正值
+不然就甚麼事都沒有做
 
-因為還有很多 alien 可以殺
-所以會得到很高的分數
+它可能寫一個很奇怪、很爛的、很異常 overfitting 的 code
 
-看到這個狀況可能較會得到相對比較少的值
+如果 final classifier 的 training data
 
-因為 alien 變得比較少而且屏障消失了
+跟這些 system 用的 training data 是同一組的話
 
-這是屏障，屏障消失了，所以你可能很快就會死，分數就比較少
+就會發現喔小明的 classifier 好強 Error Rate 是 100%
 
-總之 Actor 跟 Critic 可以合在一起 train
+都參考小明的 classifier 就好
 
-合在一起 train 的好處就是簡單講這樣比較強這樣子
+但其實小明的 classifier 其實甚麼事都沒有做
 
-這個不一定要在這堂課解釋完
+它只是硬把 training data 記起來而已
 
-永遠可以留到下學期 MLDS 再講這樣子
+所以在 train final classifier 的時候必須要用另外一筆 training data 來 train final classifier
 
-最後這後面還有很多
+不能跟前面 train 系統的 classifier 一樣
 
-最後只想 demo 一下到底如果用 Actor Critic 這種方法
+如果有 final classifier 就可以給不同的系統不同的權重
 
-可以做到什麼樣的地步
+如果小毛的系統特別差的話
 
-現在用 Actor Critic 這些東西大家都在玩 3D 遊戲了
+那 final classifier 就會給它比較小的權重
 
-這個就是 machine 自己 learn 的
-然後它會走它沒有看過的迷宮
+比如說是 0 這樣
 
-它會知道要去吃綠色的平果
+這樣小毛的自尊心其實還是會被傷害
 
-machine 看到的，雖然這是個 3D 遊戲，它看到的就是 pixel，跟我們人一樣
+只是它是被機器傷害所以就可以維護團隊和諧
 
-所以用 A3C 可以硬玩這種遊戲
-這個是硬玩一發賽車遊戲
-
-硬開個賽車
-
-它看到的就是 pixel 跟人一樣
-
-我記得它的 reward 是速度，速度越快 reward 就會越高
-
-所以它會拼命想要加速，那撞到東西就會減速，它會避免撞到東西
-
-比如說前面有些車然後它就避開
-
-所以最後的結果是滿驚人的
-
-這學期上課就上到這邊
-
-我本來想要講一個感性的結論
-但是沒有甚麼感性的結論
-
-已經快下課了不太好講甚麼感性的結論
-
-那我想要講一下
-
-其實這學期有個東西沒有教，知道是甚麼嗎
-
-是 Machine Learning 裡面比較偏向統計理論的部分
-
-比如說 VC-dimension
-
-但是電機系未來會有其他課教 Machine Learning 裡面比較統計的部分
-
-就我所知王老師有要開統計與機器學習
-
-但是它會講比較偏向統計理論的東西
-
-所以這學期內容是沒有有關統計理論的部分
-
-然後如果覺得我教的太簡單了
-
-那你就可以去聽王老師的課
-
-如果你覺得我教的太難了，聽不懂
-
-沒有關係，余老師要開機器學習導論是給大學生的
-
-所以以後可以先修機器學習導論
-
-以後電機系會有很多機器學習的課
-
-我上課的內容跟軒田的機器學習的基石還有技法
-
-其實我是盡量有錯開的
-
-就算你是修過基石和技法
-
-相信你在這門課裡面應該也是有聽到不少東西
-
-或者是你之後再去聽基石跟技法
-
-你會發現我講的東西跟軒田講的東西，其實是我盡量做到沒有太多東西重複
-
-這學期上課就上課這邊，謝謝大家
+最後這一頁講過了
 
 臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心

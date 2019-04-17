@@ -2,1865 +2,2485 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-deep learning 現在非常的熱門
+好，我們來講 Logistic Regression
 
-所以，它可以用在甚麼地方
+在 Logistic Regression 裡面呢
 
-我覺得真的還不需要多講
+我們在上一份投影片裡面，我們都已經知道說
 
-我覺得大家搞不好都知道得比我更多
+我們要找的東西呢，是一個機率
 
-我相信如果你隨便用 deep learning 當作關鍵字
+是一個 Posterior probability
 
-胡亂 google 一下
+如果這個 Posterior probability > 0.5 的話
 
-你就可以找到一大堆的、exciting 的 result
+就 output C1，否則呢，就 output C2
 
-所以，我們就直接用這個圖呢
+我們知道這個 posterior probability
 
-來簡單地 summarize 一下這個趨勢
+假設你覺得你想要用 Gaussian 的話
 
-這個圖呢，是 google 的 Jeff Dean
+其實很多其他的 probability，化簡以後
 
-它在 sigmoid 的一個 keynote speech 的一張投影片
+也都可以得到同樣的結果
 
-那這個圖想要表達的事情是這樣
+假設你覺得你想要用 Gaussian 的話
 
-橫軸代表時間
+那你就說，你可以說這個
 
-從 2012 的 Q1 到 2016
+posterior probability 就是 σ(z)
 
-縱軸，代表說在 google 內部
+它的 function 長的是右邊這個樣子
 
-有用到 deep learning 的 project 的數目
+那這個 z 呢，是 w 跟 x 的 inner product 加上 b
 
-那可以發現說，這個趨勢
+所謂 w 跟 x 的 inner product 呢，是說
 
-是從幾乎 0 到超過 2000
+這個 w，它是一個 vector
 
-所以，這個使用 deep learning 的 project 數目呢
+它的每一個 dimension 我們就用下標 i 來表示
 
-是指數成長的
+那這個 w 呢，是一個 vector
 
-那如果你看它的應用的話
+每一個 x，都有一個對應的 w 下標 i
 
-它有各種不同的應用，涵蓋幾乎你可以想像的領域
+你把所有的 xi 跟 (w 下標 i) 相乘
 
-比如說，Android, Apps, drug discovery
+summation 起來再加上 b，就得到 z
 
-Gmail, Image understanding, 
-Natural language understanding
+代進這個 sigmoid function
 
-Speech, 各種不同的應用
+就得到機率
 
-通通有用到 deep learning
+所以，我們的 function set 是長這樣子
 
-那 deep learning 可以做的應用實在是太多了
+我們的 function set,  f(下標 w, b) (x)
 
-我們這邊就不要花時間來講這些東西
+這邊加下標 w, b 的意思就是說
 
-如果要講這些東西的話呢
+我們現在的這個 function set 是受 w 和 b 所控制的
 
-再用兩、三堂課，其實也是講不完的
+就是你可以選不同的 w 和 b，你就會得到不同 function
 
-那這個隨便 google 就有的東西呢，我們就不要再講了
+所有 w 和 b 可以產生的 function 集合起來
 
-我們來稍微回顧一下
+就是一個 function set，那這一項
 
-這個 deep learning 的歷史
+它的涵意呢，就是一個 posterior probability
 
-在歷史上呢，它是有經過好幾次的沉沉浮浮
+given x，它是屬於 C1 的機率
 
-首先，在 1958 年
+如果我們用圖像化的方式來表它的話呢
 
-有一個技術叫做 Perceptron 被提出來
+它長這樣
 
-Perceptron 這個技術，它也是一個 linear 的 model
+我們的 function 裡面，有兩組參數
 
-它非常非常像
+一組是 w，我們稱之為 weights
 
-我們在前一堂課講的 Logistic Regression
+weights 呢，有一整排
 
-它只是沒有 sigmoid 的部分
+然後有一個 constant b
 
-但它還是 linear 的 model
+這個我們稱之為 bias
 
-那一開始，有人提出這個想法的時候
+然後有一個 sigmoid function
 
-提出 Perceptron 這個想法的時候呢
+如果我們今天的 input 是 x1, xi 到 xI
 
-大家非常非常的興奮
+你就把 x1, xi, xI 分別乘上 w1, wi, wI
 
-這個是 Frank Rosenblatt
+然後再加上 b 呢，你就得到 z，這個 z
 
-在海軍的 project 裡面提出來的
+我發現我寫錯了一個地方，後面這邊呢，應該是要 + b
 
-他一開始提出來的時候，大家覺得非常非常興奮
+你把  x1*w1 + xi*wi 加到 xI*wI，再加上 b，就得到 z
 
-那個時候要做 Perceptron 的運算呢
+z 通過我們剛才得到的 sigmoid function
 
-如果你看 Bishop 的教科書，裡面有一張的機器呢
+它 output 的值，就是機率，就是 posterior probability
 
-看起來是房間那麼大的機器
+這個是整個模型，長這個樣子
 
-那個時候，New York Times 據說還寫了一個報導說
+這件事呢，叫做 Logistic Regression
 
-從此以後，人工智慧就要產生了
+那我們可以把 Logistic Regression
 
-電腦可以自己學習，就像現在這個樣子
+跟我們在第一堂課就講的 Linear Regression 做一下比較
 
-可是後來呢
+Logistic Regression，把每一個 feature 乘上一個 w
 
-MIT 有一個
+summation 起來再加上 b，再通過 sigmoid function
 
-有人呢，就寫了一本教科書
+當作 function 的 output
 
-這本教科書的名字就叫做 Perceptron
+那它的 output 因為有通過 sigmoid function
 
-這本教科書裡面，他就指出了 linear 的 model
+所以，一定是界於 0~1 之間
 
-是有極限的，就像我們在上一張投影片講的
+那 Linear Regression 呢？它就把 feature * w 再加上 b
 
-linear model 有很多事都辦不到
+它沒有通過 sigmoid function
 
-就像是我們剛才舉的那麼簡單的 example
+所以，它的 output 就可以是任何值
 
-它都辦不到
+可以是正的，可以是負的，負無窮大到正無窮大
 
-然後大家希望就破滅了
+那等一下呢，我們說 machine learning 就是 3 個 step
 
-然後，當時在 1958 年，剛提出 Perceptron 的時候呢
+等一下我們會一個一個 step
 
-有各種驚人的 application
+比較 Logistic Regression 跟 Linear Regression 的差別
 
-就像現在 deep learning 一樣，有人就說
+接下來呢，我們要決定一個 function 的好壞
 
-我用了 Perceptron
+那我們的 training data 呢
 
-結果我可以分辨說，給我一張照片
+因為我們現在要做的是 Classification
 
-那照片裡面有坦克，或是一般的卡車
+所以我們的 training data，就是假設有 N 筆 training data
 
-那它可以正確地分辨說，那些照片裡面是坦克
+那每一筆 training data，你都要標說它屬於哪一個 class
 
-那些照片裡面是卡車
+比如說，x^1 屬於 C1，x^2 屬於 C1，x^3 屬於 C2
 
-就算那些坦克呢，被藏在叢林裡面
+x^N 屬於 C1......等等，那接下來呢
 
-就算被樹木蓋住呢，也偵測得出來
+我們假設這筆 training data 是從
 
-那其他人就覺得說，太厲害了，這就是人工智慧
+我們的 function 所定義出來的這個 posterior probability
 
-可是既然 Perceptron 有這樣的
+所產生的，就是這組 training data
 
-後來大家就發現說 Perceptron 其實很多 limitation
+是根據這個 posterior probability 所產生的
 
-那怎麼可能分辨卡車跟坦克，這麼複雜的 object 呢？
+那給我們一個 w 和 b
 
-所以，有人就去把那個 data，再拿出來看了一下
+我們就決定了這個 posterior probability
 
-就發現說，原來卡車跟坦克的照片
+那我們就可以去計算，某一組 w 和 b
 
-是在不同的日子所拍攝的
+產生 N 筆 training data 的機率
 
-所以，一天是雨天，一天是晴天
+某一組 w 和 b 產生 N 筆 training data 的機率怎麼算呢？
 
-所以，這個照片本身的亮度就不一樣
+這個很容易，就是假設 x1 是屬於 C1
 
-所以，Perceptron 它唯一抓到的東西
+那它根據某一組 w 和 b，產生的機率就是
 
-就只有亮度而已
+f(下標w, b) (x^1)
 
-所以大家就崩潰了，這個方法的名字就臭掉了
+假設 x2 是屬於 C1，那它被產生的機率就是
 
-後來就有人想說，既然
+f(下標w, b) (x^2)
 
-一個 Perceptron 不行，我能不能連接很多個 Perceptron
+假設 x3 是屬於 C2
 
-就像我們剛才講的，Logistic Regression
+我們知道 x3 如果屬於 C1 的機率
 
-都接在一起，它應該就很 powerful
+就是 f(下標w, b) (x^3)，因為我們這邊算的是 C1 的機率
 
-這個就叫做 Multi-layer 的 Perceptron
+那這個 x3 屬於 C2，所以他的機率就是
 
-事實上，1980 年代
+1 - f(下標w, b) (x^3)，以此類推
 
-Multi-layer 的 Perceptron 它的技術
+那最有可能的參數 w 跟 b
 
-基本上在 1980 年代的時候呢
+我們覺得最好的參數 w 跟 b
 
-就都開發得差不多了
+就是那個有最大的可能性、最大的機率
 
-那個時候已經開發完的技術
+可以產生這個 training data 的 w 跟 b
 
-其實就跟今天的 deep learning
+我們把它叫做 w* 跟 b*
 
-是沒有太 significant 的差別的
+w* 跟 b* 就是那個可以最大化這一個機率的 w 跟 b
 
-然後，有一個關鍵的技術是 1986 年的時候
+那我們在這邊，做一個數學式上的轉換
 
-Hinton propose 的 Backpropagation
+我們原來是要找一組 w 跟 b
 
-那其實同時也有很多人 propose Backpropagation
+最大化 L(w , b)
 
-只是大部分人把這個 credit 歸給 Hinton 的 paper
+最大化這個 function
 
-他那篇 paper 是比較著名的
+但是，這件事情等同於呢
 
-但是，在這個時候遇到的問題就是
+我們找一個 w 跟 b
 
-通常超過 3 個 layer 的 neural network
+minimize 負 ln 這個 function
 
-你就 train 不出好的結果
+我們知道取 ln，它的這個 order 是不會變的
 
-通常一個還可以，再多你就 train 不出好的結果了
+加上一個負號，就從找最大的，變成找最小的
 
-那後來在 1989 年
+所以，我們就是要找一組 w 跟 b
 
-有人就發現了一個理論
+最小化 -ln L(w, b)
 
-就是說，一個 hidden layer
+這個可以讓計算變得容易一點，左式跟右式是一樣的
 
-其實就可以
+根據左式跟右式找出來的 w 跟 b 呢
 
-model 任何可能的 function
+w* 跟 b* 呢，是同個 w* 跟 b*
 
-了解嗎？只要一個 neural network 有一個 hidden layer
+那 -ln (這一項) 怎麼做呢？
 
-它就可以是任何的 function
+你知道取 -ln 的好處就是，本來相乘，現在變成相加
 
-它就已經夠強了，所以根本沒有必要
+然後，你就把它展開，所以這一項就是 -ln f(x^1)
 
-疊很多個 hidden layer
+-ln f(x^2), -ln (1 - f(x^3))
 
-所以，這個 Multi-layer 的 Perceptron 的方法，又臭掉了
+以此類推
 
-然後，大家就比較喜歡做 SVM
+那這件事情讓你，寫式子有點難寫
 
-那這個方法就臭掉了，據說那一陣子呢
+就是你沒有辦法寫一個 summation over
 
-Multi-layer 的 Perceptron 這個方法
+因為對不同的 x，如果屬於不同 class
 
-也有人叫它 neural network 這個方法
+我們就要用不同的方法來處理它
 
-它就像是一個髒話一樣
+而且你沒有辦法 summation over x，那怎麼辦呢？
 
-寫在 paper 裡面，那個 paper 一定被 reject
+我們做一個符號上的轉換
 
-後來呢
+我們說，如果某一個 x 它屬於 class 1
 
-有人就想到一個突破的點
+我們就說它的 target 是 1
 
-這個突破的點，關鍵的地方就是
+如果它屬於 class 2，我們就說它的 target 是 0
 
-把它改個名字，這個方法已經臭掉了
+我們之前在做 Linear Regression 的時候
 
-只好改一個名字，把它改成 deep learning
+每一個 x，它都有一個對應的 y\head，對不對？
 
-整個就潮起來了
+然後那個對應的 y\head 是一個 real number
 
-所以我講說，改名字其實是有很大的力量的
+在這邊呢，每一個 x 也都有一個對應的 y\head
 
-大家現在都不想念博士
+這個對應的 y\head，它的 number 就代表說
 
-我們把博士改個名字，大家都想唸了
+現在這個 x，屬於哪一個 class
 
-下次跟系主任建議一下
+如果屬於 class 1
 
-很多人覺得說，有一個關鍵的技術是
+欸，我怎麼會犯這麼弱智的錯誤
 
-應該在 2006 年提的
+大家有發現嗎？這個投影片上，有一個錯啊
 
-用 Restricted Boltzmann Machine 做 initialization
+對，它應該是 1, 1 , 0，麼會犯這麼弱智的錯誤
 
-很多人覺得說，這是個突破這樣
+這個屬於 class 1 就應該是 1，所以這個應該是
 
-甚至有一陣子呢
+1, 1, 0 這樣，沒關係，你無視這邊
 
-大家的認知是，到底 deep learning 跟
+你就看這裡就好
 
-1980 年代的 Multi-layer Perceptron
+屬於 class 1 就是 1，屬於 class 2 就是 0
 
-有何不同呢？它的不同之處在於
+如果你做這件事的話
 
-如果你有用 RBM 做 initialization
+那你就可以把這邊的每一個式子
 
-你在做 Gradient Descent 的時候，不是要找一個
+都寫成這樣
 
-初始的值嗎？如果你是用 RBM 找的，叫 deep learning
+這看起來有一點複雜，但你仔細算一下就會發現說
 
-你沒有用 RBM 找的，是傳統的、
-1980 年代的  Multi-layer Perceptron
+左邊和右邊，是相等的
 
-後來呢，大家逐漸意識到說
+每一個 -ln f(x)，你都可以寫成
 
-因為 RBM 這個方法呢
+負的中括號、負的括號
 
-非常的複雜，假設沒有
+它的 y1\head、它的 y\head 乘上 ln f(x)
 
-假設你是 machine learning 的初學者的話
+加上 (1 - y\head) * ln(1 - f(x))
 
-你看這個 paper，我相信你是看不懂的
+你就實際上算一下，比如說
 
-如果我們今天要講 RBM
+x1, x2 都是屬於 C1
 
-要從現在開始
+所以呢，它對應的 y\head 是 1
 
-假設用我們上課那些知識，講到讓你聽懂
+所以這個 y1\head 跟 y2\head 是 1
 
-要再另外多講 3 周這樣子
+(1 -  y1\head) 跟 (1 - y2\head) 就是 0
 
-它是有用到一些比較深的理論
+0 的話呢，它乘上後面那一項，你就不要管它，把它拿掉
 
-大家覺得說，哇！這個這麼複雜
+所以，你會發現它等於它，它等於它這樣
 
-一定就是非常的 powerful 阿
+因為空間的關係，我就把 w 跟 b 省略掉了
 
-而且它不是 Neural network base 的方法
+有時候放 w 跟 b，只是為了強調說
 
-它是 graphical model
+這個 f 是 w 跟 b 的 function
 
-它這個大家覺得說，這個這麼複雜，我們看都看不懂
+那因為這個寫不下，所以把它省略掉
 
-這個一定是有用的
+好，那這個 y3 呢？
 
-後來大家逐漸試來試去以後，就發現說
+這個 x3 它屬於 C2，C2 是 0
 
-這招其實沒什麼用這樣子
+所以 y3\head 是 0，(1 - y3\head) 就是 1
 
-你可以發現說，如果你讀 deep learning 的文獻
+那前面這個部分可以拿掉，你會發現
 
-現在已經不太有人用 RBM 做 initialization 了
+右邊這個也是等於左邊這個
 
-因為這一招帶給我們的幫助呢
+有了這些以後，我們把
 
-並沒有說特別大
+這個 likelihood 的 function，取 -ln
 
-連 Hinton 自己都知道這點，
-他在某篇 paper 裡面提過這件事情
+然後呢，再假設說
 
-只是大家可能都沒有注意到那篇 paper 就是了
+class 1 就是 1，class 2 就是 0 以後
 
-所以說，但是他有個最強的地方
+我們就可以把，我們要去 minimize 的對象
 
-它最強的地方就是它讓大家
+寫成一個 function
 
-重新、再一次對這個 model 有了興趣
+我們就可以把我們要去 minimize 的對象
 
-因為它很複雜，所以大家就會開始想要研究
+寫成 summation over N
 
-deep learning 是什麼樣的東西，花很多力氣去研究
+- [ y^n\head * ln f(x^n) + (1-y^n\head) * ln (1-f(x^n))]
 
-所以，其實我聽過有一個
+那其實 summation over 的這一項阿
 
-google 的人對 RBM 的評論
+這個 Σ 後面的這一整項阿
 
-他說這個方法就是石頭湯裡面的石頭
+它其實是兩個 Bernoulli distribution 的 Cross entropy
 
-石頭湯的故事大家聽過嗎？
+這一項其實是一個 Cross entropy
 
-就有一個人說，我要煮一碗石頭湯
+所以，等一下我們就會說它是 Cross entropy
 
-有一個士兵，他到一個村莊裡面借宿
+雖然它的來源跟 information theory 沒有太直接的關係
 
-然後，他說：我要煮一碗石頭湯
+但是，我們剛才看過它推導的過程
 
-然後，大家都說：你要怎麼煮一碗石頭湯？
+但是，如果你把
 
-我用石頭就可以了
+你假設有兩個 distribution，p 跟 q
 
-就用石頭煮一碗湯，如果再加點鹽就更好了
+這個 p 的 distribution，它是說 p(x =1) = y^n\head
 
-就加點鹽
+p(x=0) =1 – y^n\head
 
-再加點米就更好了，再加點米
+q 的 distribution，它 q(x =1) 是 f(x^n)
 
-再加點菜就更好了，再加點菜
+q(x =0) 是 1 - f(x^n)
 
-然後，就煮了一鍋湯
+那你把這兩個 distribution 算 cross entropy
 
-大家就覺得好好喝，用石頭就可以煮湯這樣
+如果你不知道甚麼是 cross entropy 的話，沒有關係
 
-但是，那個石頭其實並沒有什麼作用
+反正就是，代一個式子
 
-所以，其實 RBM 就類似這種東西
+summation over 所有的 x (-Σ p(x)*ln(q(x))
 
-然後，我覺得有一個關鍵的突破是在 09 年的時候
+前面有個負號，這個就是 cross entropy
 
-我們，知道要用 GPU 來加速
+如果你把這兩個 distribution，
+算他們之間的 cross entropy
 
-這件事情還頗關鍵的，過去如果你做 deep learning
+cross entropy 的涵義是這兩個 distribution 有多接近
 
-train 一次，一周就過去了
+如果今天這兩個 distribution 一模一樣的話
 
-然後，結果實驗又失敗，你就不會想做第 2 次了
+那他們算出來的 cross entropy 就是 0
 
-其實，我小時候，其實也不是小時候啦
+所以，你把這兩個 distribution 算一下 cross entropy
 
-我多年前有跟一個學弟試著想要做 deep learning
+你把 y^n\head 乘上 ln(f(x^n))
 
-可是，那個時候還不知道疊很多層
+(1 - y^n\head) 乘上 ln (1 - f(x^n))
 
-那個時候大家都疊一層
+你得到的，就是這項
 
-直覺想法就知道說，一定要疊很多層阿
+如果你有修過 information theory 的話呢
 
-怎麼會只有疊一層？
+它這個式子寫出來，跟 cross entropy 是一樣的
 
-所以想說，我們來把它疊很多層吧
+所以在 Logistic Regression 裡面
 
-然後，我們就開始做，train 一次要一周
+我們怎麼定義一個 function，它的好壞呢？
 
-train 完以後，結果沒有比較好
+我們定義的方式是這樣
 
-就沒有人想要再繼續做下去了
+有一堆 training data，我們有(x^n, y^n\head)
 
-本來想找專題生做，專題生也都不想做
+有這樣的 pair，如果屬於 class 1 的話呢
 
-就沒有人要做，這個題目就沒有人要做了
+y^n\head 就等於 1，如果屬於 class 2 的話，
+y^n\head 就等於 0
 
-那個時候我們把他好好做出來的話，我們現在就發了
+那我們定義的 loss function，我們要去 minimize 的對象
 
-不過那時候，我們不知道要用 GPU
+是所有的 example
 
-所以，train 一次要一周，想要做出來也是很難
+它的 cross entropy 的總和
 
-現在有 GPU 以後，本來要一周的東西
+也就是說，假設你把 f(x^n) 
+當作一個 Bernoulli distribution
 
-你可能幾個小時，就可以馬上看到結果了
+把 y^n\head 當作另一個 Bernoulli distribution
 
-那在 11 年的時候
+它們的 cross entropy，你把它算出來
 
-這個方法被引入到語音辨識裡面
+這個東西，是我們要去 minimize 的對象
 
-語音辨識發現說，這招果然很有用
+所以，就直觀來講，我們要做的事情是
 
-然後，開始瘋狂地用 deep learning 的技術
+我們希望 function 的 output 跟它的 target
 
-到 12 年的時候呢
+如果你都把它看作是 Bernoulli distribution 的話
 
-這個 deep learning 的技術
+這兩個 Bernoulli distribution，他們越接近越好
 
-贏了一個很重要的 image 的比賽
+如果我們比較一下 Linear Regression 的話
 
-所以，在 image 那邊的人
-也瘋狂地用 deep learning 的技術
+Linear Regression 這邊，這個你大概很困惑啦
 
-其實，deep learning 的技術並沒有
+如果你今天是第一次聽到的話
 
-很複雜，它其實非常簡單
+你應該聽得一頭霧水，想說這個
 
-我們之前講說，machine learning 就是 3 個 step
+哇，這個這麼複雜，到底是怎麼來的
 
-那其實 deep learning 也一樣就是，這 3 個 step
+如果你是看 Linear Regression 的話，這個很簡單
 
-講說 deep learning 就這 3 個 step
+減掉它的 target，y^n\head的平方
 
-就好像是在說，把那個大象放進冰箱一樣
+就是我們要去 minimize 的對象
 
-大象放進冰箱，大家知道嗎？
+這個，比較單純
 
-把門打開，把大象趕進去
+這個，不知道怎麼來的
 
-把冰箱門關起來，就把大象放進冰箱了
+因為你可能就會有一個想法說
 
-3 個 step 聽起來就像這樣子
+為甚麼在 Logistic Regression 裡面
 
-deep learning 是很簡單的
+我們不跟 Linear Regression 一樣
 
-你其實可以非常快的了解，其實你可以秒懂它
+用 square error 就好了呢？
 
-其實在 deep learning 裡面
+這邊其實也可以用 square error 阿
 
-我們說，在 machine learning 裡面第一個 step
+沒有甚麼理由，你不能用 square error 不是嗎？
 
-就是要 define 一個 function
+對不對，因為你完全可以算說
 
-這個 function，其實就是一個 Neural network
+這個 f(x^n) 跟 (y^n\head) 的 square error
 
-那這個 Neural network 是
+你就把這個 f(x^n) 跟 (y^n\head) 代到右邊去
 
-是甚麼呢？我們剛才已經講說呢
+你一樣可以定一個 loss function
 
-我們把這個 Logistic Regression 呢
+這個 loss function 聽起來也是頗合理的
 
-前後 content 在一起
+為甚麼不這麼做呢？
 
-然後把一個 Logistic Regression 稱之為 Neuron
+等一下，我們會試著給大家一點解釋
 
-整個稱之為 Neural Network
+那到目前為止呢，這個東西，反正就是很複雜
 
-我們其實就得到了一個 Neural Network
+你就先記得說，必須要這麼做
 
-那我們可以用不同的方法
+接下來呢，我們要做的事情就是
 
-來連接這些 Neural Network
+找一個最好的 function
 
-我們用不同的方法來連接這些 Neural Network
+就是要去 minimize，我們現在要 minimize 的對象
 
-我們就得到了不同的 structure
+那怎麼做呢？你就用 Gradient Descent 就好了
 
-在這個 Neural Network 裡面
+很簡單，接下來都是一些數學式無聊的運算而已
 
-我們有一大堆的 Logistic Regression
+我們就算
 
-每個 Logistic Regression，它都有自己的 weight
+它對某一個 w 這個 vector，
+裡面的某一個 element 的微分
 
-跟自己的 bias
+我們就算這個式子，對 wi 的微分就好
 
-這些 weight 跟 bias 集合起來
+剩下的部分呢，其實就可以交給大家自己來做
 
-就是這個 network 的 parameter
+那我們要算這個東西對 w 的偏微分
 
-我們這邊用 θ 來描述它
+那我們只需要能夠算
 
-那這些 Logistic Regression
+ln(f(x^n) 對 w 的偏微分
 
-或這些 Neuron
+跟 ln(1 - f(x^n)) 對 w 的偏微分就行了
 
-我們應該怎麼把它接起來呢
+那 ln(f(x^n) 對 w 的偏微分，怎麼算呢？
 
-我們應該怎麼把它接起來呢
+我們知道說，我們把這個 f 寫在下面
 
-有各種不同的方式
+把 f 寫在下面
 
-怎麼連接，其實是你手動去設計的
+f 它受到 z 這個 variable 的影響
 
-是你手動去連接的
+然後 z 這個 variable 呢？
 
-最常見的連接方式呢？
+是從 w, x, b 所產生的
 
-叫做 Fully Connected Feedforward Network
+所以，你就知道說，我們可以把
 
-在 Fully Connected Feedforward Network 裡面呢
+這個偏微分拆開
 
-你就把你的 Neuron 排成一排一排
+把 ∂(ln(f(x)) / ∂(wi) 拆解成呢
 
-這邊有 6 個 Neuron，就兩個兩個一排
+∂(ln(f(x)) / ∂(z)
 
-然後，每一組 Neuron，它都有一組 weight
+乘上 ∂(z) / ∂(wi)
 
-都有一組 bias
+那這個 ∂(z) / ∂(wi) 是甚麼？
 
-那這個 weight 跟 bias 是根據 training data 去找出來的
+∂(z) / ∂(wi)，這個 z 的式子我寫在這邊了
 
-假設上面這個藍色 Neuron 
-它的 weight 是 1, -2，它的 bias 是 1
+只有一項是跟 wi 有關
 
-下面呢，它的 weight 是 -1, 1，它的 bias 是 0
+只有 wi * xi 那一項是跟 wi 有關
 
-假設我們現在的輸入
+所以 ∂(z) / ∂(wi) 就是 xi
 
-是 1 跟 -1
+那這一項是甚麼呢？這一項太簡單了
 
-那這兩個藍色的 Neuron 它的 output 是甚麼呢？
+我們把 f(x) 換成 σ(z)
 
-這個做一下小學生會做的運算，你就可以得到答案
+把這個換成 σ(z)
 
-1*1 + (-1)*(-2)，再加上 bias 1
+然後做一下微分
 
-通過 sigmoid function 以後
+這個  ∂(ln σ(z)) / ∂(z) 做微分以後呢，1/σ(z)
 
-你得到的結果呢，就是 0.98
+然後，再算  ∂(σ(z))/σ(z)
 
-那下面呢，你把 1*(-1)、(-1)*1 + 0
+那  ∂(σ(z))/σ(z) 是甚麼呢？
 
-再通過 sigmoid function 以後，你就得到 0.12
+這個 σ(z) 是 sigmoid function
 
-接下來，假設這一個 structure 裡面的每一個 neuron
+sigmoid function 的微分呢，其實你可以直接背起來
 
-它的 weight 跟 bias，我們都是知道的
+就是 σ(z) * (1 - σ(z))
 
-那我們就可以反覆進行剛才的運算
+如果你要看比較直觀的結果的話
 
-1 跟 -1 通過這兩個 neuron，變成 0.98 跟 0.12
+你就把它的圖畫出來
 
-再通過這兩個 neuron，變成 0.86 跟 0.11
+σ(z) 這邊顏色可能有一點淡
 
-再通過這兩個 neuron，得到 0.62 跟 0.83
+是綠色這條線，σ(z) 是綠色這條線
 
-所以，輸入 1 跟 -1
+橫軸是 z，那如果對 z 做偏微分的話
 
-經過一串很複雜的轉換以後呢
+在接近頭跟尾的地方
 
-就得到 0.62 跟 0.83
+它的斜率很小
 
-那如果你輸入是 0 跟 0 的話
+所以對 z 做微分的時候，是接近於 0 的
 
-你輸入 0 跟 0 的話，你得到的 output 就是
+在中間的地方，斜率最大
 
-經過一番一模一樣的運算，你得到的是 0.51, 0.85
+所以這個地方，斜率最大
 
-所以，一個 neural network 你就可以把它看作是
+所以把這一項對 z 做偏微分的話
 
-一個 function
+你得到的結果是長得像這樣
 
-如果一個 neural network 裡面的參數
+那這一項，其實就是 σ(z) * (1 - σ(z))
 
-weight 跟 bias 我們都知道的話
+那你就把 σ(z) 消掉
 
-它就是一個 function
+那你就得到說，這項就是 (1 - σ(z)) * xi
 
-它的 input 是一個 vector，它的 output 是另一個 vector
+那 σ(z) 其實就是 f(x)
 
-舉例來說，我們剛才看到說 input 是 [1, -1]
+所以這一項就是 [1 - f(x^n)] * xi^n
 
-output 是 [0.62, 0.83]
+右邊這一項呢，這個也是 trivial 阿
 
-input 是 [0, 0]，output 是 [0.51, 0.85]
+你把 ln(1-f(x)) 對 wi 做偏微分
 
-所以，一個 network，如果我們已經把參數設上去的話
+那就可以拆成先對 z 做偏微分，wi 再對 z 做偏微分
 
-它就是一個 function
+右邊這一項， ∂(z)/∂(wi) 我們已經知道它就是 xi
 
-如果我們今天還不知道參數
+左邊這一項
 
-我只是定出了這個 network 的 structure
+你就把 ln 裡面的值，放到分母
 
-我只是決定好說，這些 neuron 間
+然後呢，這邊是 -σ(z)
 
-我們要怎麼連接在一起
+前面有個負號，然後這邊要算 σ(z) 的偏微分
 
-這樣子的一個 network structure
+那 σ(z) 做偏微分以後，得到的結果是這樣
 
-它其實就是 define 了一個 function set，對不對？
+把 (1 - σ(z)) 消掉，就只剩下 σ(z)
 
-我們可以給這個 network 設不同的參數
+所以，這一項就是 xi * σ(z)，把它放上來
 
-它就變成不同的 function
+就是這個，ok
 
-把這些可能的 function 通通集合起來
+那我們就把這一項放進來
 
-我們就得到了一個 function set
+把這一項放進來
 
-所以，一個 neural network 你還沒有認參數
+整理一下以後，你得到的結果就是這樣
 
-你只是把它架構架起來
+接下來呢，你整理一下，把 xi
 
-你決定這些 neuron 要怎麼連接
+提到右邊去
 
-你把連接的圖，畫出來的時候
+把 xi 提到右邊去，把括弧的部分展開
 
-你其實就決定了一個 function set
+那裡面有一樣的，把它拿掉
 
-這跟我們之前做的東西都是一樣的
+最後，你得到一個直觀的結果
 
-我們之前也是做 Logistic Regression, Linear Regression
+這個式子看起來有點複雜、有點崩潰
 
-我們都是也決定了一個 function set
+但是，你對它做偏微分以後
 
-那這邊呢，我們也只是換一個方式，來決定 function set
+得到的值的結果，卻是容易理解的
 
-只是如果我們用 neural network 決定 function set 的時候
+你得到的值，它的結果呢，每一項都是負的
 
-你的 function set 是比較大的
+y^\head - f(x^n)
 
-它包含了很多原來你做 Logistic Regression
+再乘上 x^n 的第 i 個 component
 
-做 Linear Regression 所沒有辦法包含的 function
+如果你用 Gradient Descent update 它的話
 
-那剛才講的是一個比較簡單的例子
+那你的式子就很單純，就這樣
 
-在這個例子裡面呢
+wi 是原來的 wi - learning rate
 
-我們把 neuron 分成一排一排的
+乘上 summation over 所有的 training sample
 
-然後說每一排的 neuron 都兩兩互相連接
+[y^n\head - f(x^n)] * x^n 在 i 維的地方
 
-藍色 neuron 的 output 都接給紅色
+這件事情，它代表了甚麼意思呢？
 
-紅色的都接給綠色
+它代表甚麼涵義呢？如果你看括號內的式子的話
 
-綠色後面沒有別人可以接了，
-所以它是整個 network 的輸出
+括號內的這個式子的話
 
-藍色前面沒有其他人了，
-所以它就是整個 network 的輸入
+現在，你的 w 的 update 取決於三件事
 
-那 in general 而言呢
+一個是 learning rate，這個是你自己調的
 
-我們可以把 network 畫成這樣
+一個是 xi，這個是來自於 data
 
-你有好多好多排的 neuron
+第三項呢，就是這個 y^n\head
 
-你有第 1 排、第 2 排.......到第 L 排
+y^n\head - f(x^n) 是甚麼意思呢？
 
-很多排 neuron，每一排 neuron 它裡面的 neuron 的數目
+y^n\head - f(x^n) 代表說你現在這個 f 的 output
 
-可能很多，比如 1000 個、2000 個阿，這個 scale
+跟理想的這個目標
 
-那這邊每一顆球，代表一個 neuron
+它的差距有多大
 
-在 layer 和 layer 之間的 neuron，是兩兩互相連接的
+y^n\head 是目標
 
-layer 1 它的 neuron 的 output 會接給
+f(x^n) 是現在你的 model 的 output
 
-每一個 layer 2 的 neuron
+這兩項之間的差距，這兩個相減的差呢
 
-那 layer 2 的 neuron 的 input 就是所有 layer 1 的 output
+就代表說，他們的差距有多大
 
-就是所有 layer 1 的 output
+那如果今天，你離目標越遠
 
-因為 layer 和 layer 間，所有的 neuron 都有兩兩連接
+那你 update 的量就應該越大
 
-所以它叫 Fully Connected 的 Network
+所以，這個結果看起來是匹頗為合理的
 
-那因為現在傳遞的方向是從 1 到 2
+那接下來呢
 
-從 2 到 3，由後往前傳
+我們就來比較一下 Linear Regression 跟 Logistic Regression
 
-所以它叫做 Feedforward Network
+Logistic Regression 跟 Linear Regression
 
-那整個 network 呢，需要一組
+他們在做 Gradient Descent 的時候，參數 update 的方式
 
-需要一個 input，這個 input 就是一個 vector
+我們已經看到 Logistic Regression
 
-那對 layer 1 的每一個 neuron 來說
+它 update 的式子長這樣子
 
-每一個 neuron，它的 input
+那神奇的是 Linear Regression
 
-就是 input layer 的每一個 dimension
+大家應該都順利做完作業一了
 
-就是 input layer 的每一個 dimension
+Linear Regression 的這個
 
-那最後第 L 的那些 neuron
+Gradient Descent update 的式子，你應該是很熟
 
-它後面沒有接其他東西了
+他們其實是一模一樣的
 
-所以，它的 output 就是整個 network 的 output
+你看哦，他們都算
 
-假設第 L 排有 M 個 neuron 的話
+y^n\head - f(x^n)
 
-它的 output 就是 y1. y2 到 y(下標 M)
+他們都算 y^n\head - f(x^n)
 
-這邊每一個 layer，它是有一些名字的
+唯一不一樣的地方是
 
-input 的地方，我們叫做 input layer
+Logistic Regression 你的 target 一定是 0 或 1
 
-嚴格說起來，input 其實不是一個 layer
+你的 target 一定是 0 或 1
 
-它跟其他 layer 不一樣，它不是由其他 neuron 所組成的
+你的這個 f 呢。一定是介於 0~1 之間
 
-但是，我們也把它當作一個 layer 來看
+但是如果是 Linear Regression 的話，你的 target y\head
 
-所以，叫它 input layer
+它可以是任何 real number
 
-output 的地方，我們叫它 output layer
+而你這個 output 也可以是任何 value
 
-其餘的部分，就叫做 hidden layer
+但是他們 update 的這個方式，是一樣的
 
-那所謂的 deep 是什麼意思呢？
+作業二我們需要做 Logistic Regression
 
-所謂的 deep 就是有很多 hidden layer
+你甚至八成都不用改 code
 
-就叫做 deep
+秒做就可以把它做出來這樣子
 
-那有人就會問一個問題，說要幾個 hidden layer
+大家作業一做的還順利嗎？
 
-才叫做 deep learning
+我相信你應該是遇到了種種特別的問題啦
 
-這個就很難說了
+比如說，如果你在做 Gradient Descent 的話
 
-有人會告訴你說，要 3 層以上才叫做 deep
+你會發現說
 
-有人會告訴你說，要 8 層以上才叫做 deep
+雖然教科書上跟你講 Gradient Descent 的時候
 
-所以就看每一個人的定義，都不一樣
+你對他是不屑一顧的
 
-本來沒有 deep learning 這個詞的時候
+然後，你覺得說一個 complex 的這個 surface
 
-大家都說：我在做 neural network
+我應該用 Gradient Descent 可以輕易地找到它的最佳解
 
-通常都只有一層，自從有 deep learning 這個詞以後
+但是，你會發現說實際上做起來
 
-有一層的人，都說他在做 deep learning 這樣
+是沒有那麼容易的
 
-所以，現在基本上只要是 neural network base 的方法呢
+對不對，我其實可以出一個那種教科書上的問題
+讓你們來做 Linear Regression
 
-大家都會說是 deep learning 的方法
+但是，我們用真實的 example 就可以讓你知道說
 
-那到底可以有幾層呢？
+在真實的世界，你會碰到怎麼樣的問題
 
-在 2012 年的時候
+事實上，因為今天我們做的是 Linear Regression
 
-參加 ImageNet 比賽得到冠軍的 AlexNet
+我看你八成可以用這個
 
-它有 8 層，它的錯誤率是 16.4 %
+解 least square error 的方式，偷偷找一下最佳解
 
-大家可能都知道說，它比第二名的好非常多
+然後再從那個最佳解當作 initialization 開始找對吧
 
-第二名的 error rate 是 30%
+大家聽得懂我在說甚麼嗎？
 
-到 14 年的時候，VGG 有 19層
+呵呵
 
-它的 error rate 降到 7%
+有這麼做的人舉手一下
 
-GoogleNet 有 22 層，它的 error rate 降到 6.7%
+沒有人這麼做，還是不敢舉手這樣子
 
-但是，這個都還不算甚麼
+要是我就這麼做
 
-Residual Network 152 層這樣
+大家知道我意思嗎？
 
-如果它跟 GoogleNet, VGG, AlexNet 比起來
+好，但是如果你做到 deep learning 的時候
 
-它大概是長這個樣子
+你就不能這麼做啦
 
-它的 error rate 是 3.57%
+因為 deep learning 你沒有任何方法可以去
 
-如果你看 Benchmark Corpus 的話，其實
+找它的最佳解，到時候你才會真正的卡翻
 
-它這個 performance 是比人在同一個 test 上做的還要好
+那在下課之前，我想要講一下
 
-你可能會很懷疑說
+我們今天的計畫是這樣子啦
 
-人怎麼可能會在影像辨識上輸給機器呢？
+我們講完 Logistic Regression 以後
 
-因為那個 test 其實還滿難的
+我們就會進入 deep learning
 
-它給你一張圖，一張狗的圖
+然後等一下第三堂課，助教就會來講一下作業二
 
-你光回答狗並不是正確答案，你要回答哈士奇這樣子
+那我們現在要問的問題是這樣
 
-那個 test 其實還蠻難的，但其實為了要公平的比較
+為什麼 Logistic Regression 不能加 square error？
 
-當時，在人跟機器比較的時候
+我為甚麼不能用 square error，
+當然可以用 square error 阿
 
-那些人是有事先看過 training data 的
+我們如果用 square error 的話會怎樣？
 
-也就是說，你有先讓它訓練辨識不同狗的種類
+我們做 Logistic Regression 的時候，我們的式子長這樣
 
-不同花的種類、不同豬的種類
+我當然可以做 square error 阿
 
-只是經過訓練以後，它還是沒有機器那麼強就是了
+我把我的 function 的 output 減掉 y^n\head 的平方
 
-那這個是跟 101 做一下比較
+summation 起來當作我的 loss function
 
-101 在這邊
+我一樣用 Gradient Descent 去 minimize 它
 
-這個我們之後再講，那 Residual Network 呢
+有什麼不可以呢？當然沒什麼不可以這樣子
 
-它不是一般的 Fully Connected Feedforward Network
+如果我們算一下這個微分的話
 
-如果你用一般 Fully Connected Feedforward Network
+你會發現說，如果我們把括號裡面
 
-搞在這個地方，其實結果是會有問題的
+summation 後面這個式子
 
-它不是 overfitting，而是 train 都 train 不起來
+對 wi 做偏微分的話
 
-所以，你其實要特別的 structure
+它得到的結果呢，是這樣子
 
-才能搞定這麼深的 network
+然後這個 2 呢，提到前面去
 
-這個我們之後再講
+所以，2(f(x) - y\head)
 
-那 network 的運作呢
+然後，把 f(x) 對 z 做偏微分
 
-我們常常會把它用 Matrix Operation 來表示
+把 w 對 z 做偏微分
 
-怎麼說呢，我們舉剛才的例子
+把他們都乘起來
 
-假設第一個 layer 的兩個 neuron
+然後，這一項
 
-他們的 weight 分別是 1, -2, -1, 1
+欸，這個地方
 
-那你可以把 1, -2, -1, 1 排成一個 matrix
+沒有寫錯，好，就是
 
-把這個 1, -2, -1, 1 排成一個 matrix
+這一項，就是這一項
 
-那當我們 input 1, -1 要做運算的時候
+把 z 對 f(x) 做偏微分
 
-我們就是把 1*1、(-1)*(-2)、1*(-1)、(-1)*1
+因為 f(x) 是 sigmoid function
 
-所以我們就可以把 1 跟 -1 當做一個 vector 排在這邊
+所以，做偏微分以後，就是 f(x) * (1 - f(x))
 
-當我們把這個 matrix 跟這個 vector
+∂(z) / ∂(wi) 就是 xi
 
-做運算的時候，我們算 1*1 + (-2)*(-1)
+當然你可以
 
-就等於是做 1*1、(-1)*(-2)
+就用 Gradient Descent 去 update 你的參數
 
-當我們做 1*(-1)、(-1)*1 的時候
+但是，你現在會發現你遇到一個問題
 
-就等於是做 1*(-1)、(-1)*1 這樣
+假設 y^n\head  = 1
 
-接下來呢，有 bias 1 跟 0
+假設第 n 筆 data 是 class 1
 
-所以，我們要在後面把 bias 排成一個 vector
+當我的 f(x) 已經等於 1 的時候
 
-再把這個 vector 加上去
+當我的第 n 筆 data 是 class 1
 
-這個結果，算出來就是 [4, -2]
+而我的 f(x) 已經等於 1 的時候
 
-就是通過 activation function 之前的值，就是 4, -2
+我已經達到 perfect 的狀態了
 
-然後，通過這個 sigmoid function
+這個時候，沒有甚麼問題
 
-然後在這個 neural network 的文件裡面
+因為你 f(x) = 1、y^n\head = 1 的時候
 
-我們把這個 function 稱之為 activation function
+你把這兩個數值代進這個 function 裡面
 
-事實上，它不見得是 sigmoid function
+你會發現說，至少這一項
 
-因為到現在，大家都換成別的 function
+f(x) - y^n\head 是 0
 
-如果你是從 Logistic Regression 想過來的話
+所以你的微分，會變成 0
 
-你會覺得它是一個 sigmoid function，
-但現在已經較少用 sigmoid function
+這件事情是很合理
 
-假設我們這邊用的是 sigmoid function 的話呢
+但是，如果今天是另一個狀況
 
-我們就是把 4, -2 丟到 sigmoid function 裡面
+f(x^n) = 0
 
-接下來算出來，就是 0.98, 0.12
+意味著說，你現在離你的目標
 
-所以，一個 neural network，一個 feedforward network
+仍然非常的遠
 
-它的一個 layer 的運算，你從 1, -1 到 0.98, 0.12
+因為你的目標是希望 f(x^n) 的目標是 1
 
-你做的運算就是把 input 1 跟 -1
+但你現在 output 是 0
 
-1 跟 -1 乘一個 matrix
+你離目標還很遠
 
-加上一個 bias 所成的 vector
+但是，如果你把這個式子代到這裡面的話
 
-再通過一個 sigmoid function
+你會發現說，這邊有乘一個 f(x^n)，而 f(x^n)  = 0
 
-得到最後的結果
+這時候，你會變成你微分的結果算出來也是 0
 
-所以，以 general 來說
+所以，如果你離目標很近
 
-一個 neural network
+微分算出來是 0 沒有問題，但是，如果你離目標很遠
 
-假設我們說第一個 layer 的 weight
+微分算出來也是 0
 
-全部集合起來，當作一個 matrix, W^1
+這個是 class 1 的例子
 
-這個 W^1 是一個 matrix
+如果我們舉 class 2 的例子，看起來結果也是一樣
 
-把它的 bias 全部集合起來
+假設 y^n\head  = 0
 
-當作一個 vector, b^1
+假設現在距離目標很遠
 
-把第二個 matrix 的 weight 全部集合起來
+假設距離目標很遠的時候
 
-當作 W^2
+f(x^n) = 1 你代進去，至少最後這個式子是 0
 
-把它的每一個 neural 的 bias 集合起來，當作 b^2
+你微分算出來也是 0
 
-到第 L 個 layer，所有的 weight 集合起來，變成 W^L
+距離目標很近的時候，微分算出來也是 0
 
-bias 集合起來，變成 b^L
+這會造成甚麼問題呢？
 
-那你今天給它一個 input x 的時候
+如果我們把
 
-output 的這個 y 要怎麼算出來呢？
+參數的變化對 total loss 作圖的話
 
-我們假設我們把 x1, x2, 到 xN，接起來，變成一個 x
+你會發現說，如果你選擇 cross entropy
 
-那這個 output 的 y 要怎麼把它算出來呢？
+跟你選擇 square error
 
-你就這樣算
+參數的變化跟 loss 的變化
 
-x * W^1 + b^1
+串起來是這樣子的
 
-再通過 activation function
+黑色的是 cross entropy
 
-然後，你就算出第二排這些 neuron 的 output
+紅色的是 square error
 
-我們稱之為 a^1，你把 x * W^1 + b^1，就得到 a^1
+我們剛才講說 cross entropy 在距離目標很近的地方
 
-x * W^1 + b^1
+假設現在中心最低的點就是
 
-再通過 activation function 以後，就得到 a^1
+距離目標很近的地方
 
-接下來呢，你做一樣的運算
+你的微分值就很小
 
-把 a1 * W^2 + b^2
+但是，距離目標很遠的地方
 
-再通過 activation function 以後，就得到 a^2
+你的微分值也是很小的
 
-然後，就這樣一層一層的做下去到最後一層
+所以，在距離目標很遠的地方呢
 
-你把 a^(L-1) * W^L + b^L 通過 activation function 以後
+你會非常的平坦
 
-得到這個 network 的最終 output y
+這會造成甚麼問題呢？
 
-所以，整個 neural network 的運算其實就是
+如果是 cross entropy 的話
 
-一連串 matrix 的 operation
+你距離目標越遠，你的微分值就越大
 
-就是這個 function
+那沒有問題，所以你距離目標越遠
 
-x 它的 input, output，x 跟 y 的關係
+你參數 update 的時候就越快
 
-x 跟 y 的關係，他們是怎麼樣的關係呢？
+你參數更新的速度就越快
 
-你把 x * W^1 + b^1，再通過 activation function
+你參數 update 的時候，變化量就越大
 
-再把這個 output 再乘上 W^2，加 b^2
+這個沒有問題，距離你的目標越遠
 
-再通過 activation function，再通過 sigmoid function
+你的步伐當然要踏越大一點
 
-最後，到乘上 W^L，加上 b^L
+但是，如果你選 square error 的話，你就會很卡
 
-再通過這個 sigmoid function
+因為，當你距離目標遠的時候
 
-就得到最後的 y
+你的微分是非常非常小的
 
-所以，一個 neural network
+就變成說，你離目標遠的時候
 
-實際上做的事情就是一連串的
+你移動的速度是非常慢
 
-vector 乘上 matrix ，再加上 vector
+所以，如果你用隨機
 
-就是一連串我們在線性代數就有學過的：矩陣運算
+你 random 找一個初始值
 
-那把這件事情寫成矩陣運算的好處就是
+那通常你離目標的距離，是非常遠的
 
-你可以用 GPU 加速
+那如果你今天是用 square error
 
-實際上呢，現在一般在用 GPU 加速的時候
+你其實可以自己在作業裡面試試看
 
-這個 GPU 的加速並不是
+如果你用 square error，你選一個起始值
 
-真的有去對 neural network 做甚麼特化
+你算出來的微分很小，你一開始就卡住了
 
-是說，現在有一些特別的技術有做特化
+它的參數都不 update，你就永遠卡在那邊
 
-但是，如果你 general 是買那種玩遊戲的顯卡的話
+它的參數 update 的速度很慢
 
-那它是沒有對這個 neural network 做甚麼特化
+你等了好幾個小時了，它都跑不出來這樣
 
-那你實際上拿來加速的方式是
+那你可能會想說
 
-當你需要算矩陣運算的時候
+那我們可以說看到這個
 
-你就 call 一下 GPU，叫它幫你做矩陣運算
+微分值很小的時候，就把它的
 
-這會比你用 CPU 來算還要快
+那個 learning rate 設大一點阿
 
-所以，我們在寫 neural network 式子的時候
+可使問題是微分值很小的時候
 
-我們習慣把它寫成 matrix operation 的樣子
+你也有可能距離你的目標很近阿
 
-那裡面如果有需要用到矩陣運算的時候
+如果距離目標很近的時候
 
-就 call GPU 來做它
+這個時候你應該把它的微分值設小一點
 
-那這整個 network，我們怎麼看待呢？
+但是，你現在搞不清楚說
 
-我們可以把它到 output layer 之前的部分阿
+到底 Gradient 小的時候，微分值算出來小的時候
 
-到 output layer 之前的部分
+你是距離目標很近，還是距離目標很遠
 
-看作是一個 feature 的 extractor
+因為做 Gradient Descent 的時候
 
-這個 feature extractor 就 replace 我們之前
+你是在玩世紀帝國這個遊戲
 
-要手動做 feature engineering
+你不知道你距離目標是很近，還是很遠
 
-做 feature transformation 這件事情
+所以你就會卡翻了
 
-所以，你把一個 x input，通過很多很多 hidden layer
+不知道你的 learning rate 應該設大還是設小
 
-在最後一個 hidden layer 的 output
+所以你選 square error
 
-每一個 neuron 的 output，x1, x2, 到 xK
+在實做上，你當然可以這麼做
 
-你就可以把它想成是一組新的 feature
+那你可以在作業裡面試試看
 
-那 output layer 做的事情呢？output layer 就是
+你是不容易得到好的結果的
 
-一個 Multi-class 的 Classifier
+用 cross entropy 可以讓你的 training 順很多
 
-這個 Multi-class Classifier，它是拿前一個 layer 的 output
-
-當作 feature
-
-這個 Multi-class Classifier，
-它用的 feature 不是直接從 x 抽出來的
-
-它是經過很多個 hidden layer，做很複雜的轉換以後
-
-抽出一組特別好的 feature
-
-這組好的 feature 可能是能夠被 separable
-
-經過這一連串的轉換以後呢
-
-它們可以被用一個簡單的 layer 的
-
-Multi-class Classifier 就把它分類好
-
-那我們剛才其實有講過說
-
-Multi-class Classifier 它要通過一個 sigmoid function
-
-而不要通過一個 Softmax function，對不對？
-
-要通過一個 Softmax function
-
-因為我們把 output layer
-
-也看作是一個 Multi-class Classifier
-
-因為我們把 output layer 也看作是
-一個 Multi-class Classifier
-
-所以，我們最後一個 layer 也會加上 Softmax
-
-一般你在做 neural network 的時候呢
-
-是會這樣做
-
-那舉一個不是寶可夢的例子
-
-不是寶可夢的例子，我之後會示範一下做這個例子
-
-就 input 一張 image，它是一張手寫的數字
-
-然後 output 說這個 input 的 image，它對應的是甚麼？
-
-那在這個問題裡面，你的 input 是一張 image
-
-但對機器來說，一張 image 就是一個 vector
-
-假設這是一個解析度 16*16 的 image
-
-那它有 256 個 pixel
-
-對 machine 來說，它就是一個 256 維的 vector
-
-那在這個 image 裡面呢
-
-每一個 pixel 就對應到其中的 dimension
-
-所以，右上角這個 pixel 就對應到 x1
-
-這個就對應到 x2，右下角的就對應到 x256
-
-如果你可以說，有塗黑的地方就是 1
-
-那沒有塗黑的地方，它對應的數字就是 0
-
-那 output 呢？
-
-neural network 的 output，如果你用 Softmax 的話
-
-那它的 output 代表了一個 
-probability distribution，對不對？
-
-所以，今天假設 output 是 10 維的話
-
-就可以把這個 output 看成是
-
-對應到每一個，你可以把這個 output 看成是
-
-對應到每一個數字的機率
-
-y1，代表了 input 這張 image
-
-根據這個 neural network 判斷，它是屬於 1 的機率
-
-代表它是屬於 2 的機率，代表它是屬於 0 的機率
-
-那你就實際上讓 network 幫你算一下說
-
-每一個 input 加上數字屬於 image 的機率是多少？
-
-假設屬於數字 2 的機率最大是 0.7
-
-那你的 machine 就會 output 說
-
-這張 image 它是屬於數字 2
-
-那在這個 application 裡面，
-假設你要解這個手寫數字辨識的問題
-
-那你唯一需要的，就是一個 function
-
-這個 function input 是一個二維的 vector
-
-output 是一個 10 維的 vector
-
-而這個 function 就是 neural network
-
-所以，你只要兜一個 neural network
-
-你可以用簡單的 feedforward network 就好了
-
-兜一個 neural network，
-它的 input 有 256維、是一張 image
-
-它的 output 你特別設成 10 維
-
-這 10 維裡面，每一個 dimension
-
-都對應到一個數字
-
-如果你做這樣的設計，input 是 256 維
-
-output 固定是 10 維的話
-
-那這一個 network，它其實就
-
-代表了一個可以拿來做手寫數字的 function
-
-這個 function set 裡面呢
-
-這個 network 的 structure 就 define 了一個 function set
-
-這個 function set 裡面
-
-每一個 function 都可以拿來做手寫數字辨識
-
-只是有些做出來結果比較好
-
-有些做出來結果比較差
-
-那接下來你要做的事情就是
-
-用 Gradient Descent 去找一組參數
-
-去挑一個最適合拿來做手寫數字辨識的 function
-
-那在這個 process 裡面呢
-
-我們需要做一些 design
-
-之前在做 Logistic Regression
-
-或是 Linear Regression 的時候
-
-我們對 model 的 structure 是沒有甚麼好設計的
-
-但是，對 neural network 來說
-
-我們現在唯一的 constraint 只有 input 要是 256 維
-
-output 要是 10 維
-
-但是中間要有幾個 hidden layer
-
-每一個 hidden layer 要有多少的 neuron
-
-是沒有限制的
-
-你必須要自己去設計它
-
-你必須自己去決定說，我要甚麼 layer
-
-每個 layer 要有多少的 neuron
-
-那決定 layer 的數目
-
-和每一個 layer 的 neuron 數這件事情
-
-就等於是決定了你的 function set 長甚麼樣子
-
-你可以想像說，如果我今天決定了一個差的 function set
-
-那裡面沒有包含任何好的 function
-
-那你之後在找最好的 function 的時候，就好像是
-
-大海撈針，結果針不在海裡這樣
-
-怎麼找都找不到一個好的 function
-
-所以，決定一個好的 function set
-
-其實很關鍵，你就決定這個 network 的 structure
-
-是很關鍵的
-
-講到這邊，總是會有人問我一個問題
-
-假設我們今天讓 machine 來聽我的 talk
-
-然後，叫它 predict 之後會有甚麼問題的話
-
-它一定可以預測接下來的問題
-
-那我們到底應該要怎麼決定 layer 的數目
-
-還有每一個 layer 的 neuron 的數目呢
-
-這個答案，就是我不知道這樣子
-
-這個問題很難，就好像問說怎麼成為寶可夢大師一樣
-
-這只能夠憑著經驗和直覺這樣
-
-這個 network structure 要長甚麼樣子
-
-就是憑著直覺還有多方的常識阿
-
-然後，後續想辦法找一個最後的 network structure
-
-找 network structure 這件事情，並沒有那麼容易
-
-它有時候是滿困難的
-
-有時候甚至需要一些 domain knowledge
-
-所以，我覺得從非 deep learning 的方法
-
-到 deep learning 的方法
-
-我並不認為machine learning 真的變得比較簡單
-
-而是我們把一個問題轉化成另一個問題
-
-就本來不是 deep 的 model
-
-我們要得到好的結果
-
-你往往需要做 Feature Engineering
-
-也就是做 Feature Transform，然後找一組好的 feature
-
-但是，如果今天是做 deep learning 的時候
-
-你往往不需要找一個好的 feature
-
-比如說，做影像辨識的時候
-
-你可以直接把 pixel 丟進去
-
-過去做影像辨識的時候，你需要對影像抽一些 feature
-
-抽一些人定的 feature
-
-這件事情就是 Feature Transform
-
-但是有 deep learning 之後，你可以直接丟 pixel 硬做
-
-但是，今天 deep learning 製造了一個新的問題
-
-它所製造的新的問題就是，
-你需要去 design network 的 structure
-
-就你的問題變成本來抽 feature
-
-轉化成怎麼抽、怎麼 design network structure
-
-那我覺得 deep learning 是不是真的好用就 depend on
-
-你覺得哪一個問題比較容易
-
-我個人覺得如果是
-
-語音辨識或是影像辨識的話
-
-design network structure 可能比 
-Feature Engineering 容易
-
-因為，雖然說我們人工會看、會聽
-
-我們自己都做得嚇嚇叫
-
-但是，這件事情它太過潛意識了
-
-它離我們意識的層次太遠
-
-我們其實不知道
-
-我們無法意識到，我們到底是怎麼做語音辨識這件事情
-
-所以，對人來說你要抽一組好的 feature
-
-讓機器可以用很方便的用 linear 的方法做語音辨識
-
-這件事對人來說很難，因為
-根本不知道好的 feature 長甚麼樣子
-
-所以，還不如 design 一個 network structure
-
-或是嘗試各種 network structure
-
-讓 machine 自己去找出好的 feature
-
-這件事情反而變得比較容易
-
-我覺得對影像來說，也是一樣
-
-那對其他 case 來說，我覺得就是 case by case
-
-比如說，你有聽過一個說法是
-
-deep learning 在 NLP 上面
-
-覺得 performance 沒有那麼好
-
-有聽過這個說法的同學舉手一下
-
-好，沒關係，手放下
-
-好像沒有太多人聽過這個說法
-
-那這件事情是這樣
-
-如果你開語音辨識跟影像辨識的文件
-
-語音辨識跟影像辨識這兩個 community
-
-是最早開始用 deep learning 的
-
-一用下去，進步量就非常驚人
-
-比如說，電視的錯誤率相對下降了 20% 以上
-
-那如果是 NLP 的話
-
-你就會覺得說，它的進步量
-
-似乎沒有那麼驚人
-
-甚至很多 NLP 的人，現在仍然認為說 
-deep learning 不見得那麼 work
-
-那我覺得這個，我自己的猜想是
-
-這個原因就是，人在做 NLP 這件事情
-
-文字處理來說，人是比較強的
-
-比如說，叫你說
-
-叫你設計一個 rule detect 說
-
-一篇 document 它是正面的情緒，還是負面的情緒
-
-你可以說我就列表
-
-列一些正面情緒的詞彙跟負面情緒的詞彙
-
-然後看這個 document 裡面，
-正面情緒的詞彙出現百分之多少
-
-你可能就可以得到一個不錯的結果
-
-所以，NLP 這個 task
-
-對人來說，你比較容易設計 rule
-
-所以，你設計的那些 ad-hoc 的 rule
-
-我好像可以給你一個還不錯的結果
-
-這就是為甚麼 deep learning 相較於 NLP 傳統的方法
-
-覺得進步沒有那麼地顯著
-
-但它其實還是有一些進步的
-
-只是(覺得沒有)其他的領域
-
-沒有語音和影像處理看起來那麼地顯著
-
-但還是有進步的
-
-那我覺得就長久而言呢
-
-因為文字處理其實也是很困難的問題
-
-你沒有很多幽微的資訊，可能是人自己也不知道的
-
-所以，就長久而言呢
-
-deep learning，讓 machine 自己去學這件事情
-
-還是可以佔到一些優勢
-
-只是一下子，眼下看起來進步沒有那麼顯著
-
-它跟傳統的方法比起來的差異就沒有那麼驚人
-
-但是還是有進步的
-
-這是我一些想法
-
-那再來就是有人會問說
-
-能不能夠自動學 network 的 structure
-
-其實是可以的，你可以去問余天立老師
-
-就是在基因演算法那邊，有很多的 technique
-
-是可以讓 machine 自動的去找出 network structure
-
-不過這些方法，目前還沒有非常的普及
-
-你看到那些非常驚人的應用
-
-比如說，AlphaGo 什麼的阿
-
-都不是用這些方法所做出來的
-
-那還有一個常問的問題就是
-
-我們能不能自己去設計 network 的 structure
-
-我可不可以不要 fully connected
-
-我可不可以說，第一個連到第三個，第二個連到第四個
-
-就自己亂接，可以
-
-一個特殊的接法就是 Convolutional Neural Network
-
-這個我們下一堂課再講
-
-那接下來，第二步
-
-第二步跟第三步真的很快，我們等一下就秒講這樣子
-
-第二步是甚麼呢？
-
-要定義一個 function 的好壞
-
-在 Neural Network 裡面
-
-怎麼決定一組參數它的好壞呢？
-
-就假設給定一組參數
-
-我要做手寫數字辨識
-
-所以，我有一張 image，跟它的 label
-
-然後，把這張 image 呢，這個 label 告訴我們說
-
-因為你現在是一個 Multiclass classification 的問題
-
-所以，今天這個 label 1，告訴我們說
-
-你現在的 target 是一個 vector
-
-你現在的 target 是一個 10 維的 vector
-
-只有在第一維，對應到數字 1 的地方
-
-它值是 1，其他呢，都是 0
-
-那你就 input 這張 image 的 pixel
-
-然後，通過這個 neural network 以後呢
-
-你會得到一個 output
-
-那這個 output，我們就稱之為 y
-
-我把我們的 target，稱之為 y\head
-
-接下來你要做的事情就是
-
-計算這個 y 跟 y\head 之間的 cross entropy
-
-就跟我們在做  Multiclass classification 的時候
-
-是一模一樣的
-
-我們就計算 y 跟 y\head 之間的 cross entropy
-
-然後，接下來我們就是要調整 network 的參數
-
-去讓這個 cross entropy 越小越好
-
-當然你整個 training data 裡面，
-不會只有一筆 data，你有一大堆的 data
-
-你有第一筆 data
-
-那它所算出來的 cross entropy 是 C^1
-
-第二筆 data 算出來是 C^2
-
-到第 N 筆 data 算出來是 C^N
-
-那你會把所有 data 的 cross entropy 全部 sum 起來
-
-得到一個 total loss，L
-
-然後，你接下來要做的事情就是
-
-在 function set 裡面，找一個 function
-
-它可以 minimize 這個 total loss
-
-或者是找一組 network 的 parameter
-
-現在寫成 θ*
-
-它可以 minimize 這個 total loss
-
-怎麼解這個問題？
-
-怎麼找一個 θ* minimize 這個 total loss 呢？
-
-你用的方法就是 Gradient Descent
-
-Gradient Descent 大家已經太熟了，沒有甚麼好講的
-
-實際上，在 deep learning 裡面用 Gradient Descent
-
-跟 Linear Regression 那邊沒有甚麼差別，就一模一樣
-
-所以，你要做的事情，只是 function 變複雜而已
-
-其他東西都是一樣的
-
-也就是說
-
-你的 θ 裡面是一大堆的參數
-
-一大堆的 weight 跟一大堆的 bias
-
-你先 random 找一個初始值
-
-random 給每一個數字一個初始值
-
-接下來呢，去計算一下它的 Gradient
-
-計算每一個參數，對你 total loss 的偏微分
-
-那把這些偏微分全部集合起來呢
-
-叫做 Gradient
-
-有了這些偏微分以後，你就可以更新你的參數
-
-你就把所有的參數，都減掉一個 learning rate
-
-這邊寫成 μ，乘上偏微分的值
-
-你就得到一組新的參數
-
-這個 process 就反覆進行下去
-
-你有了新的參數，再計算一下它的 Gradient
-
-然後，再根據你的 Gradient
-
-再更新你的參數，你就得到一組新的參數
-
-按照這個 process，繼續下去
-
-這個都是我們講過的東西
-
-你就可以找到一組好的參數
-
-你就做完 neural network 的 training 了
-
-所以，其實就這樣子啦
-
-deep learning 的 training 就這樣子
-
-就算是最潮的 AlphaGo
-
-也是用 Gradient Descent train 的啦！
-
-所以，大家可能會想像說
-
-如果是 deep learning 的話
-
-machine 的 learning 應該是這樣子
-
-其實上，我們知道說
-
-Gradient Descent 就是玩世紀帝國，所以其實是這個樣子
-
-然後，希望你不要覺得太失望
-
-然後，你可能會問說，那這個 Gradient Descent
-
-的 function 式子長甚麼樣子呢？
-
-之前我們都手把手的把那個算式算出來給大家看
-
-但是，在 neural network 裡面
-
-因為 function 比較複雜
-
-所以，如果我們要手把手的算出來給大家看
-
-是比較難，需要花一些時間
-
-其實，在現代這個時代
-
-我還記得幾年前，在做 deep learning 很痛苦
-
-因為你要自己 implement Backpropagation
-
-那現在呢，你應該已經沒有人
-自己 implement Backpropagation 了
-
-因為有太多太多太多的 toolkit
-
-可以幫你算 Backpropagation
-
-那在作業三，我們要做 deep learning，為了容許你用
-
-這些 toolkit
-
-所以，你就算不會算這個微分
-
-Backpropagation 就是算這個微分的一個比較有效的方式
-
-因為參數非常多嘛
-
-你有 million的參數
-
-你沒有辦法為每個 million 的參數
-都算微分，這太花時間了
-
-Backpropagation 是一個比較有效率的算這個微分的方式
-
-如果你想要更知道詳情的話
-
-我之前的 deep learning 課呢
-
-內容是有錄影的，你可以聽一下這個上課的內容
-
-如果你不想知道的話呢，其實也沒什麼關係
-
-我聽過一個傳聞是說
-
-就是說有某個公司，它在應徵 deep learning 的人
-
-我就問他說，你們要應徵 deep learning 的人，
-會問他什麼問題
-
-他說，我問她說如何算微分
-
-75%、號稱是 deep learning 專家的人，其實不會算微分
-
-所以，大家已經太習慣用 toolkit 了
-
-也不太會算微分了
-
-那 toolkit 很多啦，這邊就列一些出來，給大家參考
-
-那最後，在請助教講作業二之前
-
-我們有一個最後的問題
-
-為甚麼我們要 deep learning？
-
-你可能直覺地說這個答案很簡單啊
-
-因為越 deep，performance 就越好
-
-這個是一個很早年的實驗
-
-這個是 2011 年，Interspeech 裡面的某一篇 paper
-
-他做的是 word error rate
-
-word error rate 是越小越好，你會發現
-
-1 個 hidden layer
-
-每個 hidden layer，2k 個 neuron，word error rate 是24.2
-
-那越來越 deep 以後
-
-它的 performance，error rate 就越來越低
-
-但是，如果你稍微有一點 machine learning 的常識的話
-
-這個結果並沒有讓你太 surprise 阿，因為
-
-本來，model 越多的 parameter
-
-它 cover 的 function set 就越大
-
-它的 bias 就越小，對不對？
-
-你今天如果有越多的 training data
-
-你有夠多的 training data 去控制它的 variance
-
-一個複雜的 model，一個參數比較多的 model
-
-它 performance 比較好，是很正常的阿
-
-那變 deep 有甚麼特別了不起的地方？
-
-有一個理論是這樣告訴我們
-
-這個理論是這樣說的
-
-任何連續的 function
-
-假設任何連續的 function，
-它的 input 是一個 N 維的 vector
-
-它 output 是一個 M 維的 vector
-
-它都可以用一個 hidden layer 的 neural network 來表示
-
-只要你這個 hidden layer 的 neuron 夠多
-
-它可以表示成任何的 function
-
-那既然一個 hidden layer 的 neural network
-
-它可以表示成任何 function
-
-而我們在做 machine learning 的時候，
-我們需要的東西就只是一個 function 而已
-
-既然 hidden layer 就可以表示任何 function
-
-那做 deep 的意義何在呢？
-
-沒有甚麼特別的意義阿
-
-所以有人說，deep learning 就只是一個噱頭而已
-
-就是做 deep 感覺比較潮
-
-如果你只是把它變寬，變成 fat neural network
-
-那感覺就太虛弱了
-
-所以它沒有辦法引起大家的注意
-
-所以，我們要做 deep learning
-
-真的是這樣嗎？這個我們在往後的 lecture
-
-再來告訴大家
-
-最後就是列一些 reference 阿
-
-如果你對 deep learning 很有興趣的話，你可以先看一下
-
-那還有我上學期講 deep learning 的錄影呢
-
-在這邊也找的到
-
-那另外呢，我有一個 6 小時的 tutorial 的 slide
-
-那你在這個連結上，也可以找到
-
-這個 tutorial ，我 11 月還會在新竹再講一次
-
-這或許是我人生中最後一次講這個 tutorial
-
-千萬不要來聽，因為
-
-為甚麼呢？因為在 tutorial 講的東西
-
-在未來的課程裡面，都會涵蓋，它就只是一個 subset 而已
-
-那接下來來我們就先休息 5 分鐘，
-然後趕快就助教來換場一下
+我們在這邊呢，休息 10 分鐘
 
 臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
+
+我們來上課吧
+
+那我們接下來要講的是
+
+這個 Logistic Regression 的方法阿
+
+我們稱它為 discriminative 的方法
+
+而剛才呢，我們用 Gaussian
+
+來描述 posterior probability 這件事呢
+
+我們稱之為 generative 的方法
+
+實際上，他們的 function
+
+他們的這個 model、function set 呢，是一模一樣的
+
+不管你是用我們在這份投影片講的 Logistic Regression
+
+還是前一份投影片講的機率模型
+
+只要你在做機率模型的時候
+
+你把 covariance matrix 設成是 share 的
+
+那他們的 model 其實是一模一樣的
+
+都是 σ(w * x + b)
+
+那你可以找不同的 w 跟不同的 b，
+就得到不同的 function
+
+那我們
+
+我們可以直接去把 w 跟 b 找出來
+
+如果你今天是用 Logistic Linear Regression 的話
+
+你可以直接把 w 跟 b 找出來
+
+就用 Gradient Descent 的方法
+
+如果今天是 generative model 的話
+
+那首先呢，我們會去算
+
+μ^1, μ^2 跟 Σ 的 inverse
+
+然後呢，我們就去把
+
+我們一樣把 w 算出來、把 b 算出來
+
+你算出 μ^1, μ^2 跟 covariance matrix
+
+接下來呢，你就把這些項代到
+
+這裡面，代到這裡面
+
+這邊這個 Σ^1, Σ^2 呢，應該都是等於 Σ
+
+這邊應該都把它代成 Σ
+
+那就把它算出來就可以得到 w 跟 b
+
+現在的問題來了
+
+如果我們比較左邊跟右邊求 w 跟求 b 的方法
+
+我們找出來的 w 跟 b 會是同一組嗎？
+
+會是同一組嗎？
+
+你覺得它是同一組的同學舉手一下
+
+你覺得它是不同的同學舉手一下
+
+好，謝謝，手放下
+
+多數同學覺得它是不同
+
+沒錯，你找出來的結果不會是一樣的
+
+所以，今天當我們用 Logistic Regression
+
+還是用剛才的 probabilistic 的 generative model
+
+我們用的其實是同一個 model
+
+其實是同一個 function set
+
+也就是我們的 function 的那個 pool 阿
+
+我們可以挑的那個 function 的 candidate 阿
+
+其實是同一個 set
+
+但是 ，因為我們做了不同的假設
+
+所以，我們最後找出來的
+
+根據同一組 training data 找出來的參數
+
+會是不一樣的
+
+在這個 Logistic Regression 裡面
+
+其實我們就沒有做任何假設
+
+我們沒有對這個 probability distribution 有任何的描述
+
+我們就是單純去找一個 w 跟 b
+
+那在 generative model 裡面
+
+我們對 probability distribution 是有假設的
+
+比如說，假設它是 Gaussian
+
+假設它是 Bernoulli
+
+假設它是不是 Naive Bayes...... 等等
+
+我們做了種種的假設
+
+根據這些假設，我們可以找到另外一組 w 跟 b
+
+左右兩邊找出來的 w 跟 b 呢，不會是同一組
+
+那問題就是，哪一組找出來的 w 跟 b 是比較好的呢？
+
+如果我們比較
+
+Generative model 跟 Discriminative model 的話
+
+那我們先看一下我們之前講的
+
+defense 跟 special defense 的例子
+
+如果用 generative model 的話
+
+我們的這兩個 class
+
+就藍色的是水系的神奇寶貝，紅色的是一般系的寶可夢
+
+他們之間 boundary 是這一條
+
+如果你是用 Logistic Regression 的話呢
+
+你找出來的 boundary 是這一條
+
+其實從這個結果上，你很難看出來說
+
+誰比較好啦
+
+但是，如果我們比較說
+
+我們都用 7 個 feature 的這個 class
+
+我們會發現說，如果用 generative model 的話
+
+我們剛才說，我們得到的正確率呢，是 73%
+
+如果是用 discriminative model 的話
+
+在同樣的 data set 上面，我們只是用
+
+不同的假設，所以找了不同的 w 跟 b
+
+但是我們找出來的結果比較好的
+
+我們找出來的正確率有 79% 這樣
+
+那我相信在文獻上，會常常聽到有人說
+
+discriminative model 會比 generative model
+
+常常會 performance 的更好
+
+為甚麼會這樣呢？
+
+我們來舉一個 toy 的 example
+
+現在假設呢，你有一筆 training data
+
+你有兩個 class
+
+那你這筆 training data 裡面呢
+
+總共有
+
+每一筆 data 呢，有兩個 feature
+
+然後呢
+
+你總共有 1 + 4 + 4 + 4，總共有 13 筆 data
+
+第一筆 data 是兩個 feature 的 value 都是 1
+
+接下來呢，有 4 筆 data
+
+第一個 feature 是 1，第二個 feature 是 0
+
+接下來 4 筆 data，是第一個 feature 是 0，
+第二個 feature 是 1
+
+接下來 4 筆 data，是兩個 feature 都是 0
+
+然後呢，我們給第一筆 data 的 label 是 1
+
+我們給剩下 12 筆 data 的 label 呢
+
+都是 class 2
+
+那假設你現在不做機器學習，做人類的學習
+
+給你一個 testing data
+
+它的兩個 feature 都是 1，
+你覺得它是 class 1 還是 class 2 呢？
+
+我們來問一下大家的意見吧
+
+如果你覺得它是 class 1 的同學，舉手一下
+
+手放下，你覺得它是 class 2 的同學，舉手一下
+
+沒有人覺得是 class 2，大家都覺得是 class 1
+
+那如果我們來問一下 Naive Bayes
+
+它覺得是 class 1 還是 class 2，它會怎麼說呢？
+
+所謂的 Naive Bayes 就是，我們假設
+
+所有的 feature，它產生的機率是 independent
+
+所以 P(x|Ci)，P of x 從某一個 class 產生出來的機率
+
+等於從某一個 class 產生 x1 的機率
+
+乘上從某一個 class 產生 x2 的機率
+
+那我們用 Naive Bayes 來算一下
+
+首先，算一下 prior 的 probability
+
+class 1 它出現的 probability 是多少？
+
+總共 13 筆 data，只 sample 到一次是 class 1
+
+所以是 1/13
+
+class 2 的機率是多少呢？
+
+總共 13 筆 data，有 12 筆是 class 2
+
+所以它是 12/13，它比較多
+
+那接下來呢，我們算說
+
+在 class 1 裡面，x1 = 1 的機率
+
+在 class 1 裡面，x1 = 1 的機率 就是 1
+
+在 class 2 裡面，x1 = 1 的機率也是 1
+
+class 1 就這筆 data 嘛
+
+它 x1 是 1，x2 是 1
+
+所以，如果你用機率來統計的話
+
+那在 class 1 裡面，x1 = 1 的機率是 1
+
+在 class 1 裡面，x2 = 1 的機率也是 1
+
+接下來我們看
+
+我發現我犯了一個錯，這邊應該是 C2，不好意思
+
+這邊應該是 C2，這邊也應該是 C2
+
+如果我們看 class 2 的話
+
+如果我們看右邊這 12 筆 class 2 的 data
+
+在 class 2 裡面，x1 = 1的機率是多少呢？
+
+是 1/3 對不對，只有 1/3 的 data 是 x1(老師講錯) = 1 的
+
+是 x1 = 1 的
+
+那再來我們看 x2
+
+x2= 1 的機率在 class 2 裡面有多少呢？
+
+在 class 2 裡面只有 1/3 的 data
+
+x2 = 1，所以它的機率是 1/3
+
+如果我們把這些機率通通算出來以後
+
+給你一個 testing data
+
+你就可以去初估測它是來自 class 1 的機率
+
+你就可以初估測它是來自 class 2 的機率
+
+我們就算這筆 training data x 呢
+
+它來自 class 1 的機率是多少
+
+那你就把它代到這個
+
+Bayesian 的 function 裡面，算一下
+
+C1 的 prior probability 是 1/3
+
+P(x|C1) 的機率是 1*1
+
+甚麼意思呢？
+
+這筆 data x，從 C1 裡面 generate 出來的機率
+
+等於這個機率乘上這個機率
+
+下面這項你算過，這是 1/13，這是 1*1
+
+那這一項呢，P(C2) 是 12/13
+
+P(x|C2)，從 C2 裡面 sample 出
+
+根據 C2 的 distribution ，
+sample 出這筆 data 的機率是多少呢？
+
+是 1/3 * 1/3
+
+因為 x1 = 1 的機率在 C2 裡面是 1/3
+
+x2 = 1 的機率在 C2 裡面是 1/3
+
+所以這一項是 1/3 * 1/3
+
+如果你實際去做一下運算
+
+實際算一發就知道說
+
+這一個是小於 0.5 的
+
+所以對 Naive Bayes 來說
+
+給它這樣子的 training data
+
+它認為這一筆 testing data
+
+應該是屬於 class 2
+
+而不是 class 1
+
+所以這跟大家的直覺比起來，是相反的
+
+是相反的
+
+其實我們很難知道說
+
+怎麼知道說這筆 data 的產生到底是來自
+
+class 1 還是 class 2
+
+比較合理的假設
+
+你會覺得說，因為 class 1 裡面
+
+x1 和 x2 通通都是等於 1 的
+
+所以，這筆 data 應該是要來自 class 1 才對吧
+
+可是對 Naive Bayes 來說
+
+它不考慮不同 dimension 之間的 correlation
+
+所以，對 Naive Bayes 來說
+
+這兩個 dimension 是 independent 所產生的
+
+在 class 2 裡面，之所以沒有
+
+sample 到這樣的 data，觀察到這樣的 data
+
+是因為你 sample 的不夠多
+
+如果你 sample 的夠多
+
+搞不好就有都是 1 的 data
+
+就都是 1 的 data
+
+也是有機率被產生出來的
+
+只是，因為我們 data 不夠多
+
+所以，沒有觀察到這件事而已
+
+所以，今天這個 generative model
+
+跟 discriminative model 的差別就在於
+
+這個 generative model
+
+它有做了某些假設
+
+假設你的 data 來自於一個機率模型
+
+它做了某些假設
+
+也就是說，它其實做了腦補這件事情
+
+腦補是什麼，大家知道嗎？
+
+就是，如果你看了一部動漫
+
+那裡面沒有發生某一些事情
+
+比如說，兩個男女主角其實沒有在一起
+
+但是，你心裡想像他們是在一起，這個就是腦補
+
+所以，這個 generative model 它做的事情
+
+就是腦補
+
+如果，我們在 data 裡面明明沒有觀察到
+
+在 class 2 裡面
+
+有都是 1 的這樣的 example 出現
+
+但是，對 Naive Bayes 來說
+
+它想像它看到了這件事情
+
+所以，它就會做出一個跟我們人類直覺想法不一樣的
+
+判斷的結果
+
+那到底腦補是不是一件好的事情呢？
+
+通常腦補可能不是一件好的事情
+
+因為你的 data 沒有告訴你這一件事情
+
+你卻腦補出這樣的結果
+
+但是，如果今天在 data 很少的情況下
+
+腦補有時候也是有用的
+
+如果你得到的情報很少，腦補可以給你更多的情報
+
+所以，其實
+
+discriminative model 並不是在所有的情況下
+
+都可以贏過 generative model 
+
+有些時候 generative model 也是有優勢的
+
+甚麼時候會有優勢呢？
+
+如果你今天的 training data 很少
+
+你可以比較說，在同一個 problem 下
+
+你給 discriminative model 和 generative model 
+
+不同量的 training data
+
+你會發現說，這個 discriminative model
+
+因為它完全沒有做任何假設
+
+它是看著 data 說話
+
+所以它的 performance 的變化量，
+會受你的 data 量影響很大
+
+假設，現在由左到右是 data 越來越多
+
+然後，縱軸是 error rate
+
+discriminative model 它受到 data 影響很大
+
+所以 data 越來越多，它的 error 就越來越小
+
+如果你是看 generative model 的話
+
+它受 data 的影響是比較小的
+
+因為它有一個它自己的假設
+
+它有時候會無視那個 data，而遵從它內心自己的假設
+
+自己內心腦補的結果
+
+所以如果你看 data 量
+
+所以如果你看 data 量的影響的話，在 data 少的時候
+
+generative model 有時候是可以
+贏過 discriminative model 的
+
+只有在 data 慢慢增加的時候
+
+generative model 才會輸給 discriminative model
+
+這個其實是 case by case
+
+你可以在作業裡面做做實驗，
+看看你能不能觀察到這樣的現象
+
+那有時候 generative model 是有用的
+
+可能是
+
+你今天的 data 是 noise 的
+
+你的 label 本身就有問題
+
+因為你的 label 本身就有問題
+
+你自己做一些腦補、做一些假設
+
+反而可以把 data 裡面有問題的部分呢
+
+忽視掉
+
+那我們在做 discriminative model 的時候
+
+我們是直接假設一個 posterior probability
+
+然後去找 posterior probability 裡面的參數
+
+但是我們在做 generative model 的時候
+
+我們把整個 formulation 裡面拆成
+
+prior 跟 class-dependent 的 probability 這兩項，對不對
+
+那這樣做有時候是有好處的
+
+如果你把你的整個 function 拆成
+
+prior 跟 class-dependent 的 probability 這兩項的話
+
+有時候會有幫助
+
+因為，這個 prior 跟 class-dependent 的 probability 
+
+它們可以是來自於不同的來源
+
+舉例來說，以語音辨識為例
+
+大家可能都知道說呢
+
+語音辨識現在都是用
+
+neural network，它是一個discriminative 的方法
+
+但事實上，整個語音辨識的系統
+
+是一個 generative 的 system
+
+DNN 只是其中一塊而已
+
+所以說，該怎麼說呢
+
+所以說，就全部都是用 DNN 這件事情呢
+
+並不是那麼的精確，它整個 model 其實是 discriminative
+
+為甚麼會這樣呢
+
+因為它還是要去算一個 prior probability
+
+因為 prior probability 是某一句話
+
+被說出來的機率
+
+而你要 estimate 某一句話被說出來的機率
+
+你並不需要有聲音的 data
+
+你只要去網路上爬很多很多的文字
+
+你就可以計算某一段文字出現的機率
+
+你不需要聲音的 data
+
+這個就是 language model
+
+所以在語音辨識裡面
+
+我們整個 model 反而是 generative 的
+
+因為你可以把 class-dependent 的部分跟 prior 的部分 
+
+拆開來考慮，而 prior 的部分
+
+你就用文字的 data 來處理
+
+而 class-dependent 的部分，才需要聲音和文字的配合
+
+這樣你可以把 prior estimate 的更精確
+
+這一件事情在語音辨識裡面是很關鍵的
+
+現在幾乎沒有辦法擺脫這個架構
+
+那現在我們要講，我們剛剛舉的例子通通都是
+
+只有兩個 class 的例子
+
+接下來我們要講的是
+
+如果是有兩個以上的 class，我們等一下舉的例子是
+
+3 個 class 的，那應該要怎麼做呢？
+
+那我們等一下就只講過程、不講原理
+
+如果你想要知道原理的話
+
+你可以看一下 Bishop 的教科書
+
+那這個原理跟我們剛才從
+
+只有兩個Class的情況呢
+
+幾乎是一模一樣的
+
+我相信你自己就可以推導出來
+
+所以我就不想重複一個你覺得很 trivial 的東西
+
+那我們就直接看它的操作怎麼做
+
+假設我有三個 class
+
+C1, C2 跟 C3
+
+每一組 class 都有自己的 weight
+
+和自己的 bias
+
+這邊 w^1, w^2, w^3 分別代表 3 個 vector
+
+b1, b2, b3 呢，代表 3 個 scalar
+
+那接下來呢
+
+input  一個 x，這個是你要分類的對象
+
+你把 x 跟 w^1 做 inner product 加上 b1
+
+x 跟 w^2 做 inner product 加上 b2
+
+x 跟 w^3 做 inner product 加上 b3
+
+你得到 z1, z2 跟 z3
+
+這個 z1, z2 跟 z3 呢，它可以是任何值
+
+它可以是負無窮大到正無窮大的任何值
+
+接下來呢，我們把 z1, z2, z3 
+
+丟進一個 Softmax 的 function
+
+這個 Softmax function 它做的事情是這樣
+
+把 z1, z2, z3 都取 exponential
+
+得到 e^(z1), e^(z2), e^(z3)
+
+接下來，把 e^(z1), e^(z2), e^(z3)
+
+summation 起來
+
+你得到它們的 total sum
+
+然後你再把這個 total sum 分別除掉這 3 項
+
+把 total sum 分別除掉這 3 項
+
+得到 Softmax function 的 output, y1, y2 跟 y3
+
+如果覺得有一點複雜的話，我舉一個數字
+
+假設 z1 = 3, z2 = 1, z3 = -3
+
+做完 exponential 以後
+
+e^3 是很大的，是 20
+
+e^1 是 2.7
+
+e^(-3) 很小，是 0.05
+
+接下來呢，你把這 3 項合起來
+
+再分別去除掉，也就是做 normalization
+
+那你得到的結果呢，20 就變成 0.88
+
+2.7 就變成 0.12，0.05 就趨近於 0
+
+那當你做完 Softmax 以後
+
+原來 input z1, z2, z3 它可以是任何值
+
+但是，做完 Softmax 以後，你的 output 會被限制住
+
+第一個，你的 output 的值一定是介於 0~1 之間
+
+首先，你 output 值一定是正的
+
+不管你 z1, z2, z3 是正的還是負的，開exponential 以後
+
+都變成是正的
+
+那今天它的 total sum 
+
+一定是 1，你 output 的和一定是 1
+
+因為在這個地方做了一個 normalization，
+所以你的 total sum 一定是 1
+
+為甚麼這個東西叫 Softmax 呢？因為如果你做
+
+如果是 max 的話，就是取最大值嘛
+
+但是，你做 Softmax 的意思呢
+
+是說你會對最大的值做強化
+
+因為今天，你有取了 exponential
+
+你取了 exponential 以後呢
+
+大的值和小的值，他們之間的差距呢
+
+會被拉得更開
+
+強化它的值，這件事情呢，叫做 Softmax
+
+那你就可以把這邊的每一個 y 呢
+
+yi 呢，當作 input x
+
+input 這個 x 是第 i 個 class 的 posterior probability
+
+所以今天假設說，你 y1 是 0.88
+
+也就是說，你 input x 屬於 class 1 的機率是 88%
+
+屬於 class 2 的機率是 12%
+
+屬於 class 3 的機率是趨近於 0
+
+這個 Softmax 的 output
+
+就是拿來當 z 的posterior probability
+
+那你可能會問說
+
+為甚麼會這樣呢？
+
+事實上這件事情
+
+是有辦法推導的
+
+如果有人在外面演講，問我說為什麼是用 exponential
+
+我就會回答說，你也可以用別的
+
+因為我用別的，你也會問同樣的問題這樣子
+
+但是，這個事情是有辦法講的
+
+你可以去翻一下 Bishop 的教科書
+
+這件事情是可以解釋的
+
+如果，你今天有 3 個 class
+
+假設這 3 個 class，通通都是 Gaussian distribution
+
+他們共用同一個 covariance matrix
+
+在這個情況下，你做一般推導以後
+
+你得到的就會是這個 Softmax 的 function
+
+這個就留給大家，自己做
+
+如果你想要知道更多，你還可以 google 一個叫做
+
+ maximum entropy 的東西
+
+maximum entropy 也是一種 classify
+
+但它其實跟 Logistic Regression 是一模一樣的東西
+
+你只是換個名字而已
+
+那它是從另外一個觀點呢
+
+來切入為甚麼我們的 classifier 長這樣子
+
+我們剛才說，我們可以從機率的觀點
+
+假設我們用的是 Gaussian distribution，
+經過一般推導以後
+
+你可以得到 Softmax 的 function
+
+那你可以從另外一個角度
+
+從 information theory 的角度去推導
+
+你會得到 Softmax 這個 function
+
+這個就留給大家
+
+自己去研究，google maximum entropy 你會找到答案
+
+所以，我們複習一下剛才做的事情
+
+你就有一個 x 當作 input
+
+所以你乘上 3 組不同的 weight
+
+加上 3 組不同的 bias，得到 3 個不同的 z
+
+通過 Softmax function 
+
+你就得到
+
+y1, y2, y3 分別是這 3 個 class 的 posterior probability
+
+可以把它合起來呢，當作是 y
+
+那你在訓練呢，你要有一個 target
+
+它的 target 是甚麼呢？
+
+它的 target 是 y\head
+
+每一維、你用 3 個 class，你 output 就是 3 維
+
+這 3 維分別對應到 y1\head, y2\head 跟 y3\head
+
+我們要去 minimize 的對象
+
+是 y 所形成的這個 probability distribution
+
+它是一個 probability distribution 嘛
+
+在做完 Softmax 的時候
+
+它就變成了
+
+你把它當一個 probability distribution 來看待
+
+你可以去計算這個 y 跟 y\head 他們之間的 cross entropy
+
+它的這個 cross entropy 的式子呢
+
+我就發現我寫錯了
+
+這邊前面應該要有一個負號，不好意思
+
+這前面應該要有一個負號
+
+好
+
+所以，這兩個 probability 的 cross entropy
+
+它們的式子就是 y1\head
+
+乘上 ln(y1)
+
+y2\head * ln(y2) + y3\head * ln(y3)
+
+前面再加一個負號
+
+就是它們之間的 cross entropy
+
+如果我們要計算 y 跟 y\head 的 cross entropy 的話
+
+y\head 顯然也要是一個 probability distribution
+
+我們才能夠算 cross entropy
+
+怎麼算呢？
+
+假設 x 是屬於 class 1 的話
+
+在 training data 裡面，我們知道 x 是屬於 class 1 的話
+
+它的 target 就是 [1 0 0]
+
+如果是屬於 class 2 的話，它的 target 就是 [0 1 0]
+
+如果是屬於 class 3 的話，它的 target 就是 [0 0 1]
+
+我們之前有講過說
+
+如果你設 class 1 的 target 是 1
+
+class 2 的 target 是 2，class 3 的 target 是 3
+
+這樣會有問題
+
+你是假設說，1 跟 2 比較近、2 跟 3 比較近
+
+1 跟 3 比較遠，這樣做會有問題
+
+但是，如果你今天是
+
+換一個假設
+
+你今天是假設
+
+如果 x 是屬於 class 1 的話，它的目標是 [1 0 0]
+
+屬於 class 2是 [0 1 0]，屬於 class 3是 [0 0 1]
+
+那你就不用假設 class 和 class 之間
+
+誰跟誰比較近，誰跟誰比較遠
+
+的問題這樣
+
+至於這個式子，哪來的呢？
+
+其實這個式子也是去 maximum likelihood
+
+我們剛才在講這個 binary 的 case 的時候
+
+我們講說，我們的這個 cross entropy 這個 function
+
+minimize cross entropy 這件事情
+
+其實是來自 maximize likelihood
+
+那在有多個 head 的情況下
+
+也是一模一樣的
+
+它是一模一樣的
+
+你就把 max likelihood 那個 function 列出來
+
+那經過一番整理，你也會得到 minimize cross entropy
+
+那這件事呢，就交給大家自己做
+
+接下來，我要講的是
+
+這個 Logistic Regression 阿，其實它是有
+
+非常強的限制
+
+怎麼樣的限制呢？
+
+我們今天假設這樣一個 class
+
+假設這樣一個 class
+
+現在有 4 筆 data
+
+它們每一筆 data 都有兩個 feature
+
+那它們都是 binary 的 feature
+
+那 class 2 呢，有兩筆 data
+
+分別是 (0, 0)、(1, 1)
+
+class 1 有兩筆 data，分別是 (0, 1)、(1, 0)
+
+如果把它畫出來的話
+
+class 1 的兩筆 data 是在這裡、在這裡
+
+class 2 的兩筆 data 是在這跟這
+
+如果我們想要用 Logistic Regression
+
+對它做分類的話
+
+我們能做到這件事情嗎？
+
+我們能做到這件事情嗎？
+
+你會發現說
+
+這件事情
+
+我們是辦不到的
+
+Logistic Regression 的話，我們會希望說
+
+對 Logistic Regression 的 output 而言
+
+這兩個屬於 class 1 的 data，它的機率
+
+要大於 0.5
+
+另外兩個屬於 class 2 的 data
+
+它的機率要小於 0.5
+
+但這件事情，對 Logistic Regression 來說呢
+
+它卡翻了，它沒有辦法做到這件事
+
+因為 Logistic Regression 兩個 class 之間 boundary
+
+就是一條直線
+
+它的 boundary 就是一條直線
+
+所以，你要分兩個 class 的時候，你只能在你的
+
+feature 的平面上，畫一條直線
+
+要馬畫這邊，要馬畫這邊
+
+那不管你怎麼畫
+
+你都沒有辦法把
+
+紅色的放一邊、藍色的放一邊
+
+不管你怎麼畫，你都沒有辦法把
+紅色的放一邊、藍色的放一邊
+
+這直線可以隨便亂畫、你可以調整
+
+w 跟 b，你的 weight 跟 bias
+
+使得你的某些 Regression，兩個 class 之間的 boundary
+
+可以是任何樣，可以是這樣、是這樣，怎麼畫都可以
+
+這個 boundary 是一條直線，怎麼畫都可以
+
+但你永遠沒有辦法把
+
+今天這個 example 的紅色點跟藍色點分成兩邊
+
+怎麼辦呢？
+
+假設你還是堅持要用 Logistic Regression 的話
+
+有一招叫做 Feature Transformation
+
+就是你剛才的 feature 定的不好
+
+原來 x1, x2 的 feature 定的不好
+
+我們可以做一些轉化以後
+
+找一個比較好的 feature space
+
+這一個比較好的 feature space，
+讓 Logistic Regression 是可以處理
+
+我們把 x1 跟 x2 呢
+
+轉到另外一個 space 上面
+
+轉到 x1' 跟 x2' 上面
+
+x1' 是
+
+怎麼做 feature transformation 是
+
+這是很 heuristic and ad hoc的東西
+
+想一個你喜歡的方式
+
+舉例來說，我這邊定 x1' 就是某一個點到 (0,0) 的距離
+
+x2' 就是某一個點到 (1,1) 的距離
+
+如果我們把它畫出來的話
+
+如果我們把它畫出來，我們先看
+
+先看左下角這個點好了
+
+如果我們看左下角這個點
+
+它的 x1' 應該是 0
+
+因為它跟 (0,0) 的距離就是 0
+
+它跟 (1,1) 的距離，(0,0) 跟 (1,1) 的距離是
+
+根號 2，所以 x2' 是 sqrt(2)
+
+所以，經過這個 transformation，(0,0) 這個點
+
+跑到這邊
+
+那經過這個 transformation，(1,1) 這個點
+
+跑到右下角
+
+因為它跟 (0,0) 的距離是 sqrt(2)，跟 (1,1) 的距離是 0
+
+經過這個 transformation，(0,1)
+
+這邊又寫錯了，這邊應該是 (1,0)
+
+(0,1) 和 (1,0)它們跟 (0,0) 和 (1,1) 之間的距離
+
+都是一樣的
+
+(0,1) 和 (0,0) 之間的距離是 1
+
+(0,1) 和 (1,1) 之間的距離是 1
+
+所以，經過這個 transform 以後
+
+這兩個紅色的點會map，重疊在一起
+
+都變成是 1
+
+這個時候，對 Logistic Regression 來說
+
+它可以處理這個問題了
+
+因為它可以找一個 boundary，比如說，可能在這個地方
+
+把藍色的點跟紅色的點分開
+
+但是，麻煩的問題是這樣
+
+麻煩的問題是
+
+我們不知道怎麼做 feature transformation
+
+如果我們花太多力氣在做 feature transformation
+
+那就不是機器學習了，不是人工智慧了
+
+就都是人的智慧了
+
+所以，有時候我們不知道要怎麼找一個
+
+好的 transformation
+
+所以，我們會希望說
+
+這個 transformation 是由機器自己產生的
+
+怎麼讓機器自己產生這樣的 transformation 呢？
+
+我們就把很多個 Logistic Regression 呢
+
+cascade 起來
+
+把很多 Logistic Regression 接起來
+
+我們就可以做到這一的事情
+
+假設 input 是 x1, x2
+
+我們有一個 Logistic Regression 的 model
+
+我們這邊就把 bias 省略掉，讓圖看起來比較簡單一點
+
+這邊有一個 Logistic Regression 的 model
+
+它的 x1 乘一個 weight，跟 x2 乘一個 weight
+
+加起來以後得到 z 的 sigmoid function
+
+它的 output 我們就說是
+
+新的 transform 的第一維，x1'
+
+我們有另外一個 Logistic Regression 的 model
+
+它跟 x1 乘上一個 weight，對 x2 乘一個 weight，得到 z2
+
+再通過 sigmoid function，得到 x2'
+
+我們說它是 transform 後的另外一維
+
+如果我們把 x1 跟 x2 經過
+
+這兩個 Logistic Regression mode 的 transform
+
+得到 x1' 跟 x2'，而在這個新的 transform 上面
+
+class 1 和 class 2 是可以用一條直線分開的
+
+那麼最後，只要再接
+另外一個 Logistic Regression 的 model
+
+它的 input 就是 x1' 和 x2'
+
+對它來說， x1' 和 x2' 就是
+
+每一個 example 的 feature，不是 x1 和 x2，是 x1' 和 x2'
+
+那根據 x1' 和 x2' 這個新的 feature
+
+它就可以把 class 1 和 class 2 分開
+
+所以前面這兩個
+
+Logistic Regression 做的事情
+
+就是做 feature transform 這件事情
+
+它先把 feature transform 好以後
+
+再由後面的，紅色的 Logistic Regression 的 model 呢
+
+來做分類
+
+如果舉比較實際的例子的話
+
+我們看剛才那個例子
+
+我們在 x1 和 x2 平面上，有 4 個點
+
+我們可以調整藍色這個 Logistic Regression
+
+它的 weight 的參數
+
+讓它的 posterior probability 的 output 呢
+
+長得像是這個圖上的顏色這樣子
+
+因為這個 boundary 一定是一條直線嘛
+
+所以，這個 posterior probability 的 output 呢
+
+一定是長這樣子的，它的等高線一定是直的
+
+在左上教的地方
+
+output 的值比較大，在右下角的地方
+
+output 的值比較小
+
+你可以調整參數，讓這個藍色的
+
+這個 Logistic Regression
+
+它 input x1, x2 的時候，對這 4 個點
+
+它的 output 是 0.73, 0.27, 0.27, 0.05
+
+這件事情呢，是它做得到的
+
+對綠色這個點來說
+
+你也可以調整它的參數
+
+讓它對右下角紅色這個點的 output 是 0.73
+
+對藍色的點是 0.27, 0.27
+
+對左上角這個點，它是 0.05
+
+Logistic Regression 它可以
+
+它的 boundary 一定是一條直線
+
+那這個直線可以有任何的畫法
+
+你可以是左邊高、右邊低
+
+你可以是左上高、右下低，也可以是右下高、左上低
+
+這都是做得到的，只要調整參數，都做得到這些事情
+
+所以，現在呢
+
+有了前面這兩個 Logistic Regression 以後
+
+我們就可以把 input 的每一筆 data
+
+做 feature transform得到另外一組 feature
+
+有就是說呢，原來左上角這個點
+
+原來左上角這個點
+
+它本來在 x1, x2 的平面上是 (0, 1)
+
+但是在 x1', x2' 的平面上
+
+它變成是 (0.73, 0.05)
+
+如果我們看右下角，這個紅色的點
+
+在 x1', x2' 的平面上
+
+它就是 (0.05, 0.73)
+
+呃，這個 x1 跟 x2 是不是畫反了呢？
+
+我看一下，對，畫反了
+
+不好意思，這個 x1 跟 x2 是畫反的
+
+因為你看這個是 0.05
+
+然後，這個縱軸呢
+
+才是比較小的，才是 0.05
+
+所以，x1 跟 x2 呢，這邊的 label
+
+應該要是反過來的
+
+然後，我們現在把
+
+紅色的點變到 (0.73, 0.05) 的位置
+
+紅色的點變到 (0.05, 0.73) 的位置
+
+把這兩個藍色的點變到 (0.27, 0.27) 的位置
+
+我們做了這樣的轉換以後呢
+
+我們就可以用紅色的這個 Logistic Regression
+
+畫一條 boundary
+
+把藍色的點和紅色的點分開
+
+所以，如果我們只有一個 Logistic Regression
+
+我們沒有辦法把這個 example 處理好
+
+但是，如果我們有 3 個 Logistic Regression
+
+他們被接在一起的話
+
+那我們就可以把這件事情處理好
+
+所以，把這些 Logistic Regression 的 model 疊在一起
+
+它還滿有用的，我們可以有
+
+某一個 Logistic Regression 它的 model、它的 input
+
+是來自於其他 Logistic Regression 的 output
+
+而某一個 Logistic Regression 的 output
+
+它也可以是其他 Logistic Regression 的 input
+
+我們可以把它前後相連起來
+
+就變得呢，很 powerful
+
+那我們呢，可以給它一個新的名字
+
+我們把每一個 Logistic Regression
+
+叫做一個 Neuron
+
+把這些 Logistic Regression 串起來
+
+所成的 network，就叫做 Neural Network
+
+就叫做類神經網路
+
+換了一個名字以後，它整個就潮起來了
+
+你就可以騙麻瓜
+
+你就可以跟麻瓜講說，我們是在模擬人類大腦的運作
+
+而麻瓜就會覺得，你做的東西實在是太棒了
+
+這個東西就是 deep learning 這樣
+
+所以我們呢，就進入 deep learning
+
+臺灣大學人工智慧中心
+科技部人工智慧技術暨全幅健康照護聯合研究中心
+http://aintu.tw
+

@@ -2,2455 +2,3322 @@
 科技部人工智慧技術暨全幅健康照護聯合研究中心
 http://aintu.tw
 
-告訴我們說，network 越 deep
+supervised learning 的話呢，有哪些 suggestion
 
-從 1 層到 7 層，我的 error rate 不斷地下降
+所以，就算我們上課還沒有講到
 
-那問題是
+也沒有關係，我相信對大家來說
 
-如果你仔細地思考一下這個問題
+應該不是一個問題
 
-你的 network 越深
+我們今天唯一需要做的就是
 
-如果你 imply 的是你的參數越多的話
+講完 CNN 的部分
 
-那這個有甚麼好說的
+我們都知道說，CNN 它常常被用在
 
-你的 model 比較複雜
+影像處理上
 
-你的 data 如果比較多的話
+如果你今天用 CNN 來做影像處理
 
-本來你的 performance 就會比較好
+比如說，你用 CNN 來
 
-所以你真正要比較一個
+我當然可以用
 
-你真正要比較 Deep 和 Shallow 的 model 的時候
+一般的 neural network
 
-你應該做的事情是，你要調整 Deep 和 Shallow 的 model
+來做影像處理，不一定要用 CNN
 
-讓他們的參數是一樣多的
+比如說，你想要做影像的分類
 
-那很多人在比較 Deep 和 Shallow 的 model 的時候
+那你就是 train 一個 neural network
 
-是沒有注意到這一件事情的
+input 是一張圖片
 
-所以那一個評比是不公平的
+那這張圖片你就把它表示成裡面的 pixel
 
-如果你要給 Deep 和 Shallow 的 model 公平的評比
+也就是一個很長很長的 vector
 
-你要故意調整他的參數
+那 output 就是看你，假設你有 1000 個類別
 
-讓他們的參數是一樣多的，在這個情況下
+output 就是 1000 個 dimension
 
-Shallow 的 model 就會是一個
+那我相信，根據剛才那堂課的內容，大家
 
-矮胖的 model，Deep 的 model就會是一個瘦高的 model
+應該都可以給你 training data，大概就可以秒做出來
 
-接下的問題就是
+但是
 
-在這個公平的評比之下
+我們現在會遇到的問題是這樣子
 
-是 Shallow 比較強還是 Deep 比較強 ?
+實際上，如果我們 train neural network 的時候
 
-所以剛才那一個實驗結果裡面呢
+我們會期待說，在這個 network 的 structure 裡面
 
-是有後半段
+每一個 neuron，其實就代表了一個最基本的 classifier
 
-後半段的實驗結果是這樣說的
+事實上，在文獻上呢
 
-它說我們用 5 層
+根據訓練的結果，也有很多人得到這樣的結論
 
-每層兩千個 neuron， 得到 error rate 是17.2
+舉例來說，第一層的 classifier
 
-error rate 是越小越好 ，那這一邊用一層
+第一層的 neuron
 
-3772 的 neuron，得到 error rate 是 22.5
+它是最簡單的 classifier
 
-為什麼是 37722 個 neuron 呢？
+它做的事情就是 detect 有沒有綠色出現
 
-這並不是什麼 lucky number
+有沒有黃色出現，有沒有斜的條紋
 
-這是為了讓一個 hidden layer 的 network 跟
+那第二個 layer，它做的事情是
 
-有 5 層的 hidden layer 的 network，它們的參數是接近的
+detect 更複雜的東西
 
-那如果我們只有一層的 network
+根據第一個 layer 的 output
 
-這個時候它的 error rate 是 22.5
+它如果看到直線橫線
 
-這個 error rate 遠比它大
+就是窗框的一部分
 
-如果我們看另外一個 case，7 層
+如果看到棕色的直條紋就是木紋
 
-每層 2000 個 neuron 跟一層 4634 個 neuron
+看到斜條紋加灰色的
 
-它們的參數數目是接近的
+這個有可能是很多東西，比如說，輪胎的一部分等等
 
-這個時候你會發現說
+再根據第二個 hidden layer 的 output
 
-只有一層它的 performance 是比較差的
+第三個 hidden layer 會做更複雜的事情
 
-甚至如果你今天再增加 network 的參數變成一層
+比如說，它可以知道說
 
-但是有 16k 個 neuron，有好多好多的 neuron
+某一個 neuron 看到蜂巢，它就被 activate
 
-有原來這個 case 的4倍
+某一個 neuron 看到車子，就被 activate
 
-那你的 error rate 也只有從 22.6 降到 22.1 而已
+某一個 neuron 看到人的上半身
 
-當你用一個只有一層，但非常非常寬的  network
+就被 activate
 
-跟也是只有一層，但是沒有那麼寬的 network 來比
+那現在的問題是這樣子
 
-因為他的參數比較多
+當我們直接用一般的
 
-所以它的 performance 還比它強
+fully connected 的 feedforward network 來做影像處理
 
-它的 performance 還是比它強
+的時候，往往我們會需要太多的參數
 
-但如果你比較
+舉例來說
 
-這個有兩層的 network 跟這個只有一層的 network
+假設這是一張 100*100 的彩色圖片
 
-這個有兩層的 network 的參數遠比它少
+它解析度才 100*100，那這已經是很小張的 image 了
 
-這個參數是少的
+那你把它拉成一個 vector
 
-這個參數是多的
+它有多少的 pixel
 
-但是結果，這個 case 只有兩層
+它有 100*100*3
 
-它的 performance 還是比
+對不對，每個 pixel 其實需要
 
-只有一層的 network 的 performance 還要好
+3 個 value 來描述它，如果是彩色的圖的話
 
-現在，接下來的問題就是
+是三萬維，那 input vector 如果是三萬維
 
-為什麼會這樣
+這個 hidden layer 假設 1000 個 neuron 就好了
 
-因為在很多人的的想像裡面
+你的這個第一層 hidden layer 的參數
 
-deep learning 會 work 就是因為
+就已經有 30000*1000 了
 
-這是一個，有人覺得說 deep learning 就是一個暴力輾壓的方法
+這樣太多了
 
-我弄一個大很大的 model
+所以，CNN 它做的事情其實是
 
-然後我 collect 一大堆的 data
+我們來簡化這個 neural network 的架構
 
-所以就得到比較好的 performance
+我們把這裡面一些，根據人的知識
 
-它就是一個暴力的方法
+我們根據我們對影像處理的理解，就知道說
 
-你有沒有發現實際不是這個樣子
+某些 weight 其實是用不上的，我們一開始
 
-如果你今天只是單純的增加 parameter
+就把它濾掉
 
-但是你是讓 network 長寬
+我們一開始就想一些辦法，
+不要用 fully connected network
 
-而不是長高的話
+而是用比較少的參數
 
-其實你對 performance 的幫助，是比較小的
+來做影像處理這件事情
 
-把 network 長高，對 performance 的影響很有幫助
+所以，CNN 其實是比一般的 DNN
 
-把 network 長寬 ，幫助沒有那麼好
+還要更簡單的
 
-為什麼會這樣呢？
+等一下，我們講完以後你就會發現說
 
-我們可以想像說，當我們在做 deep learning 的時後
+你可能覺得說，CNN 看起來
 
-其實我們就是在做這個模組化的這件事情
+它的運作很複雜
 
-甚麼意思呢 ?
+它應該是個比較複雜的東西
 
-大家都應該會寫程式
+但事實上，它的模型呢
 
-所以你就知道說，當你在寫程式的時候
+是比 DNN 還要更簡單的
 
-你不能把所有的程式都寫在 main function  裡面
+我們就是用 prior knowledge
 
-你不能把 5000 行的程式都寫在 main function 裡面
+去把原來 fully connected 的 layer 裡面的一些參數拿掉
 
-你會寫一些 subfunction
+就變成 CNN
 
-對不對，你會在你的 main function 裡面
+我們先講一下，為甚麼
 
-去 call subfunction 1、function 2 和 function 3
+我們有可能把一些參數拿掉
 
-然後 function 2 裡面可能還會去 call
+為甚麼我們有可能只用比較少的參數
 
-subsub 1、subsub 2 和 subsub 3
+就來做影像處理這件事情
 
-然後 subsub 2 還會再 call  subsubsub2 這個樣子
+那這邊有幾個觀察，第一個是
 
-它是一層一層
+在影像處理裡面
 
-它是有這個結構化的結構
+如果我們說，第一層的 hidden layer
 
-但是這個層次，你要有結構化的架構
+那些 neuron 要做的事情就是偵測某一種 pattern
 
-這樣做的好處是
+有沒有某一種東西，有沒有某一種 pattern 出現
 
-有一些 function 是可以共用的
+那大部分的 pattern 其實是比整張 image 還要小
 
-比如說，搞不好這個  function 是  sorting
+所以，對一個 neuron 來說
 
-然後，你只要在其他的
+假設它要知道說，一張 image 裡面
 
-更 high level 的 function 裡面 call sorting
+有沒有某一個 pattern 出現
 
-就會 call 到這個 function
+它其實不需要看整張 image
 
-你就不用每一次在每一個 subfunction 裡面
+它只要看 image 的一小部分
 
-需要做 sorting 的時候
+它就可以決定這件事情了
 
-都 implement 一個完整的 sorting function
+舉例來說
 
-你可以把它變成模組
+假設我們現在，有一張圖片
 
-需要的時候再去 call 它
+那第一個 hidden layer 的某一個 neuron
 
-這樣你就可以減少你程式的複雜度
+它的工作是
 
-可以讓你的程式比較簡潔
+要偵測有沒有鳥嘴的存在
 
-那如果用在 machine learning 上面呢
+那你可能
 
-你可以想像我們現在有架一個 task
+有一些 neuron 偵測有沒有鳥嘴的存在
 
-假設我們要做影像分類
+有一些 neuron 偵測有沒有爪子的存在
 
-那我們要把 image 分成，比如說 4 類
+有一些 neuron 偵測有沒有翅膀的存在
 
-比如說，長頭髮女生、長頭髮男生
+有沒有尾巴的存在，之後合起來
 
-和短頭髮女生、短頭髮男生
+就可以偵測，圖片中有沒有一隻鳥
 
-那你可能說，我們對這四類我們要分類的影像
+假設有某一個 neuron 它的工作是
 
-通通去 collect data
+要偵測有沒有鳥嘴的存在
 
-比如說，長頭髮女生可以 collect 到一堆 data
+那它其實並不需要看整張圖
 
-長頭髮男生也有一些 data
+因為，其實我們只要給
 
-短頭髮女生，短頭髮男生都有一些 data
+neuron 看這樣一個小的部分
 
-你就去 train 4 個 classifier
+這個小的紅色框框裡面的區域
 
-你就可以 solve 這個 problem
+它其實就可以知道說
 
-但是問題就是，長頭髮的男生
+它是不是一個鳥嘴
 
-你的 data 可能是比較少的
+對人來說也是一樣，只要看這個小的區域你就會知道說
 
-比如說，在立法院裡面
+這是鳥嘴，不需要看整張圖才知道這件事情
 
-只有林昶佐是長頭髮
+所以，每一個 neuron 其實只要連接到
 
-那他現在也不是長頭髮，所以這個 data 是比較少的
+一個小塊的區域就好，它不需要連接到
 
-就是你沒有太多的 training data
+整張完整的圖
 
-所以，你 train 出來的
+那第二個觀察是這樣子
 
-detect 長頭髮男生的 classifier
+同樣的這個 pattern
 
-就比較 weak
+在 image 裡面，它可能會出現在
 
-所以，你 detect 長頭髮男生的 performance 就比較差
+image 的不同的部分
 
-那怎麼辦呢？
+它會出現在 image 的不同的部分
 
-你可以用模組化的概念
+但是，它們代表的是同樣的含意，它們也有同樣的形狀
 
-假設我們現在不是先直接去解那一個問題
+它們可以用同樣的 neuron
 
-而是把原來的問題切成比較小的問題
+同樣的參數，然後，detector 就可以偵測出來
 
-比如說，我們 learn 一些 classifier
+比如說，在這張圖裡面，有一個在左上角的鳥嘴
 
-這一些 classifier 它的工作
+那這張圖裡面，有一個在
 
-是去 detect 有沒有某一種 attribute 出現
+中央的鳥嘴
 
-比如說，它不是直接去 detect 說
+但是，你並不需要說，我去訓練兩個不同的 detector
 
-是長頭髮男生，還是長頭髮女生
+一個是專門偵測左上角有沒有鳥嘴
 
-它是把這個問題切成比較小的問題
+一個是偵測中央有沒有鳥嘴
 
-它把這個問題切成
+如果這樣做的話呢，它就
 
-我們先決定說，input 一張 image，它是男生還是女生
+太冗了，所以，我們要 cost down
 
-input 一張 image，它是長頭髮還是短頭髮
+所以，它不需要太多的冗員，因為這個
 
-雖然說，長頭髮的男生 data 很少
+這個 neuron，偵測左上角鳥嘴的 neuron
 
-雖然說，長頭髮的男生 data 很少
+跟中央的偵測有沒有鳥嘴的 neuron，他們
 
-但女生的 data 和男生的 data 都可以
+做的事情，其實可能就是一樣的
 
-分別 collect 到足夠的 data
+所以，我們並不需要有兩個 neuron
 
-雖然，長頭髮男生的 data 很少
+兩組參數，來做
 
-但是長髮的人跟短髮的人的 data
+duplicate 的事情，所以，我們可以
 
-你都可以 collect 到夠多
+要求這兩個 neuron，他們就用同一組參數
 
-所以你 train 這些 basic 的 classifier 的時候
+它們就 share 它們的參數，它們就共用同一組參數
 
-你就不會 train 的太差
+這樣你就可以減少，你需要的參數的量
 
-你這些 basic 的 classifier 都是有足夠 data
+那第三個，是我們知道一個 image
 
-把它 train 好
+你可以對它做 subsampling
 
-所以，接下來
+你把一張 image 的奇數行
 
-如果你要解，最後我們要真正處理的問題的時候
+偶數列的 pixel 拿掉
 
-你的每一個 classifier 就去參考這一些
+變成原來的 1/10 的大小
 
-basic 的 attribute 的 output
+它其實部會影響人對這張 image 的理解
 
-你就最後要下決定的那一個 classifier
+對你來說，這張 image 跟這張 image
 
-它是把前面的 basic 的 classifier 當中的 module
+看起來可能沒有太大差別
 
-去 call 它的 output
+你都可以辨識裡面有甚麼物件
 
-而每一個 classifier 都共用同樣的 module
+所以，做 subsampling 這件事情
 
-都共用同樣的 module
+對影像辨識來說，能是沒有太大的影響的
 
-只是可能用不同的方式來使用它而已
+所以，我們可以用這個概念把 image 變小
 
-對 classifier 來說
+這樣，你就可以減少你需要用的參數
 
-它看到前面的 basic 的 classifier 告訴它說
+所以，整個 CNN 的架構是這樣
 
-是女生、是長頭髮
+等一下，我們會一個一個解釋
 
-那這個 classifier output 就是 yes，反之就是 no
+在 CNN 的整個架構裡面
 
-所以，對後面這些 classifier 來說
+每一個 block 它做的事情是什麼
 
-它可以利用前面這些 classifier
+首先，input 一張 image 以後呢
 
-所以它只要用比較少的 training data
+首先，這個 image 會通過
 
-就可以把結果 train 好
+convolution 的 layer
 
-雖然說 classifier 2 的 data 很少
+然後，接下來，做 Max pooling 這件事
 
-但是，現在要做的事情是比較簡單的
+那這每一件事，我們等一下都會解釋
 
-真正複雜的事都被 basic classifier 做掉了
+然後，再做 convolution 這件事
 
-所以，classifier 需要做的事情比較簡單
+然後，再做 Max Pooling 這件事
 
-所以，比較少的 data，就可以把它 train 好
+那這個 process 可以反覆數次
 
-那 deep learning 怎麼跟模組化的概念，扯上關係呢？
+那反覆的次數，你覺得夠多以後呢
 
-你想想看
+但反覆幾次這個你要事先決定
 
-每一個 neuron 其實就是一個 basic 的 classifier
+它就是 network 的架構，就好像 network 有幾層一樣
 
-第一層 neuron，它是一個最 basic 的 classifier
+你要做幾次 convolution，做幾次 Max Pooling
 
-第二層 neuron 是比較複雜的 classifier
+你在定你那個 network的架構時，就要事先決定好
 
-它用第一層 basic 的 classifier 的 output
+那你做完
 
-當作它的 input
+你做完你決定要做的 convolution 和
 
-它把第一層的 classifier 當作 module
+Max Pooling 的次數以後，那你會做另外一件事情
 
-而第三層的 neuron 又把第二層的 neuron
+你要做一件事情叫 Flatten
 
-當作它  module，以此類推
+那做完 Flatten 以後，你把 Flatten output
 
-當然這邊要強調的是說
+丟到一般的 fully connected 的 network 裡面去
 
-在做 deep learning 的時候
+然後，得到最後影像辨識的結果
 
-怎麼做模組化這件事情是 machine
+那我們剛才講說
 
-自動學到的
+這個我們基於
 
-那我覺得呢，這件事情還頗神奇
+3 個對影像處理的觀察
 
-那 machine 就自動學到說
+所以，設計了 CNN 這樣的架構
 
-比如說，在 image 裡面
+那第一個觀察是
 
-第一層 classifier 就是 detect 最單純的 attribute 等等
+同樣的 pattern
 
-那我們剛才說
+要偵測一個 pattern，你不需要看整張 image
 
-做 modularization 的好處是甚麼
+你只要看 image 的一個小部分
 
-做 modularization 的好處是
+第二個是，同一個 pattern 它
 
-讓我們的模型變簡單了，對不對
+不出現在一張圖片的不同的區域
 
-我們是把本來的比較複雜的問題，變得比較簡單
+第三個是，我們可以做 subset
 
-所以，當我們把問題變簡單的時候
+前面這兩個 property 呢
 
-就算 training data 沒有那麼多
+它就是用 convolution 的 layer
 
-我們也可以把這個 task 做好
+來處理掉
 
-這個是 modularization、這是模組化的精神
+最後這個 property
 
-如果 deep learning 做得是做模組化的話
+是用 Max Pooling
 
-其實，神奇的事就是
+來處理，那等一下，我們就要介紹一下
 
-deep learning 需要的 training data 是比較少的
+每一個 layer 在做的事情
 
-這個，有沒有跟你的認知是相反的呢
+那我們就先從 convolution 開始看起
 
-我知道現在因為 deep learning 很紅
+假設現在
 
-新聞上都有各種各式樣的說法
+我們的 network 的 input 是一張 6*6 的 image
 
-常常聽有人說
+假設這是黑白的
 
-AI 就等於 big data 加 deep learning
+如果是黑白的，每一個 pixel 就只需要用一個 value
 
-那很多人就會覺得說
+來描述它
 
-所以，這個 deep learning 會 work
+比如說，1 就代表有塗墨水
 
-是因為 big data 的關係
+0 就代表，沒有塗到墨水
 
-沒有 big data，deep learning 就不會 work
+那在 convolution layer 裡面
 
-其實，我認為並不是這個樣子
+它有一組 Filter
 
-你知道嗎 ， 如果你仔細想想看
+它有一堆 filter
 
-假設我有真正很大的 big data
+那這邊的每一個 filter
 
-假設我們今天要做 image 的 classification
+我等一下會講說，它其實就等同於是
 
-然後，我們的 data base 實在是太大了
+fully connected layer 裡面的一個 neuron
 
-大到我可以把全世界的 image 通通收集進來
+我們等一下會講，現在先想說，我們有
 
-testing 的每一張 image
+一組 filter
 
-都在我的 data base 裡面有一張
+那每一個 filter，其實就是一個 matrix
 
-那我何必做 machine learning
+比如說，這邊的每一個 filter
 
-我直接 table lookup 就好了
+都是 3*3 的 matrix
 
-所以其實 machine learning 跟 big data
+那這邊的每一個 filter 裡面的參數
 
-在某種程度上它們其實是相反的
+這個 matrix 裡面的每一個 element 的值
 
-你有真正的 big data 的時候
+就是 network 的 parameter
 
-你就不用 learn 它，你就 table lookup
+它就跟那些 neuron 的 weight 跟 bias 一樣，它們是
 
-我們之所以不能 table lookup
+network 的 parameter
 
-就是因為沒有足夠 data
+它們是必須學出來的
 
-所以，我們才需要 machine 去做舉一反三這件事情
+根據 training data 學出來，並不是人去設計的
 
-我們才需要  machine 去做學習這一件事情
+所以，每一個 filter
 
-所以這一邊有沒有跟你的認知是不太一樣的呢
+它裡面的值是做甚麼
 
-其實當我們做 deep learning 的時候
+它裡面的值是什麼，要做甚麼事情
 
-就是因為我們沒有足夠的 training data
+也是自動被學出來的
 
-所以，我們需要 deep learning
+這邊呢，我們
 
-那剩下的我們就留待下一次再說，謝謝
+每一個 filter，如果你是 3*3 的 size
 
-好，各位同學大家好
+意味著它就是在偵測
 
-我們開始上課吧
+一個 3*3 的 pattern
 
-上周我我們講到說
+它在偵測一個 pattern 的時候，它不看整張 image
 
-為什麼我們需要用到 deep learning
+它只看一個 3*3 的範圍內
 
-然後 ，這是我們已經講過的
+就可以決定有沒有某一個 pattern 的出現
 
-如果你們在用 deep learning 的話
+這個就是我們考慮的第一個 property
 
-其實你們是在做模組化這一件事情
+整個 pattern 其實比整張 image 還要小
 
-所以，如果從模組化的觀點來看的話
+那這個 filter 怎麼跟這個 image
 
-deep learning 所給我們帶來的優勢並不是
+做 operation 呢
 
-就像有人說的，我就用一個比較大的 model
+這個 operation 的 process 是這樣
 
-然後有比較多的參數，collect 比較多的 training data
+首先，你有第一個 filter
 
-然後，硬 train 下去，所以
+它是一個 3*3 的 matrix
 
-performance 比 Shallow 的 model 好
+那你把這個 filter 放在 image 的左上角
 
-可能不是這樣
+那我猜你可能會很困惑說
 
-因為我們說 deep learning 的好處是來自於模組化
+突然出現甚麼 filter 阿，放在左上角阿
 
-那模組化的好處是，我現在是用
+跟我們之前講的 neural network 都不一樣
 
-比較 efficient 的方式來使用我的參數
+等一下其實會告訴你說，這個就是一個 neural network
 
-在影像上面
+那 training 就跟之前那個 Backpropagation 是一模一樣的
 
-你可以觀察到類似模組化的現象
+那我們現在只是從 convolution 的角度來看
 
-我今天要講的是，接下來我要講的是
+它是怎麼運作的
 
-語音的部分
+它運作的方式是這樣
 
-那我們知道 deep learning 在影像和語音上表現的特別好
+我們把一個 filter 放在一個 image 的左上角
 
-我們在來一下在語音上
+然後，你把這 9 個值
 
-為什麼我們會需要用到模組化的概念
+跟這 9 個值
 
-那我們先非常非常簡短的介紹一下
+做內積
 
-語音的、人類語言的架構
+所以，內積的結果，這邊是 1, 1, 1
 
-當你說一句話的時候
+這邊是1, 1, 1，內積的結果你就得到 3
 
-比如說 ，你說 what do you think
+接下來，你挪動一下，你的 filter 的位置
 
-那這句話其實是由一串 phoneme 所組成的
+那至於要挪多少，這個你要事先決定好
 
-所謂的 phoneme，它的中文翻成音素
+那這個挪動的距離
 
-它是語言學家訂出來的，人類發音的基本單位
+欸，大家有問題嗎？
 
-如果你不知道 phoneme 是甚麼的話
+講道這邊，如果大家沒有問題的話，我們就繼續
 
-就把它想成是音標
+這個挪動的距離
 
-所以，what 由 4 個 phoneme 組成
+叫做 stride
 
-do 由兩個 phoneme 組成，you 由兩個 phoneme 組成
+這個 stride 等於多少，你要自己設啦
 
-等等，然後接下來，同樣的 phoneme
+所以，你設 stride = 1
 
-它可能會有不太一樣的發音
+那 filter 就放在這邊，所以，1, 1, 1
 
-為甚麼呢？當你發 d uw 的時候
+乘上 -1, -1, 1
 
-和你發 y uw 的時候
+心算一下，得到是 -1
 
-你心裡想的是同一個 phoneme
+你可以設 stride = 2
 
-你心裡想要發的都是 uw
+stride = 2 的話，你就得到 -3
 
-但是，因為人類口腔器官的限制
+那 filter 移到這邊，1, 1, 1
 
-所以，你沒辦法每一次發的 uw 都是一樣的
+-1, -1, -1 得到 -3
 
-為甚麼呢？因為這個 uw 前面跟後面
+那我們等一下就設 stride = 1
 
-有接了其他的 phoneme
+所以，設 stride = 1
 
-因為人類發音器官的限制
+你把 filter 往右移一格，得到 -1
 
-所以，你的 phoneme 的發音會受到前後的 phone 所影響
+往右移一格，得到 -1；再往右移一格，得到 -3
 
-所以，為了表達這一件事情
+再往右移一格，得到
 
-我們會給同樣的 phoneme
+這邊是 1, 1, 1，這邊是  -1, 1, -1，得到  -1
 
-不同的 model
+然後，你接下來往下移一格
 
-這個東西叫做 tri-phone
+得到 -3，就這樣，以此類推
 
-那 tri-phone 表達的方式是這樣
+把這件事情，就每一次都
 
-你把這個 uw
+stride = 1，就每次都移動一格
 
-加上前面的 phoneme d 跟後面的 phoneme y
+那最後，你就會得到一個
 
-跟這個 uw 加上前面的 phoneme y 跟後面的 phoneme th
+最後，直到你把 filter 移到右下角的時候
 
-就是 tri-phone
+這邊是 1, 1, 1，這邊是 -1, 1, -1
 
-那有人看到這種表示方式就覺得說
+你就得到 -1
 
-tri-phone 就是 3 個 phone
+所以，做這件事情以後
 
-看起來像是
+本來是一個 6*6 的 matrix
 
-本來只考慮一個 phone，現在考慮 3 個
+經過這個 convolution process，就得到一個
 
-不是這個意思，不是考慮 3 個 phone 的意思
+4*4 的 matrix
 
-這個意思是說，現在一個 phone
+如果你看這個 filter 的值
 
-我們用不同的 model 來表示它
+它的斜對角的地方是 1, 1, 1
 
-如果一個 phoneme ，它的 contest 不一樣
+所以，它的工作就是 detect 有沒有 1, 1, 1
 
-這兩個 uw 的 contest 不一樣
+有沒有這個連續的，左上到右下的 1, 1, 1
 
-我們就用不同的 model
+出現在這個 image 裡面
 
-來模擬、來描述這樣子的 phoneme
+比如說，它出現在這個地方
 
-那一個 phoneme，它可以拆成幾個 state
+比如說，它出現在這個地方
 
-state 有幾個，其實是你要自己訂的
+所以，這個 filter 就會告訴你說
 
-是 engineer 自己訂的，比如說，我們通常就訂成
+你看現在左上跟左下
 
-3 個 state
+出現最大的值
 
-那這個是人類語言的基本架構
+就代表說，這個 filter 要偵測的 pattern
 
-怎麼做語音辨識呢？
+它出現在這個 image 的左上角
 
-怎麼做語音辨識呢？
+所以，左上角最大值跟左下角
 
-語音辨識其實非常的複雜
+有最大的值，這件事情呢
 
-我們現在只是講語音辨識的第一步
+就考慮了 property 2
 
-第一步這是你要做的事情是把
+因為，同一個 pattern
 
-acoustic feature 轉成 state
+它出現在左上角的位置，跟出現在左下角的位置
 
-這是一個單純的 classification 的 problem
+我們都用 filter 1 就可以
 
-這個 classification 的 problem 就跟
+偵測出來，我們不需要用不同的 filter 來做這件事情
 
-比如說，你在作業三
+我們用同一個 filter 就可以把它偵測出來
 
-把 input 一張 image 分成 10 類是一樣的
+在一個 convolution 的 layer 裡面，它會有
 
-現在只是要 input 一個 acoustic feature
+一打 filter，它會有一大堆的 filter
 
-然後，把它分說它是哪一個 state
+那剛才只是一個 filter 的結果
 
-所以，acoustic feature 是甚麼呢？
+會有另外一個 filter，它裡面會有不一樣的參數
 
-這邊我們不會細談，所謂的 acoustic feature
+比如說，這裡會有一個 filter 2
 
-簡單講起來就是
+會有不一樣的參數，那它也做跟 filter 1
 
-input 聲音訊號，它是一串 wave form
+一模一樣的事情
 
-那你把這個，在這個 weight phone 上面取一個 window
+你就先把 filter 2 放在左上角
 
-這個通常不會取太大
+再做 inner product 得到 -1
 
-比如說，250 個 mini second
+再挪動一格，得到  -1，就這樣，以此類推
 
-你把一個 window 當作
+所以，你把 filter 2 跟 input 的 image
 
-你把一個 window
+做完 convolution 以後
 
-裡面就把它用一個 feature
+你就得到另外一個 4*4 的 matrix
 
-來描述這個 window 裡面的特性
+你就得到另外一個 4*4 的 matrix
 
-那這個東西，就是一個 acoustic feature
+那這個紅色的 4*4 的 matrix 跟
 
-那你在這個聲音訊號上面呢
+藍色的 4*4 的 matrix 合起來
 
-你會每隔一個時間點，每隔一小段
+就叫做，他們叫做 Feature Map
 
-時間，就取一個 window
+這個東西叫做 Feature Map
 
-所以，一段聲音訊號就會變成一串
+那看你有幾個 filter，你就會得到多少的 image
 
-vector sequence，這個叫做 acoustic feature sequence
+比如說，你有 100 個 filter
 
-那在做語音辨識的第一階段
+那這邊你會得到 100 個 image
 
-你需要做的事情就是
+講到這邊大家有沒有甚麼問題想要問呢？
 
-決定每一個 acoustic feature
+沒錯，因為現在每一個 filter size 都是一樣的
 
-它屬於哪一個 state
+意味著說，如果你今天有同一個 pattern
 
-你要建一個 classifier，這個 classifier 告訴我們說
+它有不同的 size，有大的鳥嘴，也有小的鳥嘴
 
-第一個 acoustic feature 它屬於 state a, state a
+它必須要用
 
-第三個也屬於 state a
+如果你可以事先知道的話，你當然可以用 normalize
 
-接下來屬於 state b，接下來屬於 state c 等等
+但是，input 一張 image，你沒有辦法事先知道
 
-光只有做這樣子，是沒有辦法做一個語音辨識系統的
+知道它是大的鳥嘴還是小的鳥嘴，所以
 
-這個東西只是 state 而已
+你也沒辦法 normalize
 
-你要把 state 轉成 phoneme
+所以，CNN 並不能夠自動處理這個問題
 
-然後再把 phoneme 轉成文字
+對它來說，這種不同 scale 的東西，它其實
 
-接下來，你還要考慮同音異字的問題
+不見得能夠處理
 
-用 language model 考慮同音異字的問題，等等
+那你其實可以看看這個
 
-這個就不是我們今天所要講的
+DeepMind 最近有解一篇 paper
 
-我想要比較一下
+是當你 input 一張 image 的時候
 
-過去在用 deep learning 之前
+它在 CNN 前面，再接另外一個 network
 
-和用 deep learning 之後，在語音辨識上的模型
+這個 network 做的事情是甚麼呢？
 
-有什麼不同
+這個 network 做的事情是
 
-這個時候，你就更能夠體會說為甚麼 deep learning
+它 output 一些 scalar
 
-在語音上，會有非常顯著的成果
+告訴你說，它要把這個 image 的
 
-那我們說
+裡面的哪些位置
 
-我們要繼續做的事情
+做旋轉、縮放
 
-在語音辨識的第一個階段，就是要做分類這個問題
+然後，再丟到 CNN 裡面
 
-也就是決定一個 acoustic feature
+這樣你其實會得到比較好的結果
 
-它屬於哪一個 state
+大家還有甚麼問題嗎？
 
-那傳統的方法呢
+那剛才舉的例子是
 
-叫做這個 HMM-GMM
+黑白的 image，所以你 input 的是一個 matrix
 
-這個 GMM 的方法是怎麼做的呢
+如果今天是彩色的 image 怎麼樣呢？
 
-這個方法是說
+我們知道彩色的 image 就是
 
-我們假設每一個 state
+RGB 組成的
 
-它就是一個 stationary 的
+對不對，RGB 組成的
 
-它裡面訊號的分佈
+所以一個彩色的 image，它就是好幾個 matrix 疊在一起
 
-每一個屬於某一個 state 的 acoustic feature 的分佈呢
+它就是一個立方體
 
-是 stationary 的，所以你可以用一個model 來描述他
+如果我今天要處理彩色的 image
 
-比如說，這一個 state
+我們要怎麼做呢？
 
-這個第一當作中心的這個 tri-phone 的第一個 state
+這個時候你的 filter，就不是一個 matrix
 
-它可以用一個 GMM 來描述它
+你的 filter 也是一個立方體
 
-那另外一個 state
+如果你今天是 RGB 這三個顏色來表示
 
-可以用另外一個 GMM 來描述它
+一個 pixel 的話
 
-這時候給你一個 feature
+那你的 input 就是 3*6*6
 
-你就可以算說，這一個 acoustic feature
+那你的 filter 就是 3*3*3
 
-從每一個 state 產生出來的機率
+你的 filter 的高就是 3
 
-這個東西叫做 Gaussian Mixture Model，叫做 GMM
+你的 filter 高就是 3
 
-但是如果說你仔細想一想，發現這一招其實
+你在做這個 convolution 的時候
 
-根本不太 work，為甚麼呢？
+你就是把這個 filter 的 9 個值
 
-因為 tri-phone 的數目太多了
+跟這個 image 裡面的 9 個值
 
-一般語言，中文英文
+做內積
 
-都有 30 幾、將近 40 個 phoneme
+了解嗎？我們並不是把每一個
 
-我們就算 30 個好了
+把每一個 RGB 顏色都分開算
 
-那在 tri-phone 裡面
+那其實這個在影像上，我們叫做 channel
 
-每一個 phoneme，隨著它 contest 的不同
+並不是把每一個 channel 分開來算
 
-也要用不同的 model
+而是，合在一起算
 
-所以，到底有多少個 tri-phone
+每一個 filter 同時就考慮了
 
-你有 30 的 3 次方個 tri-phone
+不同顏色所代表的 channel
 
-你有 9000 個，不是 9000，是
+講道這邊大家聽得懂嗎？
 
-是 27000 個 tri-phone
+那我們現在要講的東西就是
 
-每一個 tri-phone 又有三個 state
+這個 convolution 跟 fully connected
 
-所以，你有數萬個 state
+有什麼關係？
 
-你每一個 state 都要很用一個 GMM 來描述
+你可能覺得說，它是一個很特別的 operation
 
-那參數太多了
+感覺跟 neural network 沒半毛錢的關係
 
-你的 training data 根本不夠
+其實，它就是一個 neural network
 
-所以傳統上，在有 deep learning 之前怎麼處理這件事呢
+怎麼說呢？我現在要講的就是
 
-我們說有一些 state
+這個 convolution，這件事情
 
-其實它們會共用同樣的 model distribution
+其實，它就是一個
 
-這件事情叫做 Tied-state
+fully connected 的 layer 把一些 weight 拿掉而已
 
-這件事情叫做 Tied-state
+怎麼說呢？
 
-那你可能會覺得有點抽象
+我們假設這邊這個 output
 
-甚麼叫做不同的 state 共用同樣的 distribution 呢
+這個 feature map 的 output
 
-意思就是說
+其實就是
 
-假如你在寫程式的時候
+一個 hidden layer 的 neuron 的 output
 
-不同的 state 的名稱，就好像是 pointer 一樣
+如果你把這兩個東西 link 在一起的話
 
-所以，實際上你真的在寫程式的時候，你就這麼寫
+這個 convolution 其實就是一個
 
-state 的名稱是 pointer
+fully connected 的 layer 拿掉一些 weight 的結果
 
-那不同的 pointer
+怎麼說呢？
 
-它們可能會指向同樣的
+我們在做 convolution 的時候
 
-它們可能會指向同樣的 distribution
+我們把 filter，假設我們今天考慮 filter 1
 
-所以，有一些 state
+我們把 filter 1 放在左上角
 
-它的 distribution 是共用的
+然後，你做 inner product，得到一個值 3
 
-有一些沒有共用
+這件事情等同於
 
-到底哪一些要共有，哪一些不要共用
+我們現在把這個 6*6 的 image 拉直
 
-就變成說，你要憑著經驗
+拉直變成這樣子
 
-還有一些語言學的知識阿
+然後，你有一個 neuron 的 output 是 3
 
-來決定說哪些 state 它們的聲音是需要共用的
+那這個 neuron 的 output 怎麼來的呢？
 
-可是，這樣是不夠的
+這個 neuron 的 output 它是考慮了
 
-如果只分 state 的 distribution
+你看這個 filter
 
-要共用或不共用，這樣太粗了
+它把它放在左上角
 
-所以，有的人就會開始提出一些想法說
+它在左上角
 
-如何讓它部分共用，等等
+所以，這個 filter，它考慮的 pixel
 
-那在 deep learning 火紅之前
+是 1, 2, 3、1, 2, 3
 
-再前一個提出來比較有創新的方法，叫做 subspace GMM
+這邊是 4, 5, 6
 
-那其實它裡面有這個 modularization、有模組化的影子
+欸，不是 4, 5, 6
 
-在這個 subspace GMM 裡面呢
+這邊 1, 2, 3, 4, 5, 6，所以這邊是 7, 8, 9
 
-這個方法是說，我們原來是每一個
+這邊是 7, 8, 9
 
-state 它就有一個 distribution
+這邊是 13, 14, 15
 
-在 subspace GMM 裡面，它說
+假設你把這一個 6*6 的 image 的 36 個 pixel 拉成
 
-我們先把很多很多的 Gaussian
+直的
 
-先找出來，我們先找一個 Gaussian pool
+那這 9 個 pixel 分別就是
 
-那每一個 state，它的 information 就是一個 key
+編號 1, 2, 3 的 pixel 跟 7, 8, 9 的 pixel
 
-那一個  key 告訴我們說，這個 state
+跟 13, 14, 15 的 pixel
 
-要從這個 Gaussian 的 pool 裡面
+那如果我們說這個 filter 做 inner product 以後的 output 3
 
-挑那些 Gaussian 出來，比如說
+就是某一個 neuron 的 output 3 的話
 
-可能有某一個 state 1
+就代表說有 1 個 neuron
 
-它挑第一、第三、第五個 Gaussian
+這個 neuron 的 weight
 
-某一個 state 2，它挑第一、第四、第六個 Gaussian
+只連接到 1, 2, 3
 
-如果你這樣做的話
+7, 8, 9 跟 13, 14, 15
 
-這些 state 有些時候就可以 share 部分的 Gaussian
+這 3 個 pixel 而已
 
-那有些時候就可以完全不 share Gaussian
+而這個 neuron 它的這 9 個 weight
 
-那至於要 share 多少的 Gaussian
+就是 filter 這個 matrix 裡面的這 9 個 weight
 
-這個東西，是可以從 training data 去把它學出來的
+花很多時間故意把它用同樣的顏色
 
-這個是在 DNN 火紅之前的做法
+這樣看的出來嗎？這個 1 是
 
-但是，如果你仔細想想
+框棕色，所以這邊才是棕色的
 
-剛才講的這個，HMM-GMM 的方式
+這個框紅色，這真的搞很久，所以這是紅色
 
-所有的 phone 或者是 state
+這個橙色的
 
-是 independent model 的
+這邊有 9 個不同的顏色，所以
 
-這件事情是不 efficient 的
+這 9 個不同顏色裡面框起來的 weight
 
-對 model 人類的聲音來說
+分別就是這 9 個不同的 weight
 
-那如果你想想看人類的聲音
+大家看的懂嗎？
 
-不同的 phoneme
+所以，現在是這樣子的
 
-雖然說我們把它歸類為不同的音素
+我們應該在 fully connected 的 layer 裡面
 
-我們在分類的時候把他歸類為不同的 class
+一個 neuron，照理說是連接到所有的 input
 
-但這些 phoneme 之間並不是
+你有 36 個 pixel 當作 input
 
-完全無關的
+那這個 neuron 本來應該連接到 36 個 input
 
-它們都是由人類的發音器官所 generate 出來的
+但是，我們現在只連接 9 個 input
 
-它們中間是有根據人類發音器官發音的方式
+只連接 9 個 input，因為我們知道說
 
-它們是有某些關係的
+要 detect 一個 pattern，我們不需要看整張 image
 
-舉例來說，在這個圖上
+我就看 9 個 input 就好
 
-這個圖呢，在這個圖上呢
+所以，當我們這麼做的時候，你就用了
 
-人類語言裡面所有的母音
+比較少的參數，你就用了比較少的參數
 
-這個母音的發音呢
+當我們移動一格，把 filter 做 stride = 1 的移動的時候
 
-其實，就只受到三件事情的影響而已
+發生甚麼事呢？
 
-一個是你舌頭的前後的位置
+我們得到另外一個值 -1
 
-一個是你舌頭上下的位置
+我們假設這個 -1 是另外一個
 
-還有一個，就是你的嘴型
+neuron 的 output
 
-所以，一個母音的發音
+那這個 neuron 連接到哪些 input 的 weight 呢
 
-其實就只受到這三件事的影響而已
+這一個框起來的地方啊
 
-比如說，在這個圖上呢
+這個框起來的地方，它正好就對應到 pixel 2, 3, 4
 
-你可以找到英文的五個
+2, 3, 4，這個是 8, 9, 10
 
-常見的、英文的 5 個母音 a, e, i, o, u
+8, 9, 10 跟 14, 15, 16
 
-這個  a, e, i, o, u 啊
+跟 14, 15, 16，你會發現說這邊呢
 
-它們之間的差別就是
+同樣的 weight 代表同一個顏色，所以
 
-當你發 a 到 e 到 i 的時候
+這 9 個 matrix
 
-你的舌頭是由下往上
+這 9 個在這個 filter 所對應的matrix 裡面的 weight
 
-那個 i 跟 o 的差別呢
+就是這個圖上 9 個不同的顏色
 
-是你的舌頭放在前面或放在後面的差別
+所以，當我們做這件事情的時候，意味著說
 
-所以，如果你發 a, e, i, o, u 的話
+這裡個 neuron
 
-你的舌頭變化方式呢
+本來在 fully connected layer 裡面
 
-就會這張圖一樣
+每一個 neuron 都有獨立、自己的 weight
 
-相信這個時候，你心理一定是在想
+但是，當我們做這個
 
-一定是在默念 a, e, i, o, u 這樣
+convolution 的時候
 
-然後，你會想說
+首先，我們把每一個 neuron 它前面連接的 weight 減少
 
-怎麼感覺不太出來
+再來，我們強迫說
 
-我發現你自己唸，不太會感覺你的舌頭位置在哪裡
+某些 neuron、這兩個 neuron
 
-你要知道說，你的舌頭位置是不是真的跟這個圖上一樣
+他們一定要共用同一組 weight
 
-你就回去張大嘴巴，對著鏡子唸 a, e, i, o, u
+他們的 weight 永遠都必須是一樣的
 
-你會發現說，你舌頭的位置呢
+它連接到 pixel 1 的 weight
 
-就跟這個圖上是一模一樣的
+要等於它連接到 pixel 2 的 weight
 
-在這個圖上，同一個位置
+它連接到 pixel 2 的 weight
 
-的母音呢
+要等於它連接到 pixel 3 的 weight
 
-代表說，舌頭的位置是一樣的，但是
+它連接到 pixel 3 的 weight，
+要等於它連接到 pixel 4 的 weight
 
-嘴型是不一樣的
+我故意用同樣的顏色來表示，希望你可以看的出來
 
-比如說，我們看左上角
+這件事情叫做 weight 的 sharing
 
-在最左上角的位置有兩個母音
+當我們做這件事情的時候，我們用
 
-一個是 i，一個是 u 這樣
+用的這個參數呢
 
-那 i 跟 u 的差別
+又比原來又更少
 
-它們舌頭位置是一樣的，只是嘴型是不一樣的
+我們強迫一些 weight
 
-如果是 i 的話，嘴是比較扁的
+一定要 share 在一起
 
-u 的話，嘴是比較圓的
+我們用的 weight 就更少
 
-所以，你只要改變嘴型的位置，就可以從 i 變成 u
+這邊有一些事情是投影片上沒有講的
 
-你本來發 i~~~u~~~ 這樣子
+可能會問說
 
-你改變一下嘴型，它的發音就不一樣
+這怎麼 train
 
-所以說，因為不同的 phoneme 之間是有關係的
+首先，第一件事情就是這都是用 toolkit 做的
 
-所以，你說每一個 phoneme 都搞一個自己的 model
+所以，你大概不會自己寫
 
-這件事情其實是沒有效率的
+如果你要自己寫的話
 
-那如果今天是用
+它的做法就是，你就跟原來的 Backpropagation
 
-deep learning 是怎麼做的呢
+用一模一樣的作法
 
-如果是 deep learning 的話
+只是有一些 weight
 
-你就是去 learn 一個 deep neural network
+就永遠是 0，你就不 train 它，它就永遠是 0
 
-這個 deep neural network 的 input 呢
+然後，再來呢
 
-就是一個 acoustic feature
+你說怎麼讓這個 weight 的值永遠都是一樣的
 
-它的 output 就是每一個 feature 屬於哪一個 state 的機率
+你就用一般的 Backpropagation 的方法
 
-這是一個很單純的 classification 的 problem
+然後，這個 weight 你算出一個 gradient
 
-跟你作業三做在影像上是沒有甚麼差別的
+這個 weight 你算出一個 gradient
 
-learn 一個 DNN，input 是一個 acoustic feature
+再把本來要 tight 在一起
 
-output 就是告訴你說，這個 acoustic feature
+要 share weight 的那些 weight 的  gradient 平均
 
-屬於每一個 state
+然後，他們 update 同樣的值，就結束了
 
-它屬於 state a, state b, state c 的機率
+你聽不懂沒有關係，因為
 
-那這邊最關鍵的一點是
+你大概沒有機會自己實作這個東西
 
-所有的 state
+如果你真的有空的話，等一下下課可以跟我討論
 
-都共用同一個 DNN
+這件事情呢
 
-在整個辨識裡面，你就只有一個 DNN 而已
+再來，接下來要做 Max pooling
 
-你沒有每一個 state 都有一個 DNN
+Max pooling 是甚麼呢？
 
-所以，有人覺得說
+相較於 convolution，max pooling 是比較簡單的
 
-所以，有些人他沒有想清楚
+它就是做 subsampling
 
-這個 deep learning 到底 powerful 在哪裡，他會說
+根據 filter 1
 
-從 GMM 變到 deep learning 厲害的地方就是
+我們得到一個 4*4 的 matrix
 
-本來 GMM 通常你最多也就做 64 個 Gaussian mixture 而已
+根據 filter 2，你得到另外一個 4*4 的 matrix
 
-那 DNN 有 10 層，每層 1000 個 neuron
+接下來，我們做甚麼事呢？
 
-果然參數很多，參數變多了，所以 performance 變好了
+我們說，把這個
 
-這是一個暴力輾壓的方法，其實也沒什麼
+output，4 個一組，4 個一組
 
-其實 DNN 不是一個暴力輾壓的方法
+4 個一組，4 個一組
 
-你仔細想想看，在做 HMM-GMM 的時候
+每一組裡面，你可以選他們的平均
 
-你說 GMM 只有 64 個 mixture
+或者是你可以選最大，其實都可以
 
-好像覺得很簡單，但是其實你是
+你就是把原來 4 個 value 合成 1 個 value
 
-每一個 state 都有一個 Gaussian mixture
+那你可以用自己想要的方法來做這件事情
 
-所以真正合起來，它的參數是多得不得了的
+這件事情就可以讓你的 image 縮小
 
-如果你仔細去算一下
+比如說，假設我們現在就是選 4 個裡面
 
-GMM 用的參數跟 DNN 用的參數
+最大的那個保留下來
 
-我曾經在不同的 task 上估測過這一件事情
+所以，3, -1, 3, 1，我就選 3
 
-它們用的參數，你會發現其實是差不多多的
+就選最大的保留下來，那你這邊可能會有一個問題就是
 
-所以，DNN 它只是用一個很大的 model
+把這個東西放到 network 裡面，你不就沒辦法微分了嗎
 
-GMM 是用很多很小的 model
+max 這個東西，感覺不能微分阿
 
-但是，當我們把這兩個東西拿來比較的時候
+它其實可以的
 
-其實它們用的參數量，是差不多多的
+我們之後講 Maxout network 的時候，再來跟大家講
 
-但是，DNN 把所有的
+這個，其實有辦法用微分的方式來處理它
 
-它把所有的 state
+所以，結論是這樣
 
-通通用同一個 model 來做分類
+結論是這樣
 
-會是比較有效率的做法
+我們現在，這邊有 4 個值，這邊有 4 個值
 
-為甚麼這樣是比較有效率的做法呢
+所以，做完一次 convolution
 
-舉例來說，如果你今天把
+加一次 Max pooling
 
-一個 DNN
+我們就把原來 6*6 的 image
 
-它的某一個 hidden layer 拿出來
+變成一個 2*2 的 image
 
-然後，因為一個 hidden layer
+至於這一個 2*2 的 image，它每一個 pixel 的深度
 
-比如說，它其實有 1000 個 neuron
+它的這個深度
 
-你沒有辦法分析它
+每一個 pixel 用幾個 value 來表示
 
-但是，你可以把那 1000 個 layer 的 output 降維
+depend on 你有幾個 filter，如果你有 50 個 filter
 
-降到 2 維
+這邊就是 50 維
 
-所以，在這個圖上
+兩個 filter，這邊就 2 維
 
-每一個點代表了一個 acoustic feature
+所以，這個就是一個
 
-它通過 DNN 以後
+新的，但是比較小的 image
 
-它通過 DNN 以後
+那每一個 filter 就代表了一個 channel
 
-它把它這個 output layer 的 output 降到二維
+這一件是可以 repeat 很多次
 
-可以發現說它的分布是長這個樣子的
+你得到一個、你通過一個 convolution
 
-在這個圖上的顏色代表甚麼意思呢
+再加一個 Max pooling
 
-這邊的顏色，其實就是
+你就得到一個新的 image
 
-a, e, i
+你就得到一個新的 image
 
-a, e, i, o, u 這樣，特別把這 5 個母音
+那它是一個比較小的 image
 
-用跟這邊圖的顏色一樣的框框
+所以，你可以把這個比較小的 image，再做一樣的事情
 
-把它框起來
+再通過 convolution
 
-那你會發現神奇的事就是
+再通過 Max pooling，再得到一個更小的 image
 
-這邊，這 5 個母音的分布
+那我這邊舉的例子
 
-跟這一個圖的分布，其實幾乎是一樣的
+input image 已經夠小了
 
-這邊是 a, e, i, o, u
+所以，再做一次就不見了
 
-這邊是 a, e, i, o, u
+我就沒有再做一次
 
-所以，你可以發現說
+講到這邊，大家可以了解我意思嗎？
 
-DNN 在做的事情
+有甚麼問題要問的嗎？
 
-它的比較 lower 的 layer 做的事情
+其實我講到這邊的時候，我常常會
 
-它其實是在
+被問到、遇到一個問題
 
-它並不是真的要要馬上去偵測說
+大概是我講 deep learning 的 talk 已經太多了
 
-現在 input 這個發音，它是屬於
+我都可以 predict 聽眾的問題
 
-哪一個 phone 或哪一個 state，它做的事情是
+這邊每次都會有人問我一個問題，就是
 
-它先觀察說，當你聽到這個發音的時候
+如果我這邊有 25 個 filter
 
-人是用甚麼樣的方式
+我得到 25 個
 
-在發這個聲音的
+feature map
 
-它的舌頭的位置在哪裡
+假設我第一個 convolution 有 25 個 filter
 
-它的舌頭位置是高還是低呢
+我得到 25 個 feature map
 
-它的舌頭位置是在前還是後呢，等等
+第二個 convolution 也有 25 個 filter
 
-然後，lower 的 layer，比較靠近 input 的 layer
+那這樣做完，我是不是得到
 
-我們今天知道了發音的方式以後
+25 平方個 feature map
 
-接下來的 layer，再根據
+是這樣嗎？
 
-這個結果，去決定說
+其實不是這樣，就是說
 
-現在的發音是屬於哪一個 state 或哪一個 phone
+你這邊做完一次 convolution，你得到 25 個 feature map
 
-所以，所有的 phone 呢
+你這邊做完，還是得到 25 個 feature map
 
-會用同一組 detector
+這樣大家了解我意思嗎？因為你在這邊
 
-也就是這些 lower 的 layer
+假設你這邊有
 
-是一個人類發音方式的 detector
+第一層 filter 有兩個好了
 
-而所有的 phone 的偵測都是用
+那第二層的 filter
 
-同一組 detector 完成的
+它在考慮這個 input 的時候
 
-所有 phone 的偵測，都 share 同一組的參數
+它是會考慮深度的
 
-所以，它這邊就有做到模組化這件事情
+它並不是每一個 channel 分開考慮
 
-當你做模組化的時候
+它是一次考慮所有的 channel
 
-你是用比較少的參數
+所以，你 convolution 這邊有多少個 filter
 
-你是用比較有效率的方式
+你 output 就有多少個 filter
 
-來使用你的參數
+你這的25 個 filter
 
-所以，我們回到
+output 就 25 個 filter
 
-我們很久以前就提過的
+你這邊有 25 個 filter，output 還是 25 個 filter
 
-Universality 的 Theorem
+只是這邊的每一個 25 個 filter
 
-過去有一個理論告訴我們說
+它都是一個 cubic
 
-任何的 continuous 的 function
+它都是一個立方體
 
-它都可以用一層 neural network 來完成
+它的高有 25 個 value 那麼高
 
-只要那層 neural network 夠寬的話
+這樣大家有問題嗎？
 
-在 90 年代
+如果大家沒有問題的話呢
 
-這是很多人放棄做 deep learning 的一個原因
+我們就繼續
 
-你想想看，只要一層 hidden layer
+然後，有一個，再來就是
 
-就可以完成所有的 function
+最後這個 flatten 跟 fully connected 的部分
 
-一層 hidden layer 就可以表示所有的 function
+這個就很簡單，這個怎麼做呢？
 
-那做 deep learning 的意義何在呢
+flatten 的意思就是，我把
 
-所以很多人覺得說，deep 是沒有必要的
+這個 feature map 拉直
 
-我們就只要一個 hidden layer 就好
+這邊完全沒有學問在，我就把它拉直
 
-但是，這個理論有一件事情沒有告訴我們的是
+拉直以後，你就把它丟到一個 fully connected 的
 
-它只告訴我們可能性
+feedforward network，然後
 
-但是它沒有告訴我們說，要做到這件事情
+就沒有然後，就結束了
 
-有多有效率
+接下來，剩下一點時間，我就要
 
-就是，沒錯，你只要有夠多的
+秒講一下，怎麼用 Keras
 
-參數，你只要這個 hidden layer 夠寬
+來 implement CNN
 
-你就可以描述任何的 function
+那在 training, compile 跟 fitting 的部分
 
-但是，這個理論沒有告訴我們的事情是
+其實是一模一樣
 
-當我們用這一件事情
+你唯一需要改的只有說
 
-我們只用一個 hidden layer
+你要改一下你的 network structure
 
-來描述 function 的時候
+還有 input 的 format
 
-它其實是沒有效率的
+本來在原來的 DNN 裡面，input 是一個 vector
 
-當你有 multi-layer，當你有 hierarchy 的 structure
+現在如果是 CNN 的話
 
-你用這個方式來描述你的 function 的時候
+它是會考慮 input 的 image 的幾何空間的
 
-它是比較有效率的
+所以，不能 input 給它一個 vector
 
-如果剛才模組化的概念，你沒有聽得很明白的話呢
+你要 input 給它一個 tensor 這樣
 
-我們這邊舉另外一個例子
+tensor 就是高維的 vector 啦
 
-如果，你是 EE 的 background
+你要給它一個三維的 vector
 
-然後，你修過交換電路的話
+為什麼三維的 vector 呢
 
-我相信你聽過這個例子以後，就會對
+因為一個 image 的長寬各是一維
 
-deep 為甚麼 powerful 沒有太多的懷疑
+如果它是彩色的話，RGB 就是第三維
 
-我想 EE background 的人，都修過
+所以，你要給它三維的 vector
 
-邏輯電路
+你 assign 一個三維的 matrix
 
-其實邏輯電路可以跟 neural network 類比
+這個高維的 matrix 就叫做 tensor
 
-我們知道在邏輯電路裡面
+那怎麼 implement 一個 convolution 的 layer 呢
 
-我們的電路是由一堆邏輯閘
+你就這麼做
 
-AND gate, NOR gate 所構成的
+model.add
 
-對不對，在 neural network 裡面
+剛才是 dense，現在就改成 convolution2D
 
-整個 network 是由一堆 neuron、神經元所構成的
+它其實也有 1D 的，現在就改成 2D
 
-如果你有修過邏輯電路的話，你會知道說
+然後，這邊 25, 3, 3 是甚麼意思呢？
 
-其實只要兩層邏輯閘
+這邊 25, 3, 3 的意思就是說
 
-你就可以表示任何的 boolean function
+你有 25 個
 
-如果你修過邏輯電路的話，你應該知道這件事
+25 代表 25 個 filter
 
-這件事情應該不會讓你特別的驚訝
+後面的 3, 3 就代表，你的 filter 是一個 3*3 的 matrix
 
-所以，既然兩層邏輯閘可以表示任何的 boolean function
+你的 filter 都是 3*3 的 size
 
-那有一個 hidden layer 的 neural network
+那 input 呢？
 
-有一個 hidden layer 的 neural network，其實也是兩層
+你要告訴它 input shape 要是甚麼樣子
 
-它一個 input layer、一個 output layer，所以它也是兩層
+假設我現在是要做手寫數字辨識
 
-有一個 hidden layer 的 neural network
+input 是 28*28 的 image
 
-它可以表示任何的 continuous function
+它的每一個 pixel 都是
 
-其實，也不會讓人特別的驚訝
+都是只有單一顏色
 
-但是，雖然我們可以用兩層邏輯閘
+所以，你 input 的 shape 就是 1*28*28
 
-就描述任何的 boolean function
+前面這個 1 阿，如果你是黑白的話，它就是 1
 
-但是，實際上你在做電路設計的時候，你根本
+如果你是彩色的圖，每個 pixel 用 3 個值來表示
 
-不可能會這樣做，對不對
+這邊你就要放 3，代表 RGB 3 個顏色
 
-你可以用兩層邏輯閘就做一台電腦，但是
+那 28*28 就代表這個 image 總共 28*28 個 pixel
 
-沒有人會這麼做
+那 Max pooling 也很簡單
 
-為甚麼呢？因為當你用 hierarchy 的架構的時候
+就 add 一個 Max pooling 的 layer
 
-當你不是用兩層邏輯閘，而是用
+那這邊的 (2, 2) 的意思是說呢
 
-很多層的時候
+我們把 2*2 的這個
 
-這個時候，你拿來設計一個電路是
+feature map 裡面的 pixel 拿出來
 
-比較有效率的
+然後，每次就選最大的那一個
 
-雖然，兩層邏輯閘可以做到同樣的事情
+所以，假設我們 input 是一個
 
-但是，這麼做是沒有效率的
+1*28*28 的 image
 
-如果類比到 neural network 的話
+那你就這樣寫 add(Convolution2D(25, 3, 3,
 
-其實，意思是一樣的
+input_shape = (1, 28, 28)))
 
-你用一層 hidden layer 可以做到任何事情
+那通過 convolution 以後
 
-但是，用比較多的 hidden layer 是比較有效率的
+你得到的東西是甚麼呢？
 
-所以，從邏輯閘這邊來看，你用多個邏輯閘
+你得到的 output 是甚麼呢？
 
-你用多層的架構，可以用比較少的邏輯閘就完成一個電路
+你得到的 output，首先，你這個
 
-那你用比較多層的
+channel 的數目會是 25
 
-你用比較多層的 neural network
+也就是 25 個 filter
 
-你就可以用比較少的 neuron 就完成同樣的 function
+你得到的 channel 的數目就是 25
 
-所以，你會需要比較少的參數
+然後，因為你現在的 filter 的 size 是 3
 
-比較少的參數意謂著甚麼
+所以，本來 28*28 的 image
 
-比較少的參數意謂著，你比較不容易 overfitting
+通過 3, 3 的 filter
 
-或者是，你其實只需要比較少的 data
+就假設你那個邊邊的地方沒有考慮的話
 
-你就可以完成你現在要 train 的任務
+就會變成 26*26
 
-所以，這件事情有沒有跟你平常的認知是相反的呢
+這樣大家了解我意思嗎？
 
-很多人的認知是
+當然你也可以考慮邊邊啦
 
-deep learning 就是很多 data 硬輾壓過去
+如果你想要考慮邊邊的話
 
-其實不是，當我們用 deep learning 的時候
+你就在原來的 image 旁邊
 
-我們可以用比較少的 data
+補 0，把它變成比較大的 image
 
-就達到同樣的任務
+然後，接下來你做 Max pooling
 
-我們從邏輯閘這邊，再舉一個實際的例子
+你做 Max pooling，把 2*2 的
 
-假設我們現在要做 parity check
+這個 pixel 一組
 
-假設你要設計一個電路做 parity check
+然後，裡面選一個最大的
 
-那甚麼是 parity check，就是
+做完以後，你就變成 25*13*13
 
-你希望 input 一串數字
+變 25*13*13
 
-input 一串 binary 的數字
+然後，接下來
 
-如果裡面出現的 1 的數目是偶數的話
+你再做一次 convolution，假設我這次選
 
-它的 output 就是 1，如果出現的是奇數的話呢
+50 個 filter
 
-它的 output 就是 0
+然後，每個 filter size 是 3*3 的話
 
-假設你 input 的 sequence 的長度
+那現在變成 output 的 channel 就有 50 個
 
-總共有 1 個 bit 的話
+那 13*13 的 image
 
-那用兩層邏輯閘，理論上可以保證你
+通過 3*3 的 filter
 
-你要 2^d 個 gate
+就會變成 11*11
 
-你要 2^d 個 gate，才能夠描述
+我們剛才舉的例子，裡面是 6*6 的 image
 
-才能描述這樣子的一個電路
+通過 3*3 的 filter，變成 4*4
 
-但是，如果你用多層次的架構的話
+所以，你通過 3*3 的 filter 都會是
 
-你就可以用比較少的邏輯閘
+長跟寬都會減 2
 
-就做到 parity check 這件事情
+所以，本來是 13*13 的 image
 
-舉例來說，你可以把
+通過 3*3 的 filter，就變成 11*11
 
-好幾個 XNOR gate 接在一起
+然後，你接下來再做 Max pooling
 
-如果你把邏輯閘用這種方式接的話
+2*2 的 Max pooling 變成 50*5*5
 
-現在 input 1 跟 0
+那這邊呢，就問一下大家
 
-我把 XNOR gate 的真值表放在右上角
+在第一個 convolution
 
-input 1 跟 0，它的 output 就是 0
+的 layer 裡面
 
-i然後，input 0 跟 1，它的 output 就是 0
+每一個 filter，它有多少個參數呢？
 
-input 0 跟 0，它的 output 是 1
+它有多少個參數
 
-你就做完 parity check 這件事情了
+是不是 9 個參數
 
-這邊用的就是一個 hierarchical 的架構
+因為，它就是一個 3*3 的 matrix 嘛，就是 9 個參數
 
-當你用這樣子的架構的時候
+但是，在第二個 convolution layer 裡面
 
-當你用這種比較多層次的架構的時候
+雖然，你每一個 neuron
 
-你其實只需要 O(d) gates
+每一個 filter 都是 3*3，但它其實不是
 
-你就可以完成你現在要做的任務了
+3*3 個參數
 
-所以，當你用比較多層次的架構來設計電路的時候
+因為，它 input 的 channel 有 25 個
 
-你可以用比較少的邏輯閘，就達到同樣的事情
+所以，它的參數是 3*3*25
 
-這對 neural network 來說也是一樣的
+它的高是 25，所以這邊是 225
 
-用比較少的 neuron，去描述同樣的 function
+這樣大家有問題嗎？
 
-如果剛才舉的例子，你沒有聽懂的話
+如果大家沒有問題的話
 
-如果你沒有修過邏輯電路，你沒有聽懂的話
+我們就繼續看下去
 
-以下是一個日常生活中就會碰到的例子
+所以，通過兩次 convolution、兩次 Max pooling
 
-這個例子是剪窗花的
+原來 input 是 28*28
 
-剪窗花大家知道嗎？
+做完這些事以後，變成 50*5*5
 
-剪窗花就是說
+50*5*5
 
-這個應該不用解釋啦
+那做 flatten 就是
 
-就是一個色紙，然後把它摺起來
+把這一個東西拉直
 
-然後再剪一剪，就可以變成這個樣子
+那你只要 call 一個 add flatten 就好
 
-你並不是真的去把這個形狀的花樣剪出來
+把它拉直
 
-這樣太麻煩了，你先把紙摺起來
+拉直以後就變成一個 1250 維的 vector
 
-然後才剪這樣子
+你再把 1250 維的 vector
 
-這個跟 deep learning 有什麼關係呢
+丟到一個 fully connected 的 network 裡面
 
-你想想看我們用之前講的
+fully connected 的 network 大家應該都很熟悉，就跟
 
-我們用之前講的這個例子來做比喻
+我們剛才 demo 的是一樣的
 
-假設我們現在 input 的點有四個
+然後就得到 output，我們就現場實作
 
-有四個，那這個紅色的點是一類
+秒做一下 CNN 這樣
 
-藍色的點是一類
+那這 code 你只要再胡亂改一下，就可以交作業三
 
-我們之前講說如果你沒有 hidden layer 的話
+我們的 CNN 的架構
 
-如果你是一個 linear 的 model，你要怎麼做
+我們很快、非常非常快地來複習一下
 
-都沒有辦法把藍色分在一邊
+比如說，我們現在要做手寫數字辨識
 
-把紅色分在一邊
+那 input 呢，哦，忘了開聲音
 
-但是，當你加了 hidden layer 的時候會發生什麼事呢
+假設我們要做手寫數字辨識，input 是一張
 
-當你加了 hidden layer 的時候
+28*28 的影像
 
-就做了一個 feature 的 transformation
+然後，通過 convolution layer 以後呢
 
-你把原來的 x1, x2
+假設我們現在有 25 個 filter
 
-你把原來的 x1, x2
+然後，每個 filter 的 size 是 3*3
 
-ship 到另外一個平面，轉換到另外一個平面
+那 input 28*28 的 image，它的 output 呢
 
-變成 x1'、x2'
+通過 3*3 的 filter 以後
 
-變成 x1'、x2'
+你得到 image size 就是 26*26
 
-所以，原來的紅色這個點跑到這裡
+那這個 26*26 的 image，它的每一個 pixel
 
-原來的紅色這個點跑到這裡
+都是由一個 25 維的 vector 來表示
 
-原來這兩個藍色的點都跑到這裡
+如果你有 25 個 filter 的話呢
 
-所以，你發現這兩個藍色的點呢
+這是 25 維的 vector
 
-是重合在一起
+然後做 Max poling
 
-所以，當你從這裡
+就把原來 26*26 的 image 變成 13*13
 
-通過一個 hidden layer 變到這裡的時候
+然後，你可以再加另外一層 convolution
 
-其實你就好像是把原來的這個平面
+另外一層 convolution，假設它是 3*3 的話
 
-對折了一樣
+做完 convolution 就是 11*11
 
-你把這個平面對折，所以這個藍色的點
+因為有 50 個 filter，所以
 
-跟這個藍色的點，這兩個藍色的點重和在一起
+你的每一個 pixel 現在是用 50 個 value 來描述
 
-這就好像是說我們在做
+然後，你可以再做 pooling 等等
 
-剪窗花的時候，先把色紙對折一樣
+最後，把這個結果接進一個 fully connected layer 得到
 
-你把這兩個平面對折，就好像是把色紙對折一樣
+最後的 output，上次也示範說
 
-當你把這個色紙對折的時候
+如果你要用一個 Keras 來實作一個 CNN 的話
 
-如果你在這個地方戳一個洞
+你要怎麼秒做
 
-到時候，你把色紙打開的時候
+接下來，我想要講的是
 
-它只要看你摺幾折，它在這些地方
+大家、很多人常會說
 
-都會有一個洞
+deep learning 就是一個黑盒子
 
-所以，如果你把剪窗花這件事情
+然後，你 learn 完以後，你不知道它得到了甚麼
 
-想成是 training
+所以，有很多人不喜歡這種方法
 
-你把剪色紙這件事情
+其實，我是覺得，今天有一個方法
 
-想成是根據我們的 training data
+它可以讓你輕易地理解
 
-training data 告訴我們說
+它為甚麼會下這樣子的判斷
 
-有畫斜線的部分是 positive
+為甚麼個方法會下這樣子的決策的話
 
-沒畫斜線的部分是屬於 negative example
+那其實這個方法，你就會覺得它不夠 intelligent
 
-假設我們已經把這個平面 
+因為你可以輕易地理解它
 
-像色紙一樣折起來的時候 
+那今天如果它非常 intelligent 的話
 
-這個時候 training data 只要告訴我們說
+它就必須要是你無法理解的東西
 
-在這個範圍之內、在這個範圍之內、在這個範圍之內
+這樣，它才夠 intelligent，至少你會感覺它夠 intelligent
 
-是屬於 positive 的
+所以，大家常說 deep learning
 
-它只要告訴我們這個小的區間裡面的 data
+就是一個黑盒子，你 learn 出來以後，你根本不知道
 
-展開以後我們就可以做出複雜的圖樣
+為甚麼是這樣子
 
-那本來 training data 只告訴我們比較簡單的事情 
+但是，其實還是有很多方法可以分析的
 
-但是因為，現在有把空間對折的關係
+比如說，今天這邊我們來示範一下
 
-你現在要把空間做各種各樣對折的關係
+怎麼分析 CNN
 
-所以展開以後，你就可以有非常複雜的圖案
+它到底學到了甚麼
 
-或者是說，你只要在這個地方戳一個洞
+那我今天的例子，不一樣就是做在 MNIST 上面
 
-在其他地方，也就都等於戳一個洞
+那你其實可以在你的作業三
 
-所以，一筆 data，如果只用這個例子來看的話
+在 CIFAR-10 上面呢，複製看看
+(一個語料庫的名字)
 
-一筆 data 它就可以發揮五筆 data 的效用
+你能不能看到類似的結果
 
-所以，當你做 deep learning 的時候
+那要分析第一個 input layer 的 filter 是比較不容易的
 
-你其實是用比較有效率的方式
+因為第一個 layer 裡面，每一個 filter
 
-來使用你的 data
+它就是一個 3*3 的 matrix
 
-你可能會想說，真的是這個樣子嗎
+它對應到 3*3 的範圍內的 9 個 pixel
 
-我在文獻上沒有看到太好的例子
+所以，你只要看這個 filter 的值，就可以知道說
 
-這個比較像是我臆測
+它在 detect 甚麼東西
 
-但是我做了一個 toy example
+所以，第一層的 filter 是很容易理解的
 
-來展示這件事情
+但是，你比較沒有辦法想像它在做甚麼事情的
 
-這個 toy example 是這樣子的
+是第二層的 filter
 
-我們有一個 function
+在第二層，我們也是 3*3 的 filter，有 50 個
 
-它的 input 是
+但是，這些 filter 的 input 並不是 pixel
 
-二維 R^2，它的 output 是 0 跟 1
+這些 filter 的 9 個 input
 
-那這個 function 是一個地毯形狀的 function
+它的 3*3 的 input 並不是 pixel
 
-地毯形狀的 function
+而是做完 convolution，再做 Max pooling 的結果
 
-在這個紅色的、菱形的範圍內
+所以，這個 3*3 的 filter，你就算把它的 weight 拿出來
 
-它的 input 這個 R^2，就是座標
+你也不知道它在做甚麼
 
-那紅色的、這個菱形的範圍內
+另外這個 3*3 的 filter，它考慮的範圍並不是
 
-它的 output 就要是 1
+3*3 個 pixel，並不是 9 個 pixel
 
-藍色的、菱形的範圍內，它的 output 就要是 0
+而是比 9 個 pixel 更大的範圍
 
-那現在，我們來考慮
+不要忘了它的 input
 
-如果我們用了不同的 training example
+這 3*3 個 element 的 input
 
-不同量的 training example
+是做完 convolution 再加 Max pooling 的結果
 
-在一個 hidden layer 跟三個 hidden layer 的時候
+所以，它實際上在 image 上看到的範圍
 
-我們看到甚麼樣的情境
+是比 3*3 還要更大的
 
-這邊要注意一下就是，我們有特別調整一個 hidden layer
+那我們怎麼來分析一個 filter 它做的事情是甚麼呢？
 
-和三個 hidden layer 的參數
+以下，是一個方法
 
-所以並不是說，當有三個 hidden layer 的時候
+那你可以這樣做
 
-它的參數是比一個 hidden layer 多的
+我們知道說
 
-所以，一個 hidden layer 的 neural network
+現在在這 convolution layer 裡面的
 
-是一個很胖的 neural network
+50 個 filter
 
-三個 hidden layer 的 neural network
+每一個 filter 的 output
 
-它是一個很瘦的 neural network
+就是一個 matrix，對不對？
 
-所以，它們的參數
+每一個 filter 的 output 就是 11*11 的 matrix
 
-是調整到接近
+假設，我們現在把第 k 個 filter 拿出來
 
-所以你要注意一下，當你在比
+我們把 input 一張 image 的第 k 個 output 拿出來
 
-一個 shallow 的 network 跟
+它可能長這樣子，是一個 11*11 的 matrix
 
-一個比較 deep 的 network 的時候
+那裡面每一個 element
 
-一個公平的評比，應該要讓它們有一樣的參數
+我們就叫它 a上標 k，下標 i, j
 
-應該要讓它們有一樣的參數量
+上標 k 的意思是說，這是第 k 個 filter
 
-那如果你現在給它看這個
+i, j 代表說它在這個 matrix 裡面的
 
-這邊是十萬筆 data 的話
+第 i 個 row，第 j個 column
 
-那這兩個 network
+接下來，我們訂一個東西叫做
 
-都可以 learn 出這樣子的 training data
+Degree of activation of the k-th filter
 
-你從這個 function 裡面 sample 十萬筆 data
+我們訂一個值代表說
 
-然後，給它去學，給它去學
+現在的第 k 個 filter
 
-然後，它學出來就是長這樣
+它有多被 activate、它有多被啟動
 
-長的就是這樣
+現在 input 的東西
 
-那對一個 hidden layer 來說
+跟第 k 個 activate 有多相近
 
-反正，它可以模擬任何 function
+有多 match
 
-只要它夠寬，它就可以模擬任何 function
+那這個第 k 個 filter 呢
 
-這種菱形的 function
+第 k 個 filter，它被啟動的 degree 呢
 
-這種地毯的 function 應該也不是甚麼問題
+我們這邊就定義成
 
-現在，如果我們減少參數的量
+它的 11*11 matrix 裡面的
 
-減少到只用兩萬筆
+這些全部 element 的 summation
 
-我們只從這裡 sample 出兩萬筆來做 training 
+這個 filter 呢
 
-這個時候你會發現說
+就我們 input 一張 image
 
-如果只有 1 個 hidden layer 的時候
+然後，看這個 filter 它 output 的 11*11 個值
 
-你的結果就崩掉了
+把它全部加起來
 
-但是，如果是 3 個 hidden layer 的時候
+當作說，現在這個 filter 被 activate 的程度
 
-你結果也是變得比較差
+接下來，我們要做的事情是這樣子
 
-比 training data 多的時候還要差
+我們想要知道
 
-但是你會發現說，你用 3 個 hidden layer 的時候
+這個第 k 個 filter 它的作用是甚麼
 
-它的崩壞是有次序的崩壞
+所以我們想要找一張 image
 
-你看這個結果
+這一張 image 它可以讓第 k 個filter
 
-它這個結果就像是
+被 activate 的程度最大
 
-你今天要剪窗花的時候
+怎麼做到這件事情呢？
 
-你把色紙折起來，但是最後剪壞了
+假設 input 的 image 我們稱之為 x
 
-然後，展開以後長成這個樣子
+那我們現在要解的問題就是
 
-所以說
+找一個 x
 
-而且你會發現說
+它可以讓，現在我們定義的這個
 
-在比較少的 training data 的時候
+activation 的 degree a, 上標 k
 
-你有比較多的 hidden layer 最後得到的結果呢
+它可以讓我們定義的這個 activation 的 degree 最大
 
-其實是比較好的
+那這件事情要怎麼做到呢？
 
-當我們用 deep learning 的時候呢
+你其實就是用 gradient descent
 
-另外一個好處是我們可以做 End-to-end learning
+因為我們現在要 maximize
 
-所謂的  End-to-end learning 的意思是這樣
+如果是 minimize，你可以用 gradient descent
 
-比如說我們要處理的問題呢
+那 maximize，你用 gradient ascent
 
-非常的複雜
+你就可以做到這件事了
 
-比如說，語音辨識就是一個非常複雜的問題
+就結束了
 
-那我們說，我們要解一個 machine learning 的 problem 的時候
+這樣大家聽得懂嗎？
 
-我們要做的事情就是
+我覺得還頗神妙
 
-先找一個 hypothesis 的 function set
+因為，我們現在是把 x 當作我們要找的參數
 
-也就是找一個 model
+對它去用 gradient descent 或 gradient ascent
 
-當你要處理的問題是很複雜的時候
+做 update
 
-你這個 model 裡面，它會變成一個
+原來在 train 這個 CNN
 
-它會需要是一個生產線
+在 train neural network 的時候
 
-它會需要是一個生產線
+input 是固定的
 
-那你這個 model 裡面，它表示一個很複雜的 function
+那你的這個 model 的參數
 
-一個很複雜的 function 是由很多比較簡單的 function
+是要用 gradient descent 去找出來的
 
-串接在一起
+用 gradient descent 找一組參數
 
-比如說，你要做語音辨識的話
+可以讓你的 loss 可以被 minimize
 
-你先把聲音訊號送進來
+但是，現在這個立場是被反過來的
 
-再透過很多層 function，一層一層的轉換
+現在，在這個 task 裡面呢
 
-最後，變成文字
+model 的參數是固定的
 
-當你做 End-to-end learning 的時候
+那我們要用這個 gradient descent 去 update 這個 x
 
-意思就是說，你只給你的 model
+或是，我們用 gradient ascent 去 update 這個 x
 
-input 跟 output
+我們 update 這個 x，讓它可以讓這個
 
-不告訴它說，中間每一個 function
+activation function 的這個 degree of activation
 
-要怎麼分工
+是最大的
 
-你就只給它 input 跟 output
+這邊大家有問題嗎？
 
-然後，讓它自己去學
+沒有哦，這個還滿神妙的
 
-讓它去學會說
+這個是得到的結果，如果我們
 
- 中間每一個 function，生產線的每一個點
+隨便取 12 個 filter 出來的話
 
-每一站，它應該要做什麼事情
+那每一個 filter 呢，我們說我們對每一個 filter
 
-那這件事情，如果
-你在 deep learning 裡面要做這件事情的時候
+都去找一張 image
 
-你就是疊一個很深的 neural network
+這個 image 可以讓那個 filter
 
-每一層就是生產線上的一個點
+它的 activation 最大
 
-每一層都是一個 simple 的 function
+那現在有 50 個 filter
 
-每一層會自己學到說
+所以，理論上可以找 50 張 image
 
-它應該要做什麼樣的事情
+它可以讓這些 filter 的 activation 最大
 
-比如說，在語音辨識裡面
+那我就隨便取了前 12 個 filter
 
-在還沒有用 deep learning 的時候
+可以讓它最 activate 的 image 出來
 
-在還是 shallow learning 的時代
+可以看它的結果長這樣子
 
-我們怎麼做語音辨識呢，們可能是這樣做的
+那這些 image 它有一個共同的特徵就是
 
-你先有一段聲音訊號
+它是某種 texture
 
-然後，要怎麼把聲音訊號對應成文字呢
+它是某種紋路
 
-你要先做 DFT，你不知道這是甚麼也沒有關係
+在圖上不斷地反覆
 
-反正就是一個 function
+為甚麼呢？為甚麼會這樣呢
 
-生產線上的某一個站
+比如說，我們看看
 
-然後，它變成 spectrogram
+這一張 image 好了
 
-然後，這個 spectrogram 通過 filter bank
+這一張 image 上面，第三張圖上面呢
 
-不知道 filter bank 是甚麼東西沒有關係
-反正就生產線上另外一站
+它都是小小的斜條紋
 
-再得到 output，再取 log
+這意味著甚麼事？這意味著
 
-取 log 我想大家應該都知道吧，但是
+第三個 filter 它的工作就是 detect 圖上
 
-它的原理其實是，這個取 log 其實是非常有道理的
+有沒有斜的條紋
 
-不過，我們這邊不講就是了
+那不要忘了說，現在每一個 filter
 
-然後再做 DCT，最後得到 MFCC
+其實它考慮的範圍，都是每一個圖上的
 
-然後再把 MFCC 丟到 GMM 裡面
+小小的範圍而已
 
-最後，你可以得到語音辨識的結果
+所以，今天一個圖上如果出現一個
 
-這個 GMM 其實你把它換成 DNN
+小小的，隨便一個斜的條紋的話
 
-也是會有非常顯著的 improvement
+這一個 filter
 
-那在這整個生產線上面呢
+就會被 activate，這個 filter output 的值
 
-只有最後一個 block
+就會比較大、就會很大
 
-只有最後這個 GMM 這個部分
+如果，今天讓圖上
 
-藍色這個 block，是由 training data 學出來的
+所有的範圍通通出現這個小小的斜條紋的話
 
-前面這個綠色的部分，這個都是人手訂的
+那這個時候，它的 activation
 
-就是過去有五聖先賢
+它的 degree of activation 會是最大
 
-他們研究了各種人類生理的知識以後
+因為它的工作就是，偵測有沒有一個斜的條紋
 
-訂出了這些 function，那它非常非常的強
+所以你給它一個完整的數字的時候，它不會最興奮
 
-增一分則太肥，減一分則太瘦這樣
+你給它通通都是斜的條紋的時候，這個時候它最興奮
 
-你就不要想在這上面再去改什麼東西
+雖然，它完全不是一個數字
 
-你改了之後會比較差
+所以，你就會發現說，每一個 filter 它的工作就是
 
-就這樣子大概卡了 20 年
+detect 某一種 pattern
 
-五聖先賢實在太厲害了
+detect 某一種線條
 
-但是，後來有了 deep learning 以後
+比如說，第 3 個圖它 detect 斜的線條
 
-我們可以把這些東西
+第四個圖 detect 短的、直的線條
 
-用 neural network 把它取代掉
+這個 detect 這個方向斜的線條
 
-就是說，你可以把
+這個 detect 這個方向斜的線條
 
-你就把你的 deep neural network 多加幾層
+這個也是 detect 這個方向斜的線條
 
-然後，你就把 DCT 拿掉
+不過跟這個 degree 可能有點不一樣
 
-這件事情現在已經是
+它這個 degree 比較正，這個也是
 
-typical 的做法了
+detect 斜的線條，但是它比較平
 
-過去 MFCC 這種 feature，如果你上語音課的話呢
+這個 detect 是直的線條，等等
 
-你上李琳山老師的語音課
+你會發現每一個 filter 做的事情
 
-你很有可能知道 MFCC 是甚麼
+就是 detect 不同角度的線條
 
-過去，可能 20 年，這個 feature
+如果今天 input 有不同線條的話
 
-是 dominate 語音辨識這件事情
+你就會讓某一個 activation function
 
-但是現在已經不再是這樣子了 
+某一個 filter 它 output 的值最大
 
-你可以直接從 log 的 output 開始做
+我們接下來可以分析這個
 
-甚至，比較多人從 log 的 output 開始做
+fully connected 的 layer
 
-你把你的 neural network 疊深一點，
-直接從 log 的 output 開始做
+我們做完 convolution 和 Max pooling 以後呢
 
-你會得到比較好的結果
+接下來，我們會做一件事情叫做 flatten
 
-所以我記得在14年的、在語音的會議上的時候
+然後，把 flatten 以後的結果
 
-MSR 的 research team (MSR = Microsoft Research)
+丟到 neural network 裡面去
 
-語音 research team 的 head, Deng Li 進來說，掰掰 MFCC
+那我們也會想要知道說，在這個 neural network 裡面
 
-大家也沒有甚麼特別的意見這樣
+每一個 neuron 它的工作是什麼
 
-現在，甚至你可以從 spectrogram 開始做
+所以，我們就如法炮製剛才的作法
 
-你把這些都拿掉
+我們要做的事情是這樣子
 
-通通都拿 deep neural network 來取代掉
+我們定義第 j 個 neuron
 
-也可以得到更好的結果
+它的 output 叫做 a_j
 
-那 deep neural network 學到的，它要做的事情
+接下來，我們要做的事情就是
 
-你會發現，如果你分析
-那個 deep neural network 的 weight 的話 
+找一張 image x
 
-它可以自動學到要做 filter bank 這件事情
+用 gradient descent 的方法去找一張 image x
 
-filter bank 是模擬人類的聽覺器官 
+這個 image x，你把它丟到這個 neural network 裡面去
 
-所製定出來的 filter
+它可以讓 a_j 的值被 maximize
 
-但是 deep learning 可以自動學到這件事情
+那找到甚麼樣的結果呢
 
-接下來，有人就會想要挑戰說
+我們找到的結果就是這樣
 
-我們能不能夠疊一個很深很深的 neural network
+就是隨便取前 9 個 neuron 出來
 
-我們能不能夠疊一個很深很深的 neural network
+隨便取 9 個 neuron 出來
 
-直接 input 就是 time domain 上的聲音訊號
+那甚麼樣的圖丟到 CNN 裡面，可以讓這 9 個 neuron
 
-然後，output 直接就是
+最被 activate，output 的值最大呢？
 
-文字，中間完全不要做 feature transform 之類的
+就是這 9 張圖
 
-如果連 feature transform 都不用做的話
+你會發現說，跟剛才的
 
-那你就不需要學訊號與系統
+filter 所觀察到的情形，是很不一樣的
 
-但是還好這件事情，後來結局是這個樣子
+在剛才的 filter 裡面，我們觀察到的是
 
-這件事情的結局是這個樣子
+類似紋路的東西
 
-有好多好多人前仆後繼的
+在整張圖上，反覆同樣的紋路
 
-在做這一件事情
+那是因為每一個 filter，它考慮的只是一個
 
-這個甚至曾經一度
+小小的 vision，圖上的一部份的 vision
 
-在 conference 裡面有兩個 session 都在做這件事情
+所以，它 detect 是某一種 texture
 
-最後，Google 有一篇 paper 是這樣
+但是，現在每一個 neuron
 
-它最後的結果是
+在你做 flatten 以後，每一個 neuron 它的工作
 
-它拼死去 learn 了一個很大的 neural network
+就是去看整張圖
 
-input 就是聲音訊號
+它不再是只看整張圖的一小部分
 
-完全不做其他任何的事情 
+它現在的工作是看整張圖
 
-input 就是 row 的 wave phone
+所以，每一個 neuron 你可以讓它最 activate 的圖
 
-最後可以做到跟有做 feature transform 的結果打平
+並不再是 texture 那個樣子，而是一個完整的圖形
 
-但也僅止於打平而已
+而是一個完整的圖形，雖然它看起來完全
 
-我目前還沒有看到有一個結果是，可以 input
+不像數字，比如說，這個看起來像是
 
-聲音訊號
+千年眼這個樣子
 
-input time domain 的聲音，不做 feature transform
+算了，沒有人知道我在說甚麼
 
-結果比 feature transform 好
+就是，某一個 neuron，像這個 neuron
 
-可見 feature transform 很強，或許它已經是
+這個會偵測千年眼的 neuron 呢
 
-訊號處理的極限了
+它的工作其實就是
 
-就跟 machine learning learn 出來的結果
+看到這樣子的線條
 
-其實也就是 feature transform
+或到這樣子的線條
 
-如果你觀察
+或看到小小的圓圈
 
-你看 Google 那篇 paper 的話，它其實會分析一下
+就可以讓它被 activate
 
-它的這個 machine 做的事情
+所以，它偵測的也是一個完整的數字
 
-它做的事情就很像是在做 feature transform
+是一個比較大的 pattern
 
-但是，做出來也就跟 feature transform 一樣好
+接下來，我就會想要知道說
 
-也沒也辦法比 feature transform 做的更好
+如果我們考慮的是 output 呢
 
-所以，修訊號與系統還是必要的
+如果我們今天考慮的是 output 呢
 
-剛才講的都是語音的例子
+如果我們今天把，output 就是 10 維嘛
 
-那影像的話，其實也是差不多啦
+把每一維都對應到一個 digit
 
-這個我想大家應該都知道，所以
+那我們把某一維拿出來
 
-我們就稍微跳過去，過去影像也是
+然後，我們說找一張 image
 
-疊很多很多的 block
+讓那一個維度的 output 最大
 
-有很多很多人訂的、handcrafted 的 feature
+那我們會得到甚麼樣的 image 呢
 
-那你只是在用很多很多的 block
+你可以想像說，現在既然
 
-很多很多 handcrafted 的 feature 去處理你 input 的影像
+每一個 output 的每一個 dimension
 
-然後，只又在最後一層，用一個 shallow 的 classifier
+就對應到某一個數字
 
-現在，你就直接兜一個
+那我們現在如果把對應到數字 1 的那張圖
 
-很深的 network
+我們如果先找一張 image
 
-input 就直接是 pixel
+它可以讓對應到數字 1 的那個 output layer 的 neuron
 
-output 就直接是裡面影像是甚麼
+它的 output 最大
 
-就不需要抽 feature 了
+那一張 image 顯然看起來像是個數字 1
 
-那 deep learning  還有什麼好處呢
+對不對，這樣大家了解我意思嗎？
 
-有時候我們會做
+你可以期待說，搞不好我們用這個方法就可以
 
-通常我們真正在意的 task
+讓 machine 自動畫出數字
 
-它是非常的複雜的
+但是，實際上我們得到的結果是這樣子
 
-那在這種非常的複雜的 task 裡面
+得出來的結果是這樣子
 
-有時候非常像的 input，它會有很不一樣的output
+那這邊呢，每一張圖
 
-舉例來說，你在做影像辨識的時候
+分別代表數字 0, 1, 2 到 8
 
-這個白色的狗
+我就只畫了 9 個，實際上 output 有 10 個
 
-跟北極熊其實看起來是很像的
+我就只畫了 9 個，實際上 output 有 10 個
 
-它們其實是很像的
+也就是說，我們找出來可以讓
 
-但是你的 machine 要知道說
+對應到 0 的那個
 
-看到這個要 output 狗，看到這個要 output 北極熊
+output layer 裡面對應到 0 的那個 neuron
 
-有時候看起來很不一樣的東西
+它的 output 最大的 image 其實是長這個樣子
 
-其實是一樣的，比如說，這個是火車
+可以讓 1 的 neuron output 最大的 image 其實是長這樣
 
-側面看是這個樣子，橫看成嶺側成峰
+2 的其實是長這樣，以此類推，每張看起來都差不多
 
-橫著看就變這個樣子
+都像是電視壞掉的樣子
 
-所以它們是不一樣的，但 output 都要是火車
+你可就會有個疑惑，為甚麼會這樣
 
-如果你今天的 network
+是不是程式有 bug
 
-只有一層的話
+為了確定程式沒有 bug，所以我就再做了一個實驗是
 
-你只能夠簡單的 transform
+我把這每一張 image
 
-你沒有辦法把一樣的東西變得很不一樣
+都真的丟到 CNN 裡面
 
-把不一樣的東西變得很像
+然後，看說它 classify 的結果是什麼
 
-你要讓原來 input 很像的東西
+那 CNN 確實就是說
 
-結果看起來很不像
+它 classify 說這個是 0、這個是 1、這個是 2
 
-你需要做很多層次的轉換
+一直到這個是 8，CNN 就覺得說
 
-舉例來說，如果我們看下面這個例子
+你如果拿這張 image
 
-這個是語音的例子
+我們 train  出來的正確率有 98.2 給 CNN 看
 
-在這個圖上，我們是吧
+它就會說，這個東西就叫做 8
 
-這個不是我做的
+所以，很神奇吧
 
-這個是來自於 ICASSP 2012 的一篇 paper
+所以，這個結果，其實已經在很多地方都被觀察到了
 
-在這個圖上
+就是今天這個 neural network，它所學到的東西
 
-這邊做的事情是
+跟我們人類是不太一樣的
 
-把 MFCC 投影到二維的平面上
+那它所學到的東西
 
-那同樣的顏色
+跟我們人類一般所想像認知是不一樣的
 
-代表的是這個
+你可以看一下這段 video，那它也有對應的 paper
 
-不同的顏色
+那裡面呢，machine 會把各種你看起來
 
-代表的是不同的人說的話
+不像企鵝的東西也是企鵝，
+看起來不像公車的東西也是公車
 
-紅色代表是某個人說的句子
+不然像我們這邊看起來，這完全不像一個數字
 
-綠色代表是某個人說的句子
+但對 machine 來說，它就是這個數字 8
 
-藍色代表是某個人說的句子
+所以，這個 machine 它學到的東西
 
-注意一下，這些人說的句子是不一樣的
+和我們人類，是非常不一樣的
 
-在語音上，你會發現說同樣的句子
+我們就想說，那這樣我們沒有辦法畫一個數字
 
-不同的人說
+所以我們要把這個數字，我們有沒有辦法
 
-它的聲音訊號看起來是非常不一樣的
+讓這個圖看起來更像數字呢？
 
-你會發現說，這個紅色看起來跟藍色間沒有什麼關係
+所以，這邊的想法是這個樣子
 
-藍色看起來跟綠色間沒有什麼關係
+因為，我們知道說
 
-所以，有人看到這個圖就覺得
+一張圖是不是一個數字，它有一些
 
-語音辨識不能做啊
+基本的假設
 
-不能做，不同的人說話的聲音太不一樣了
+比如說，這些東西就算是
 
-就算說同樣的句子，感覺也太不一樣不能做
+你不知道它是甚麼數字，
+你也會知道說它顯然就不是一個 digit
 
-如果你今天 learn 一個 neural network
+人類手寫出來的東西，就不是長這個樣子
 
-如果你只看第一層的 hidden layer 的 output
+所以，我們應該對這個 y 做一些 Regularization
 
-你會發現說不同的人
+做一些 constraint，我們應該告訴 machine 說
 
-講的話、講的同一個句子
+說錯了，不是 y，我們應該對 x 做一些 constraint
 
-還是看起來很不一樣
+我們應該對找出來的 x 做一些 constraint
 
-但是如果你今天看的八個 hidden layer 的 output 時候
+我們應該告訴 machine 說
 
-你會發現說
+有一些 x，它雖然可以讓你的 y 很大
 
-不同的人說的同樣的句子
+但是，它不是數字
 
-它自動的被 align 在一起
+我們天生、根據我們人的 required knowledge 就知道說
 
-也就是說，這個 DNN 在很多的 layer 的轉換的時候
+這些 x，它不可能是一個數字
 
-它把本來看起來很不像的東西
+那我們可以加上甚麼樣的 constraint 呢
 
-它知道說它們應該是一樣的
+比如說，最簡單的想法是說
 
-經過很多的 layer 的轉換以後
+今天這個圖上阿
 
-就把它們兜在一起
+白色的亮點
 
-就把它們 map 在一起了
+畫這個圖的時候，白色代表是有墨水的
 
-比如說，你看這個圖上面
+有墨水就是有 ink、有筆畫的地方
 
-這邊你會看到一條一條的線
+是白色的，希望大家可以想像
 
-那在這條線裡面，你會看到不同顏色的聲音訊號
+對一個 digit 來說呢
 
-也就是說，不同的人說同樣的話
+塗白的部分，其實是有限的
 
-經過 8 個 hidden layer 的轉換以後
+塗白的部分不會太多
 
-對 neural network 來說，它就變得很像
+你整張圖都是白白的，它一定不是一個數字
 
-本來的 input 完全不像，再通過很多個 layer 的轉換以後
+那對數字來說
 
-它就變得像
+只有一整張圖的某一個小部分
 
-或者是，今天這個是語音的例子
+會有筆畫
 
-如果我們看 MNIST 手寫數字辨識的例子
+所以，我們應該要對這一個 x 做一些限制
 
-其實也可以輕易地做到這些實驗
+對 x 做一些限制
 
-input 的 vector 是長這個樣子
+比如說，這邊的限制是
 
-input 就是 28*28 個 pixel
+我發現呢，我寫錯了
 
-如果你把 28*28 個 pixel
+因為這邊是 max
 
-28*28 的 vector project 到
+所以，這邊這個加號應該是減號
 
-二維的平面的話，那它看起來像是這個樣子
+不好意思，這邊加號應該是減號
 
-你會發現說，在這個圖上
+因為我們這邊要做的事情是這樣子
 
-它這邊這個 4 跟 9 幾乎是疊在一起的
+假設這個 image 裡面的每一個 pixel
 
-因為 4 跟 9 很像，我們仔細想想看
+我們用 x_ij 來表示
 
-4 跟 9 都是一個圈圈再加一條線
+所以，每一個 image 有 28*28 個 pixel
 
-4 跟 9 很像，所以如果你光看 input 的 pixel 的話
+i 就是 1~28，j 就是 1~28
 
-4 跟 9 幾乎是疊在一起的，你幾乎沒有辦法把它分開
+我們把所有的 pixel 的值
 
-但是，如果我們看的一個 hidden layer 的 output
+我們把所有今天 image 上面的 x_ij 的值呢
 
-這個時候你會發現說， 4 跟 9 還是很像
+取絕對值加起來，如果你熟悉 machine learning 的話呢
 
-它們還是離得很近
+這一項就是 L1 的 Regularization
 
-7 也跟 4 很像
+那我們把這個 pixel 的值
 
-4、7、9，它們是很像的
+全部加起來
 
-這是第一個 hidden layer 的 output
+然後，我們希望說，我們再找一個 x
 
-但是，如果我們看第二個
-hidden layer 的 output，你就會發現說
+它可以讓 y_i 最大的同時
 
-4、7、9，是逐漸被分開的
+這邊其實應該要是減號
 
-到第三個 hidden layer 的 output，它們又被分得更開
+它同時應該要讓 x_ij 的 summation
 
-所以，如果你今天要讓不一樣的 input
+越小越好
 
-被 merge 在一起，相當在語音舉的例子
+也就是說，我們希望找出來的 image
 
-或者是讓
+大部分的地方，是沒有塗顏色的
 
-你要讓原來看起來很像的 input 
+沒有塗白色的、沒有筆畫的
 
-最後被分得很開
+只有非常少的地方
 
-那你就需要好多 hidden layer 才能辦到這件事情
+是有塗筆畫的
 
-那其實還有更多用 deep learning 的理由啦
+那如果我們加上這個 constraint 以後呢
 
-那這個有人寫了一篇 paper
+我們得到的結果看起來就像是這樣
 
-Microsoft 的 researcher
+其實，跟左邊的圖比起來呢
 
-Rich Caruana，他寫了一篇 paper，它的 title 是
+你已經有些隱約可以看出來
 
-Do Deep Nets Really Need to be Deep？
+它是一個數字，比如說
 
-如果翻譯成中文就可以翻譯成這個
+這個就有一點點像 6
 
-深度學習是不是過譽了
+雖然說，它這邊還多了一條，但它有一點點像 6
 
-在這篇 paper 裡面呢
+這個，有一點點像 8
 
-他做了一個很神奇
+這個，它好像找到了 5 的第一個筆劃
 
-這篇 paper 有點舊，它大概是兩年前 publish 的
+這個好像找到了 7 的第一個筆劃
 
-這篇 paper 看起來，那時候覺得很神奇
+等等，所以你加上了這些 constraint 以後呢
 
-但現在已經是 common sense 了
+你看起來得到的結果
 
-他的做法是這樣，他說
+就比較像數字了
 
-我們今天來比較一下一層的 hidden layer
+講到這邊，你可能會問一個問題
 
-跟三層的 hidden layer 
+首先，我們還沒有講過 L1 的 Regularization
 
-它們在 MNIST 還有 TIMIT 這些
+但是，我們等一下會講
 
-benchmark corpus 上的差別
+再來你可能會有另外一個問題，這個有絕對值阿
 
-當然結果並不意外
+怎麼微分，其實這個是可以微分的啦
 
-當你把一個 hidden layer 跟
+這個我們下一堂課會講到
 
-三個 hidden layer 調一樣參數的時候
+講到這邊，大家有沒有甚麼問題呢？
 
-當然是三個 hidden layer performance 是比較好的
+其實，我覺得說如果你再加上一些額外的 constraint
 
-其實，你也可以自己 verify 這件事情
+比如說，你希望相鄰的 pixel 是同樣的顏色等等
 
-如果你有真的在做 deep learning 的話
+你應該可以得到更好的結果
 
-其實，這是 common sense，然後
+不過，其實有更多很好的方法可以
 
-接下來，他發現說
+讓我們自動去 generate
 
-一個 hidden layer
+數字，或是 generate 它看到的東西
 
-參數怎麼增加
+所以，這邊我就沒有興致再把它做得更好
 
-performance 都不好
+其實，這個東西、這個想法
 
-它很快就 saturate 了
+就是 Deep Dream 的精神
 
-他就想說，怎麼會這樣呢
+不知道大家知不知道 Deep Dream 是甚麼呢？
 
-他就做了一件當時看起來很匪夷所思的事
+Deep Dream 是說，如果你給 machine 一張 image
 
-他說，一個 hidden layer 的 neural network
+它會在這個 image 裡面，加上它看到的東西
 
-你 learning 的 target 不要用真正的 label
+怎麼做這件事情呢
 
-懂嗎？就是我們 本來learning 的時候
+擬就找一張 image
 
-你要用真正的 label 阿
+這個是我，後面這個不是 photoshop 上去的
 
-你就看說，這個 image 有人告訴你說這個是 1
+然後，這邊我擺了一個很做作的姿勢
 
-有人告訴你說是 0
+然後，你把這張相片丟到 CNN 裡面去
 
-你的 network 就是用這個 train 的嘛
+然後，你把它的某一個 hidden layer
 
-這是很合理的想法，他說
+你把某一個 layer 裡面的
 
-你現在的 shallow network 不要用這個 label
+filter，或是 fully connected layer 裡面
 
-你用三層 hidden layer 的 output 當作你的 feature
+的某一個 hidden layer 拿出來
 
-三層 hidden layer，你把所有的 image
+那它其實是一個 vector
 
-都丟到一個 learn 好的三層 hidden layer
+你把某一個 hidden layer 拿出來
 
-然後，得到那些 output
+它其實是一個 vector，假設它這邊是
 
-那有一些 output 是錯的，就不管它是錯的這樣
+比如說，3.9、-1.5、2.3
 
-然後，一層的 hidden layer 就去學三層的 hidden layer
+接下來呢，你把
 
-幫你 label 的結果，那一個錯的 ，它就學一個錯的
+這個 filter 的值調大
 
-結果，它的 performance 會比較好
+你把本來是 positive 的 dimension 值調大
 
-會逼近三層的 hidden layer，
-幾乎跟三層的 hidden layer 一樣好
+把 positive 的 dimension 值調大
 
-因為，他就是想說
+negative 的 dimension 值調小
 
-照理說，你只要一個 hidden layer 就能做到任何事
+然後，你本來就是正的讓它更正
 
-所以，沒有理由三層可以得到這個 performance
+負的讓它更負
 
-一層得不到這個 performance
+你把這個東西，當作是
 
-但是，你直接 learn 一個一層的 network
+新的 image 的目標
 
-你就是 learn 不出這個結果
+了解我意思嗎？就是
 
-你要去讓一層 network 模擬三層 network 的行為
+你把這個 3.9 的值變大
 
-它才能夠 learn 出這個結果
+你把 -1.5 的值變得更負
 
-那有人讀了這篇 paper，他覺得說
+你把 2.3 的值變得更大
 
-Rich 的結論是 deep learning 不 work
+然後，你找一張 image
 
-其實他的結論不是 deep learning 不 work
+用 gradient descent 的方法
 
-我在 conference 遇過他本人
+讓它在這個 hidden layer 的 output
 
-我問過他說
+是你現在設下的 target
 
-你的意思是 deep learning 不 work，他說不是
+這樣大家聽得懂嗎？
 
-我的意思是 deep learning 是 work 的
+你如果這麼做的話
 
-就是你直接在一層 network 是 learn 不起來的
+你如果這麼做的話，意思就是說
 
-你要先 learn 三層的 network
+讓 CNN 誇大化它看到的東西
 
-再用一層的 network 去模擬三層 network 的行為
+它本來已經有看到
 
-你才 learn 的起來
+某一個東西了
 
-然後，這個是我在 ASRU
+你讓它看起來更像原來看到的東西
 
-2015 的時候，聽過他的 keynote speech
+你讓它本來看起來是有一點像
 
-這個時他的第一頁投影片
+某一個東西，它讓某一個 filter 呢
 
-Do Deep Nets Really Need to be Deep？
+有被 activate，但你讓它被 activate 的更劇烈
 
-然後，第二頁 Yes！
+就是你讓 CNN 誇大化它現在看到的東西
 
-然後，我們留下很多時間給大家問問題，結束！
+那如果你把這一張 image
 
-如果你想要學更多的話，你可以看一下這個
+拿去做 Deep Dream 的話
 
-Bengio 的 deep learning 的 Theoretical 的 Motivations
+你看到的結果，就會是這樣子
 
-他講了很多非常發人深省的想法
+背後出現很多念獸，要凝才看的到這樣
 
-或者是，現在 deep learning 很紅了，所以有各種
+就是有很多念獸這樣
 
-來自其他領域的解讀，比如說從
+比如說，像這邊
 
-物理的角度來解釋，為什麼要做 deep learning
+這邊有一隻熊
 
-從化學的角度來解釋，為什麼要做 deep learning
+你看這個熊，它原來是一個石頭
 
-我把連結留在這邊給大家參考
+它原來是一個石頭，那你不覺得它這個石頭
 
-講到這邊剛好告一個段落
+哇！看起來其實也是有點像熊的嗎？
+
+這個是耳朵，這個是眼睛、這個是鼻子
+
+那對機器來說，它在看這張圖的時候
+
+它本來就覺得，這個有點像熊
+
+那你就更強化這件事
+
+所，它看起來就真的變成了一隻熊
+
+這個是 Deep Dream
+
+那 Deep Dream 還有一個進階的版本
+
+這個叫做 Deep Style
+
+Deep Style 是讓，今天你 input 一張 image
+
+你 input 一張相片，然後讓 machine 去修改這張圖
+
+讓它有另外一張圖的風格
+
+比如說，讓這個相片，看起來像是吶喊
+
+那得到的結果就是這樣子
+
+這畫的還滿好的
+
+這驚人的好
+
+那這個東西，是怎麼做的呢
+
+這邊就不細講，就列一個 reference 給大家參考
+
+那它這個做的精神是這樣子
+
+你給它、把原來的 image
+
+丟給 CNN，然後得到 CNN 的 filter 的 output
+
+CNN 的 filter 的 output
+
+代表這一張 image 裡面有甚麼樣的 content
+
+然後，接下來你把吶喊這張圖
+
+也丟到 CNN 裡面
+
+也得到 filter 的 output
+
+但是，這個時候我們考慮的不是
+
+filter output 的 absolute 的 value
+
+我們並不在意一個 filter output 的 value 是什麼
+
+而是在意 filter 和 filter 之間 output 的 correlation
+
+那這個 correlation 代表了一張 image 的 style
+
+接下來，你就用同個 CNN
+
+找一張 image，這張 image 呢
+
+它的 content 像左邊這張相片
+
+比如說，這張 image 它的 filter output 的 value
+
+像左邊這張相片
+
+同時呢，這張 image 的 style
+
+像右邊這張相片
+
+所謂的 style 像右邊這張相片是
+
+你這個 image output 的 filter 間的 correlation
+
+像右邊這張相片
+
+那你找一張 image，同時可以
+
+maximize 左邊這個東西，
+也可以 maximize 右邊這個東西
+
+那你得到的結果，就是像這樣子的一個圖
+
+那你用的就是，我們剛才講的 gradient descent 的方法
+
+找一張 image
+
+maximize 這兩個 criteria 的結果，就是左邊這個圖
+
+那我們現在知道說，CNN 可以被應用在很多不同的
+
+應用上，不是只有影像處理
+
+比如說，CNN 現在有一個非常
+
+知名的應用，就是用在下圍棋上面
+
+為甚麼 CNN 可以用在下圍棋上面呢
+
+我們知道說，你要讓
+
+machine 來下圍棋，你不見得要用 CNN
+
+其實，一般 typical 的 neural network
+
+也可以幫我們做到這件事情
+
+你只要 learn 一個 network，也就是找一個 function
+
+它的 input 是棋盤，output 是棋盤上的位置
+
+也就是說，你下一步根據這個棋盤的盤勢
+
+如果你下一步要落子的話
+
+你應該落子的位置
+
+你其實就可以讓 machine 學會下圍棋了
+
+所以，你其實用 fully connected 的 feedforward network
+
+也可以幫我們做到讓 machine 下圍棋這件事情
+
+也就是說，你只要認知告訴它說 input
+
+是一個 19*19 的 vector
+
+vector 的每一個 dimension 對應到
+
+棋盤上的某一個位置
+
+如果那一個位置有一個黑子的話，就是 1
+
+如果有一個白子的話，就是 -1
+
+反之呢，就是 0
+
+如果你把棋盤描述成一個 19*19 的 vector
+
+丟到一個 fully connected 的 feedforward network
+
+output 也是 19*19 個 dimension
+
+每一個 dimension 對應到棋盤上的一個位置
+
+那 machine 就可以學會下圍棋了
+
+但是，實際上如果我們今天在這邊採用
+
+CNN 的話
+
+我們會得到更好的 performance
+
+採用 CNN 是甚麼意思呢？
+
+我們之前舉的例子都是把 CNN 用在影像上面
+
+也就是 input 是一個 matrix
+
+所以，現在你其實只要把 19*19 的 vector
+
+表示成一個 19*19 的 matrix
+
+一個棋盤可以很自然地表示成一個 19*19 的 matrix
+
+對 CNN 來說，就是把它當成一個 image 來看
+
+然後，再讓它 output 下一步要落子的位置
+
+就結束了
+
+那它 training 的 process 呢
+
+是這個樣子的
+
+這個我們講過，你就蒐集很多棋譜
+
+比如說這個是進藤光和社青春的棋譜
+
+初手下在 5 之五，然後再下在天元，再下在 5 之五
+
+接下來，你就告訴 machine 說，看到落子在 5 之五
+
+CNN 的 output 就是天元的地方是 1，其他的 output 是 0
+
+看到 5 之五和天元都有子
+
+那你的 output 就是 5 之五的地方是 1
+
+其他都是 0，這個是
+
+supervised 的部分，那其實呢
+
+AlphaGo 還有 reinforcement learning 的部分
+
+那這個我們就之後再講
+
+我們知道說，大家都是
+
+大家都說得一口 AlphaGo 啦
+
+大家都是懂懂懂這樣子
+
+自從 AlphaGo 用了 CNN 以後
+
+大家都覺得說，好像 CNN 應該很厲害
+
+所以有時候，如果你沒有用 CNN 來處理你的問題
+
+人家就會問你說，比如你去面試的時候
+
+你的碩士論文裡面沒有用 CNN 來處理問題
+
+口試的人可能不知道 CNN 是甚麼
+
+但是，他就會問你說為什麼不用 CNN 呢
+
+CN N 不是比較強嗎？
+
+這個時候你就可以嗆爆他這樣子
+
+甚麼時候我們可以用 CNN 呢
+
+你要有 image 該有的那些特性
+
+我們之前在講 CNN 開頭的時候，我們有說，根據
+
+3 個觀察，所以我們設計出了 CNN 這樣的 network 架構
+
+它在處理 image 的時候
+
+是特別有效的
+
+那為甚麼這樣子的架構，也同時可以用在
+
+圍棋上面呢
+
+那是因為圍棋有一些特性，和影像處理是很相似的
+
+第一個是
+
+我們說，在 image 上面
+
+有一些 pattern 是比整張 image 還要小的多
+
+比如說，鳥的喙是比整張 image 還要小的多
+
+但是，你只要看到一小個部分，你就會知道說
+
+它是不是鳥的喙
+
+在圍棋上，可能也有同樣的現象
+
+我對圍棋知道得很少
+
+知道的知識都沒有超過棋靈王所教我的範圍
+
+但是我也知道說，比如說，這個東西、一個白子
+
+被 3 個黑子圍住，這個叫做叫吃
+
+如果黑子現在落在這邊，就可以把白子提走
+
+那白子要接在這邊，才不會被提走
+
+總之，這個是一個 pattern，你看到這個 pattern 應該會
+
+做一些應收，做一些相應的事情
+
+比如說，你會落子在這個地方
+
+那現在你只需要看這個小小的範圍
+
+你就可以偵測說，這個白子是不是屬於被叫吃的狀態
+
+你不需要看整個棋盤，才知道這件事情
+
+所以，這件事情跟 image 是有同樣的性質
+
+那在 AlphaGo 裡面，它第一個 layer 的 filter
+
+其實就是用 5*5 的 filter
+
+顯然做這個設計的人，覺得圍棋上最基本的 pattern
+
+可能都是在 5*5 的範圍內
+
+就可以被偵測出來
+
+並不需要看整個棋盤
+
+才能夠知道這件事情
+
+接下來，我們說 image 還有一個特性是，同樣的 pattern
+
+會出現在不同的 region，而它們代表的是同樣的意義
+
+在圍棋上，也可能有同樣的現象
+
+像這個叫吃的 pattern，它可以出現在棋盤的左上角
+
+也可以出現在右下角
+
+它們都是叫吃，它們都代表了同樣的意義
+
+這些同樣的 pattern，出現在不同的位置
+
+它們也都代表同樣的意義
+
+所以，你可以用同一個 detector
+
+來處理這些在不同位置的同樣的 pattern
+
+所以，對圍棋來說呢
+
+它在第一個 observation 和第二個 observation
+
+是有這個 image 的特性的
+
+但是，讓我沒有辦法相通的地方，就是第三點
+
+我們說，我們可以對一個 image
+
+做 subsampling，你拿掉奇數行、偶數列的 pixel
+
+把 image 變成原來的 1/4 的大小
+
+但是，也不會影響你看這張圖的樣子
+
+但是，因為基於這個觀察，所以
+
+有 Max pooling 這個 layer
+
+但是，對圍棋來說
+
+你可以做這件事情嗎？
+
+比如說，你可以對一個棋盤丟掉奇數行和偶數列
+
+它還是同一個函式嗎？
+
+顯然是不是的
+
+就算我對圍棋甚麼都不懂，我也覺得說
+
+這顯然不 work，那這件事就讓我相當地困擾
+
+那我看網路上一些文章，有一些人覺得說
+
+因為 AlphaGo 裡面可能有用了 Max pooling 這樣的架構
+
+它是用 CNN ，所以裡面可能有 Max pooling 這樣的架構
+
+所以，或許這是一個
+
+它的弱點
+
+你要針對這個弱點取攻擊它，就可以擊敗它
+
+但是，AlphaGo 很強，它可能比李世乭還強
+
+它可能比高永夏還強了，所以
+
+它顯然沒有這個顯而易見的弱點了
+
+它顯然沒有這個顯而易見的弱點了，所以
+
+到底是怎麼回事呢，我就覺得相當地困惑
+
+有一天，我突然領悟到
+
+會不會在這個 AlphaGo 的 CNN 裡面
+
+有甚麼特別的地方呢
+
+我相信說，大家都讀過 AlphaGo 的 paper
+
+這個 paper 也沒幾頁，好像就 6 頁吧，一下就看完了
+
+但是，它後面有一個很長的附錄
+
+那我們一般都是不看附錄的
+
+它的 paper 裡面，從來沒有
+
+它只說了一句說，它用 CNN
+
+它沒有在正文裡面，仔細地描述它 CNN 的架構
+
+會不會實際上它 CNN 的架構裡面有甚麼
+
+特別的玄機呢
+
+所以，就讀了一下它的附錄
+
+附錄裡面，它描述了它 neural network 的 structure
+
+它是這樣說的
+
+它的 input 是一個 19*19*48 的 image
+
+19*19 我們可以理解，因為一個棋盤就是 19*19
+
+48 是怎麼來的呢
+
+對 AlphaGo 來說呢
+
+它把每一個位置都用 48 個 value 來描述它
+
+它把每一個位置
+
+都用 48 個 value 來描述它
+
+那這裡面的 value 呢
+
+就我們本來說，我們只要在一個位置描述說
+
+它是不是白子，有沒有黑子就可以了
+
+那其實 AlphaGo 它有加上了 domain knowledge
+
+它不只是說有一個位置，它有沒有白子或黑子
+
+它還會看說，這個位置是不是處於
+
+叫吃的狀態呢，等等
+
+所以，我們如果讀完這段的話，你會發現說
+
+第一個 layer，它有做 zero padding
+
+也就是說，它把原來 19*19 的 image
+
+外圍補上更多 0，讓它變成一張
+
+23*23 的 image
+
+然後，它的第一個 layer 用的是
+
+5*5 的 filter
+
+總共有 k 個 filter，k 的值呢
+
+它在 paper 裡面用的是 192
+
+因為它有試 128 跟 256
+
+接下來，它的 stride 是設 1
+
+然後，它有用 ReLU 的 activation function
+
+接下來，它有 2~12 層
+
+apply 5*5 的 filter 以後，它變成 21*21 的 image
+
+那接下來的 filter 都是 3*3 的 filter，它的 stride
+
+都是 1，然後
+
+你就會發現說，其實 AlphaGo 是沒有用 Max pooling 的
+
+有沒有很神奇呢
+
+它是沒有用 Max Pooling 的
+
+所以，這個 neural network 架構的設計
+
+是這個應用之道，存乎一心
+
+雖然說，在這個 image 裡面
+
+我們都會用 Max pooling 這個架構
+
+但是，針對圍棋的特性來
+設計 neural network 的架構的時候
+
+我們是不需要 Max pooling 這個架構的
+
+所以在 AlphaGo 裡面，它沒有用 Max pooling 這個架構
+
+並不是疏失了甚麼之類的
+
+而是，根據圍棋的特性，我們本來就不需要再
+
+圍棋的 CNN 裡面，用 Max pooling 這樣的架構
+
+那其實 CNN
+
+也可以被用在其他的、很多的 task 裡面
+
+比如說，CNN 也被用在影像處理上
+
+那 CNN 也被用在影像處理上
+
+舉例來說，這個是一段聲音
+
+你可以把一段聲音表示成所謂的 spectrogram
+
+所謂 spectrogram 的意思是說
+
+這個橫軸是時間
+
+這個縱軸是那一段時間裡面
+
+聲音的頻率
+
+比如說，假設我們看這一段時間
+
+這個偏紅色就代表說，在那一段時間裡面
+
+那一個頻率的 energy 是比較大的
+
+那在這一段時間裡面，這一個頻率跟這一個頻率
+
+跟這一個頻率的能量是比較高的
+
+那這一張 image，其實是我說
+
+你好，然後看到的 spectrogram
+
+所以，這個東西是你，這個東西是好
+
+如果有透過訓練的人呢，它其實可以看這張 image
+
+就知道說這句話的內容是甚麼
+
+我之前在 MIT 做 postdoc 的時候
+
+MIT 的語音處理實驗室據說是
+
+最早發明 spectrogram reading 
+
+的團隊，所謂 spectrogram reading 的意思就是
+
+練習看這個頻譜，就知道說
+
+它裡面內容是甚麼
+
+然後，他們經年累月的在練習這件事情
+
+就練習的很強
+
+他們每周的 group meeting 都要練習做 spectrogram
+
+就是老師會拿出一張 spectrogram
+
+然後，大家就要判讀這張 spectrogram 的內容
+
+老師就會指著一段說
+
+這個 spectrogram，這一段聲音
+
+你覺得它是哪一個 phone 呢？
+
+大家把一段聲音
+
+phone 就是類似音標的東西
+
+大家把一段聲音的音標解譯出來以後
+
+再套 language model 上去，把它解譯成文字
+
+是這樣，通常都會答對
+
+那你可能會覺得說
+
+他們練到最後可能可以看一張 image
+
+秒反映說它的結果是甚麼
+
+那其實沒有辦法
+
+通常這個解譯的過程大概要花一個小時
+
+這個東西就像念球遊戲之類的，是個很厲害的技術
+
+既然人可以看這個 image，就知道說
+
+它是甚麼樣的聲音訊號
+
+甚麼樣的 phoneme
+
+我們也可以讓機器把這個 spectrogram
+
+就當作一張 image
+
+然後，用 CNN 來判斷說，input 這張 image
+
+它是對應甚麼樣的聲音訊號
+
+那這邊通常判斷的單位，比如說是
+
+phoneme，類似音標這樣子的單位
+
+也有可能是 phoneme之類的
+
+但是，這邊神奇的地方就是
+
+當我們把一段 spectrogram
+
+當作 image，丟到 CNN 裡面的時候
+
+在語音上，我們通常只考慮
+
+在 frequency 方向上移動的 filter
+
+也就是說，我們的 filter 是這樣，是長方形的
+
+是長方形的
+
+它的寬，就跟我們 image 的寬是一樣的
+
+那我們在移動 filter 的時候呢
+
+我們是移這個方向
+
+我們只移這個方向
+
+為甚麼是這樣子呢？
+
+當然也有人試過說，把 filter 移時間的方向會怎樣呢
+
+結果是沒有太大的幫助
+
+會這樣的原因，我覺得是因為在語音裡面
+
+這個 CNN 的 output 後面都還會再接別的東西
+
+比如說，再接 LSTM 阿，等等
+
+他們都已經有考慮 typical 的 information 
+
+所以你在 CNN 裡面，你再考慮一次時間的 information
+
+其實，沒有甚麼特別的幫助
+
+但是，為甚麼在頻率上的 filter 有幫助呢
+
+想想看，我們說我們用 filter 的目的
+
+是為了要 detect 說同樣的 pattern
+
+出現在不同的 region
+
+我們都可以用同一個 filter 把它 detect 出來
+
+但在聲音訊號上面
+
+雖然，比如說，男生跟女生發同樣的聲音
+
+男生跟女生同樣說你好
+
+看起來這個 spectrogram 是非常不一樣的
+
+但實際上他們的不同，只是一個頻率的 shift 而已
+
+男生說的你好跟女生說的你好
+
+他們的 pattern 其實是一樣的
+
+比如說，你看這個 spectrogram 變化的情形
+
+其實，可能是一樣的
+
+那男生跟女生的差別，可能只是頻率上的 shift 而已
+
+你就只是把這個 pattern
+
+放在 image 上的不同位置而已
+
+所以，今天我們把 filter
+
+在 frequency 的 direction 上移動是有效的
+
+但是，在 time domain 上的移動
+
+是沒有必要，是沒有太大幫助的
+
+所以，這又是另外一個例子，就是
+
+當你把 CNN 用在另一個 application 的時候呢
+
+你永遠要想一想說
+
+這個 application 的特性是什麼
+
+而根據那個 application 的特性
+
+來 design 你的 network 的 structure
+
+那我們也知道說，CNN 會
+
+被用在文字處理上面
+
+這個是從 paper 上面截下來的圖
+
+在文字處理上面，假設你 input 一張
+
+一個 word sequence，假設你要做的事情是
+
+讓 machine 偵測說，這個 word sequence
+
+它代表的是 positive 的意思還是 negative 的意思
+
+首先，input 一個 word sequence
+
+你把這個 word sequence 裡面的每一個 word
+
+都用一個 vector 來表示
+
+那這邊的每一個 vector
+
+它代表的這個 word，它本身的 semantic
+
+那如果兩個 word 本身涵義越接近的話呢
+
+他們的 vector 在高維的空間上
+
+就越接近，這個東西叫做 word embedding
+
+那如果你不知道 word embedding 是什麼的話
+
+也沒有關係，你就記得說現在每一個
+
+word 都會用一個 vector 表示
+
+都會用一個 vector 表示
+
+當你把每一個 word 都用一個 vector 來表示的時候
+
+你把一個 sentence 裡面所有的 word 排再一起
+
+它就變成一個 image
+
+它就變成一張 image
+
+那你可以把 CNN
+
+套用在這個 image 上面
+
+怎麼做呢？
+
+當我們要把 CNN 用在文字處理上的時候
+
+你的 filter 其實是長這樣子
+
+你的 filter 是長這個樣子
+
+它的高跟 image 的高
+
+是一樣的
+
+然後，你把你的 filter
+
+沿著 word 的順序
+
+沿著句子裡面詞彙的順序來移動
+
+然後，你就會得到一個 vector
+
+不同的 filter 就會得到不同的 vector
+
+然後，接下來做 Max pooling
+
+把 Max pooling 的結果丟到 fully connected layer 裡面
+
+你就會得到最後的 output
+
+那在文字處理上呢
+
+這個 filter 只在時間的序列上移動
+
+而不在這個 embedding 的 dimension 上移動
+
+你不會設計 filter，它移動的方向是
+
+這個方向的
+
+為甚麼呢？如果你有
+
+做過類似的 task
+
+如果你有做過文字處理的 task
+
+知道這個 embedding 的 dimension 指的是甚麼的話
+
+知道 word vector 指的是甚麼的話
+
+你就會知道說
+
+其實在這個方向上移動，是不 make sense 的
+
+因為在 word embedding 裡面呢
+
+每一個 dimension 的含意其實是獨立的
+
+所以，如果當我們今天使用 CNN 的時候
+
+你會假設說，第二個 dimension
+
+跟第一個 dimension 有某種特別的關係
+
+那第四個 dimension 跟第五個 dimension
+
+有某種特別的關係
+
+而這個關係，我們是可以被
+
+如果這個關係是重複的
+
+這個同樣的 pattern 出現在不同的位置
+
+它們代表的是同樣的意思
+
+但是，在 word embedding 裡面呢
+
+不同 dimension，它們是 independent ，它們是獨立的
+
+所以，在這個方向上面
+
+移動 filter，是沒有意義的
+
+所以，如果你在做文字處理的時候
+
+你只會在 sentence 的順序上面移動 filter
+
+而不會在 word embedding 的 dimension 去移動 filter
+
+所以，這個又是另外一個例子
+
+雖然，大家覺得 CNN 很 powerful
+
+你可以用在各個不同的地方
+
+但是，你用在一個新的 task 的時候
+
+你要想一想你的新的 task
+
+在設計 CNN 的架構的時候，你要怎麼做
+
+如果你想要知道更多有關 Regularization 的事情的話
+
+以下是一些 reference
+
+我們剛才看到說，如果你想要用
+
+Deep Dream 的方法
+
+來讓 machine 自動產生一個 digit 這件事情
+
+是不太成功的
+
+但是，有很多其他的方法
+
+可以讓 machine 畫出非常清晰的圖
+
+而其他方法可以讓 machine 看過 MNIST 裡面的那些
+
+數字以後，就學會畫出以假亂真的數字
+
+這邊列了幾個方法，比如說有 PixelRNN
+
+或者是 VAE, GAN，給大家參考
 
 臺灣大學人工智慧中心
 科技部人工智慧技術暨全幅健康照護聯合研究中心
