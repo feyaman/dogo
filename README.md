@@ -26,11 +26,11 @@ ML Lecture 14: Unsupervised Learning - Word Embedding
 
 15, 16, 17  
 
-ML Lecture 15: Unsupervised Learning - Neighbor Embedding <Done>
+ML Lecture 15: Unsupervised Learning - Neighbor Embedding [Done]
 
 ML Lecture 16: Unsupervised Learning - Auto-encoder
 
-ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I),
+ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I)
 
 
 ## 1. 批踢踢推文產生器
