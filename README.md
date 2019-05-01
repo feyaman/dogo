@@ -28,7 +28,7 @@ ML Lecture 14: Unsupervised Learning - Word Embedding
 
 ML Lecture 15: Unsupervised Learning - Neighbor Embedding [Done]
 
-ML Lecture 16: Unsupervised Learning - Auto-encoder
+ML Lecture 16: Unsupervised Learning - Auto-encoder [Done]
 
 ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I)
 
