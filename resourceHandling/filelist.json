@@ -1,0 +1,42 @@
+[{
+    "Title": "Lecture 11",
+    "Description": "Why Deep?",
+    "Links": [
+        "https://github.com/TAITKit/dogo",
+        "https://github.com/TAITKit/dogo"
+    ],
+    "Code": [
+        "https://github.com/TAITKit/dogo",
+        "https://github.com/TAITKit/dogo",
+        "https://github.com/TAITKit/dogo"
+    ],
+    "Handout": "ML11.html"
+},
+{
+    "Title": "Lecture 15",
+    "Description": "Unsupervised Learning - Neighbor Embedding",
+    "Links": [
+        "https://github.com/TAITKit/dogo",
+        "https://github.com/TAITKit/dogo"
+    ],
+    "Code": [
+        "https://github.com/TAITKit/dogo",
+        "https://github.com/TAITKit/dogo",
+        "https://github.com/TAITKit/dogo"
+    ],
+    "Handout": "ML15.html"
+},
+{
+    "Title": "Lecture 16",
+    "Description": "Unsupervised Learning - Deep Auto-encoder",
+    "Links": [
+        "https://github.com/TAITKit/dogo",
+        "https://github.com/TAITKit/dogo"
+    ],
+    "Code": [
+        "https://github.com/TAITKit/dogo",
+        "https://github.com/TAITKit/dogo",
+        "https://github.com/TAITKit/dogo"
+    ],
+    "Handout": "ML16.html"
+}]
