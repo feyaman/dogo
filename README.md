@@ -16,7 +16,7 @@ ML Lecture 12: Semi-supervised
 
 ##### 青邑
 
-13, 14 : 
+13, 14, 21 : 
 
 ML Lecture 13: Unsupervised Learning - Linear Methods
 
