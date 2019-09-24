@@ -14,11 +14,13 @@ http://ai.ntu.edu.tw/aho/
 
 ##### 李衡
 
-11, 12  : 
+11, 12 ,18 : 
 
 ML Lecture 11: Why Deep?
 
 ML Lecture 12: Semi-supervised
+
+ML Lecture 18: Unsupervidsed Learning Generation  
 
 ##### 青邑
 
