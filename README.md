@@ -20,7 +20,7 @@ ML Lecture 11: Why Deep?
 
 ML Lecture 12: Semi-supervised
 
-ML Lecture 18: Unsupervidsed Learning Generation  
+ML Lecture 18: Unsupervised Learning - Deep Generative Model (Part II)
 
 ##### 青邑
 
