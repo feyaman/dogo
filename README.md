@@ -7,18 +7,24 @@ ai.ntu.edu.tw/resource
 http://ai.ntu.edu.tw/aho/
 
 ##### 家維
-
+10. Tips for Deep Learning
+11. CNN (?)
 
 ##### 蕭縈瀅
-
+4. Gradient Descent 
+5. Classification:Probabilstic Generative Model 
+6. Classification:Logistic Regression  
+7. Introduction of Deep Learning (OK)
+8. Backpropagation (OK)
+9. Hello_World_of_Deep_Learning (OK)
 
 ##### 李衡
 
-11, 12 ,18 : 
+11, 12 ,18 : (?)
 
-ML Lecture 11: Why Deep?
+ML Lecture 12: Why Deep?  (?)
 
-ML Lecture 12: Semi-supervised
+ML Lecture 13: Semi-supervised (?)
 
 ML Lecture 18: Unsupervised Learning - Deep Generative Model (Part II)
 
