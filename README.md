@@ -22,11 +22,11 @@ http://ai.ntu.edu.tw/aho/
 
 11, 12 ,18 : (?)
 
-ML Lecture 12: Why Deep?  (?)
+ML Lecture 12: Why Deep?  (OK)
 
-ML Lecture 13: Semi-supervised (?)
+ML Lecture 13: Semi-supervised (OK)
 
-ML Lecture 18: Unsupervised Learning - Deep Generative Model (Part II)
+ML Lecture 18: Unsupervised Learning - Deep Generative Model (Part II) - 
 
 ##### 青邑
 
@@ -44,7 +44,7 @@ ML Lecture 15: Unsupervised Learning - Neighbor Embedding [Done]
 
 ML Lecture 16: Unsupervised Learning - Auto-encoder [Done]
 
-ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I)
+ML Lecture 17: Unsupervised Learning - Deep Generative Model (Part I) - (OK)
 
 
 ## 1. 批踢踢推文產生器
