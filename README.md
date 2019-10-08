@@ -20,11 +20,11 @@ http://ai.ntu.edu.tw/aho/
 
 ##### 李衡
 
-11, 12 ,18 : (?)
+11, 12 ,18 : 
 
-ML Lecture 12: Why Deep?  (OK)
+ML Lecture 11: Why Deep?  (OK)
 
-ML Lecture 13: Semi-supervised (OK)
+ML Lecture 12: Semi-supervised (OK)
 
 ML Lecture 18: Unsupervised Learning - Deep Generative Model (Part II) - 
 
