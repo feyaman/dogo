@@ -32,9 +32,11 @@ ML Lecture 18: Unsupervised Learning - Deep Generative Model (Part II) -
 
 13, 14, 21 : 
 
-ML Lecture 13: Unsupervised Learning - Linear Methods
+ML Lecture 13: Unsupervised Learning - Linear Methods (OK)
 
-ML Lecture 14: Unsupervised Learning - Word Embedding
+ML Lecture 14: Unsupervised Learning - Word Embedding (OK) 
+
+ML Lecture 21: Matrix Factorization 
 
 ##### 栢淵
 
