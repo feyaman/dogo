@@ -66,8 +66,8 @@
     
   - Case 2：圖形的右下角有一些 output 遠大於 1 的 error 的點
     
-           > 此時，Regression 的 output 為紫色的線，但對 Classification 而言，綠色分界線才好
-           > ==> Regression 得出的結果 和 Classification 的結果相去甚遠
+    > 此時，Regression 的 output 為紫色的線，但對 Classification 而言，綠色分界線才好
+    > ==> Regression 得出的結果 和 Classification 的結果相去甚遠
            
   - 結論：<u>Regression 定義function 好壞的方式對 Classification **不適用**</u>，將無法得出好的結果
 
