@@ -24,7 +24,7 @@
 
 ---
 
-###How to Express a Pokemon？
+### How to Express a Pokemon？
 
 - 將寶可夢 **數值化** 作為 輸入 
 
@@ -48,7 +48,7 @@
 
 ---
 
-###How to do Classification？
+### How to do Classification？
 
 - 收集 data：例如將編號400以下的當作 training data，編號400以上的當作 testing data（共800隻的情況）
 
@@ -65,9 +65,8 @@
      ==> Regression 可得出和 Classification 相似的結果
     
   - Case 2：圖形的右下角有一些 output 遠大於 1 的 error 的點
-    
-           > 此時，Regression 的 output 為紫色的線，但對 Classification 而言，綠色分界線才好
-           > ==> Regression 得出的結果 和 Classification 的結果相去甚遠
+    > 此時，Regression 的 output 為紫色的線，但對 Classification 而言，綠色分界線才好
+      Regression 得出的結果 和 Classification 的結果相去甚遠
            
   - 結論：<u>Regression 定義function 好壞的方式對 Classification **不適用**</u>，將無法得出好的結果
 
@@ -75,9 +74,9 @@
 
 - Classification 理想解法：
 
-  > **$f$** 為我們要找的 classification function(model)
-  > **$g$** 為 $f$ 中內建的一個 function
-  > **$L(f)$** 為 loss function，即 function $f$ 在 training data 上 predict 錯誤的次數總和
+  > $f$ 為我們要找的 classification function(model)
+    $g$ 為 $f$ 中內建的一個 function
+    $L(f)$ 為 loss function，即 function $f$ 在 training data 上 predict 錯誤的次數總和
 
 <img src="http://ai.ntu.edu.tw/aho/JPG/Classification-Probabilistic_Generative_Model/Classification-Probabilistic_Generative_Model_5.jpg" width="70%">
 
