@@ -7,16 +7,17 @@ ai.ntu.edu.tw/resource
 http://ai.ntu.edu.tw/aho/
 
 ##### 家維
-10. Tips for Deep Learning
-11. CNN (?)
+9. Tips for Deep Learning
+10. CNN (X)
 
 ##### 蕭縈瀅
-4. Gradient Descent (OK)
-5. Classification:Probabilstic Generative Model 
-6. Classification:Logistic Regression  
-7. Introduction of Deep Learning (OK)
-8. Backpropagation (OK)
-9. Hello_World_of_Deep_Learning (OK)
+3-1/3-2/3-3. Gradient Descent 
+4. Classification:Probabilstic Generative Model (OK)
+5. Classification:Logistic Regression  
+6. Introduction of Deep Learning (OK)
+7. Backpropagation (OK)
+8-1. Hello_World_of_Deep_Learning (OK) 
+ML Lecture 10: Convolutional Neural Network 
 
 ##### 李衡
 
