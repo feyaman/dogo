@@ -11,7 +11,7 @@ http://ai.ntu.edu.tw/aho/
 10. CNN (X)
 
 ##### 蕭縈瀅
-3-1.3-2.3-3. Gradient Descent 
+3. Gradient Descent 
 4. Classification:Probabilstic Generative Model (OK)
 5. Classification:Logistic Regression  
 6. Introduction of Deep Learning (OK)
