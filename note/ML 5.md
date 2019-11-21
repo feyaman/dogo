@@ -6,10 +6,10 @@
 
 - **Posterior Probability：**
 
-  > $P_{w,b}(C_1|x) = σ(z)$，**由 $z$ 代入 $sigmod function$ 後得**
-  > $z=w*x+b$，$z$ **由 $w$ 和 $b$ 所控制產生**
+  > $$P_{w,b}(C_1|x) = σ(z)$$，**由 $$z$$ 代入 $$sigmod function$$ 後得**
+    $$z=w*x+b$$，$$z$$ **由 $$w$$ 和 $$b$$ 所控制產生**
 
-  **==>** **所有 $w$ 和 $b$ 可產生的 $function$ 所成的集合**，就是一個 <u>**function set**</u>
+  **==>** **所有 $$w$$ 和 $$b$$ 可產生的 $$function$$ 所成的集合**，就是一個 <u>**function set**</u>
 
 <img src="http://ai.ntu.edu.tw/aho/JPG/Classification-Logistic_Regression/Classification-Logistic_Regression_2.jpg" width="70%">
 
