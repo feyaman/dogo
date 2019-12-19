@@ -11,13 +11,24 @@ http://ai.ntu.edu.tw/aho/
 10. CNN (X)
 
 ##### 蕭縈瀅
+
+1. Regression - Case Study
+
+2. Where does the error come from?
+
 3. Gradient Descent 
+
 4. Classification:Probabilstic Generative Model (OK)
-5. Classification:Logistic Regression  
+
+5. Classification:Logistic Regression  (OK)
+
 6. Introduction of Deep Learning (OK)
+
 7. Backpropagation (OK)
+
 8-1. Hello_World_of_Deep_Learning (OK) 
-ML Lecture 10: Convolutional Neural Network 
+
+10: Convolutional Neural Network (OK)
 
 ##### 李衡
 
