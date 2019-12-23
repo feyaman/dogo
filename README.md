@@ -1,5 +1,9 @@
 # DOGO
 
+https://taitk.org/api/algorithms
+https://taitk.org/api/algorithms/37
+
+
 ## Link
 
 ai.ntu.edu.tw/resource
